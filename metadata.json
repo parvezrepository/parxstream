@@ -1,0 +1,7 @@
+{
+  "name": "CineStream - Movie & TV Streaming Hub",
+  "description": "Modern streaming web app featuring trending movies, TV series, multi-server streaming player, trailer embeds, watchlist, and live TMDB search.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
