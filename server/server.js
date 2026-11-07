@@ -32,13 +32,15 @@ app.use((req, res, next) => {
   next();
 });
 
+const apiRouter = express.Router();
+
 // Health check
-app.get('/api/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// 1. GET /api/providers -> Returns all enabled providers from manifest.json
-app.get('/api/providers', (req, res) => {
+// 1. GET /providers -> Returns all enabled providers from manifest.json
+apiRouter.get('/providers', (req, res) => {
   try {
     const providers = getEnabledProviders();
     res.json(providers);
@@ -48,8 +50,8 @@ app.get('/api/providers', (req, res) => {
   }
 });
 
-// 2. GET /api/providers/:provider/catalog -> Returns { catalog, genres }
-app.get('/api/providers/:provider/catalog', async (req, res) => {
+// 2. GET /providers/:provider/catalog -> Returns { catalog, genres }
+apiRouter.get('/providers/:provider/catalog', async (req, res) => {
   const { provider } = req.params;
   try {
     const result = await getProviderCatalog(provider);
@@ -60,8 +62,8 @@ app.get('/api/providers/:provider/catalog', async (req, res) => {
   }
 });
 
-// 3. GET /api/providers/:provider/posts?filter=...&page=1
-app.get('/api/providers/:provider/posts', async (req, res) => {
+// 3. GET /providers/:provider/posts?filter=...&page=1
+apiRouter.get('/providers/:provider/posts', async (req, res) => {
   const { provider } = req.params;
   const filter = req.query.filter || '';
   const page = parseInt(req.query.page, 10) || 1;
@@ -75,8 +77,8 @@ app.get('/api/providers/:provider/posts', async (req, res) => {
   }
 });
 
-// 4. GET /api/providers/:provider/search?q=...&page=1
-app.get('/api/providers/:provider/search', async (req, res) => {
+// 4. GET /providers/:provider/search?q=...&page=1
+apiRouter.get('/providers/:provider/search', async (req, res) => {
   const { provider } = req.params;
   const q = req.query.q || '';
   const page = parseInt(req.query.page, 10) || 1;
@@ -94,8 +96,8 @@ app.get('/api/providers/:provider/search', async (req, res) => {
   }
 });
 
-// 5. GET /api/providers/:provider/meta?link=...
-app.get('/api/providers/:provider/meta', async (req, res) => {
+// 5. GET /providers/:provider/meta?link=...
+apiRouter.get('/providers/:provider/meta', async (req, res) => {
   const { provider } = req.params;
   const link = req.query.link;
 
@@ -115,8 +117,8 @@ app.get('/api/providers/:provider/meta', async (req, res) => {
   }
 });
 
-// 6. GET /api/providers/:provider/episodes?url=...
-app.get('/api/providers/:provider/episodes', async (req, res) => {
+// 6. GET /providers/:provider/episodes?url=...
+apiRouter.get('/providers/:provider/episodes', async (req, res) => {
   const { provider } = req.params;
   const url = req.query.url;
 
@@ -133,8 +135,8 @@ app.get('/api/providers/:provider/episodes', async (req, res) => {
   }
 });
 
-// 7. GET /api/providers/:provider/stream?link=...&type=...
-app.get('/api/providers/:provider/stream', async (req, res) => {
+// 7. GET /providers/:provider/stream?link=...&type=...
+apiRouter.get('/providers/:provider/stream', async (req, res) => {
   const { provider } = req.params;
   const link = req.query.link;
   const type = req.query.type || 'movie';
@@ -152,8 +154,12 @@ app.get('/api/providers/:provider/stream', async (req, res) => {
   }
 });
 
-// 8. GET /api/proxy?url=...&headers=...
-app.all('/api/proxy', handleProxyRequest);
+// 8. /proxy?url=...&headers=...
+apiRouter.all('/proxy', handleProxyRequest);
+
+// Mount on both /api prefix and root / for robust routing across services and rewrites
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Start server if executed directly
 if (require.main === module) {

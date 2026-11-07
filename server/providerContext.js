@@ -13,7 +13,20 @@ try {
 }
 
 // Load local provider URLs
-const urlsPath = path.resolve(__dirname, '../vega-providers-main/urls.json');
+function resolveUrlsPath() {
+  const candidates = [
+    path.resolve(__dirname, 'vega-providers-main/urls.json'),
+    path.resolve(__dirname, '../vega-providers-main/urls.json'),
+    path.resolve(process.cwd(), 'vega-providers-main/urls.json'),
+    path.resolve(process.cwd(), 'server/vega-providers-main/urls.json')
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return path.resolve(__dirname, '../vega-providers-main/urls.json');
+}
+
+const urlsPath = resolveUrlsPath();
 let localUrls = {};
 try {
   if (fs.existsSync(urlsPath)) {

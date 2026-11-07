@@ -2,8 +2,23 @@ const fs = require('fs');
 const path = require('path');
 const { providerContext } = require('./providerContext');
 
-const rootDir = path.resolve(__dirname, '..');
-const vegaDir = path.resolve(rootDir, 'vega-providers-main');
+function resolveVegaDir() {
+  const candidates = [
+    process.env.VEGA_DIR,
+    path.resolve(__dirname, 'vega-providers-main'),
+    path.resolve(__dirname, '..', 'vega-providers-main'),
+    path.resolve(process.cwd(), 'vega-providers-main'),
+    path.resolve(process.cwd(), 'server', 'vega-providers-main')
+  ];
+  for (const c of candidates) {
+    if (c && fs.existsSync(path.resolve(c, 'manifest.json'))) {
+      return c;
+    }
+  }
+  return path.resolve(__dirname, '..', 'vega-providers-main');
+}
+
+const vegaDir = resolveVegaDir();
 const manifestPath = path.resolve(vegaDir, 'manifest.json');
 const distDir = path.resolve(vegaDir, 'dist');
 
