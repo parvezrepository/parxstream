@@ -1,5 +1,5 @@
 /**
- * Pure business logic for CineStream:
+ * Pure business logic for PARXSTREAM:
  * - Streaming embed URL generation
  * - Watchlist state management
  * - Catalog filtering & search
@@ -91,9 +91,9 @@ export function generateEmbedUrl(
   // 3. AutoEmbed (Zero Sandbox Restriction, frame-ancestors *, Multi-Audio)
   if (server === 'autoembed') {
     if (mediaType === 'tv') {
-      return `https://autoembed.co/tv/tmdb/${tmdbId}-${season}-${episode}`;
+      return `https://autoembed.me/tv/tmdb/${tmdbId}-${season}-${episode}`;
     }
-    return `https://autoembed.co/movie/tmdb/${tmdbId}`;
+    return `https://autoembed.me/movie/tmdb/${tmdbId}`;
   }
 
   // 2. NexStream VIP (Direct API key provided by user)
@@ -143,7 +143,7 @@ export function generateEmbedUrl(
     return `https://www.2embed.cc/embed/${idParam}`;
   }
 
-  return `https://autoembed.co/movie/tmdb/${tmdbId}`;
+  return `https://autoembed.me/movie/tmdb/${tmdbId}`;
 }
 
 /**

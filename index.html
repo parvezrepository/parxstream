@@ -2757,7 +2757,7 @@
               if (endpoint) {
                 const data = await fetchTmdb(endpoint, params);
                 if (data && data.results && data.results.length > 0) {
-                  const forcedType = (viewType === 'movie' || viewType === 'action' || viewType === 'cartoons' || viewType === 'nowPlaying' || viewType === 'bangla' || viewType === 'hindi') ? 'movie' : (viewType === 'tv' || viewType === 'anime' ? 'tv' : undefined);
+                  const forcedType = (viewType === 'movie' || viewType === 'action' || viewType === 'cartoons' || viewType === 'nowPlaying' || viewType === 'bangla' || viewType === 'hindi') ? 'movie' : (viewType === 'tv' ? 'tv' : undefined);
                   newItems = data.results.filter(item => item.poster_path).map(item => ({
                     id: item.id,
                     title: item.title || item.name || 'Untitled',
@@ -3114,10 +3114,27 @@
             media = ALL_DEMO_ITEMS.find(m => String(m.id) === String(id));
           }
 
-          // Accurate detection for TV series
-          const isTv = media
-            ? (media.media_type === 'tv' || !!media.first_air_date || (!!media.name && !media.title) || state.currentTab === 'tv' || state.currentTab === 'anime')
-            : (state.currentTab === 'tv' || state.currentTab === 'anime');
+          // Accurate detection for TV series vs Movies
+          let isTv = false;
+          if (media) {
+            if (media.media_type === 'movie') {
+              isTv = false;
+            } else if (media.media_type === 'tv') {
+              isTv = true;
+            } else if (media.first_air_date && !media.release_date) {
+              isTv = true;
+            } else if (media.release_date && !media.first_air_date) {
+              isTv = false;
+            } else if (media.name && !media.title) {
+              isTv = true;
+            } else if (media.title && !media.name) {
+              isTv = false;
+            } else {
+              isTv = (state.currentTab === 'tv');
+            }
+          } else {
+            isTv = (state.currentTab === 'tv');
+          }
 
           if (!media) {
             media = { id: id, title: 'Selected Title', media_type: isTv ? 'tv' : 'movie', overview: 'Loading details...', poster_path: '', backdrop_path: '', vote_average: 8.0 };
@@ -3279,9 +3296,41 @@
          * Fetches full TMDB details (cast, official trailer, seasons) when API credentials are provided
          */
         async function fetchDeepTmdbDetails(id, isTv) {
-          const endpoint = isTv ? `/tv/${id}` : `/movie/${id}`;
+          let endpoint = isTv ? `/tv/${id}` : `/movie/${id}`;
           try {
-            const fullData = await fetchTmdb(endpoint, { append_to_response: 'credits,videos,external_ids' });
+            let fullData = await fetchTmdb(endpoint, { append_to_response: 'credits,videos,external_ids' }).catch(() => null);
+
+            // Self-healing check: if the initial endpoint returned 404 or missing ID, check opposite type
+            if (!fullData || fullData.status_code === 34 || (!fullData.id && !fullData.title && !fullData.name)) {
+              const altEndpoint = isTv ? `/movie/${id}` : `/tv/${id}`;
+              const altData = await fetchTmdb(altEndpoint, { append_to_response: 'credits,videos,external_ids' }).catch(() => null);
+              if (altData && (altData.id || altData.title || altData.name)) {
+                fullData = altData;
+                isTv = !isTv;
+                state.modalMedia.media_type = isTv ? 'tv' : 'movie';
+                state.modalMedia.title = altData.title || altData.name || state.modalMedia.title;
+
+                const typeBadge = document.getElementById('modalMediaTypeBadge');
+                if (typeBadge) {
+                  typeBadge.textContent = isTv ? 'TV Series' : 'Movie';
+                  typeBadge.className = isTv
+                    ? 'bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded'
+                    : 'bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded';
+                }
+                const tvSelectors = document.getElementById('tvSelectors');
+                if (isTv) {
+                  if (tvSelectors) tvSelectors.classList.remove('hidden');
+                  setupTvSelectors(state.modalMedia, altData.seasons);
+                } else {
+                  if (tvSelectors) tvSelectors.classList.add('hidden');
+                }
+
+                loadStreamPlayer();
+                fetchCineproSourcesForModal(id, isTv, 1, 1);
+              }
+            }
+
+            if (!fullData) return;
 
             // Extract IMDb ID for alternate server mirrors
             if (fullData.external_ids && fullData.external_ids.imdb_id) {
@@ -3526,7 +3575,21 @@
           if (!media) return;
 
           const iframe = document.getElementById('streamIframe');
+          const video = document.getElementById('streamVideoPlayer');
           const loader = document.getElementById('playerLoading');
+
+          // Ensure video player is paused and hidden, iframe is displayed
+          if (video) {
+            try { video.pause(); } catch (e) {}
+            video.removeAttribute('src');
+            video.innerHTML = '';
+            video.classList.add('hidden');
+          }
+          if (state.hlsInstance) {
+            try { state.hlsInstance.destroy(); } catch (e) {}
+            state.hlsInstance = null;
+          }
+          if (iframe) iframe.classList.remove('hidden');
 
           loader.classList.remove('opacity-0');
           loader.classList.remove('pointer-events-none');
@@ -3551,11 +3614,11 @@
               streamUrl = `https://vidsrc.pm/embed/movie/${tmdbId}`;
             }
           } else if (state.currentServer === 'autoembed') {
-            // AutoEmbed: Direct embed
+            // AutoEmbed: Direct embed & Multi-Language
             if (isTv) {
-              streamUrl = `https://autoembed.co/tv/tmdb/${tmdbId}-${state.selectedSeason}-${state.selectedEpisode}`;
+              streamUrl = `https://autoembed.me/tv/tmdb/${tmdbId}-${state.selectedSeason}-${state.selectedEpisode}`;
             } else {
-              streamUrl = `https://autoembed.co/movie/tmdb/${tmdbId}`;
+              streamUrl = `https://autoembed.me/movie/tmdb/${tmdbId}`;
             }
           } else if (state.currentServer === 'vidsrc_su') {
             // VidSrc SU: Fast clean HTML5 player
@@ -3565,7 +3628,7 @@
               streamUrl = `https://vidsrc.su/embed/movie/${tmdbId}`;
             }
           } else if (state.currentServer === 'twoembed') {
-            // 2Embed: Alternative multi-source player (accepts IMDb or TMDB ID)
+            // 2Embed / VidSrc CC: Alternative multi-source player (accepts IMDb or TMDB ID)
             const idParam = imdbId || tmdbId;
             if (isTv) {
               streamUrl = `https://www.2embed.cc/embedtv/${idParam}&s=${state.selectedSeason}&e=${state.selectedEpisode}`;

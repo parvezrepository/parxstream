@@ -65,8 +65,12 @@ apiRouter.get('/providers/:provider/catalog', async (req, res) => {
     const result = await getProviderCatalog(provider);
     res.json(result);
   } catch (err) {
-    console.error(`Error loading catalog for provider "${provider}":`, err.message);
-    res.status(500).json({ error: 'Failed to load catalog', provider, message: err.message });
+    console.warn(`[PARXSTREAM] Notice loading catalog for provider "${provider}":`, err.message);
+    res.json({
+      catalog: [{ title: 'All Titles', filter: '' }],
+      genres: [],
+      warning: err.message
+    });
   }
 });
 
@@ -80,8 +84,8 @@ apiRouter.get('/providers/:provider/posts', async (req, res) => {
     const posts = await getProviderPosts(provider, filter, page);
     res.json(posts);
   } catch (err) {
-    console.error(`Error loading posts for provider "${provider}":`, err.message);
-    res.status(500).json({ error: 'Failed to load posts', provider, message: err.message });
+    console.warn(`[PARXSTREAM] Notice loading posts for provider "${provider}":`, err.message);
+    res.json([]);
   }
 });
 
@@ -99,8 +103,8 @@ apiRouter.get('/providers/:provider/search', async (req, res) => {
     const posts = await searchProviderPosts(provider, q, page);
     res.json(posts);
   } catch (err) {
-    console.error(`Error searching posts for provider "${provider}":`, err.message);
-    res.status(500).json({ error: 'Failed to search posts', provider, message: err.message });
+    console.warn(`[PARXSTREAM] Notice searching posts for provider "${provider}":`, err.message);
+    res.json([]);
   }
 });
 
@@ -120,8 +124,8 @@ apiRouter.get('/providers/:provider/meta', async (req, res) => {
     }
     res.json(meta);
   } catch (err) {
-    console.error(`Error loading meta for provider "${provider}":`, err.message);
-    res.status(500).json({ error: 'Failed to load metadata', provider, message: err.message });
+    console.warn(`[PARXSTREAM] Notice loading meta for provider "${provider}":`, err.message);
+    res.status(404).json({ error: 'Metadata unavailable', message: err.message });
   }
 });
 
@@ -138,8 +142,8 @@ apiRouter.get('/providers/:provider/episodes', async (req, res) => {
     const episodes = await getProviderEpisodes(provider, url);
     res.json(episodes);
   } catch (err) {
-    console.error(`Error loading episodes for provider "${provider}":`, err.message);
-    res.status(500).json({ error: 'Failed to load episodes', provider, message: err.message });
+    console.warn(`[PARXSTREAM] Notice loading episodes for provider "${provider}":`, err.message);
+    res.json([]);
   }
 });
 
@@ -157,8 +161,8 @@ apiRouter.get('/providers/:provider/stream', async (req, res) => {
     const streams = await getProviderStream(provider, link, type);
     res.json(streams);
   } catch (err) {
-    console.error(`Error resolving stream for provider "${provider}":`, err.message);
-    res.status(500).json({ error: 'Failed to resolve stream', provider, message: err.message });
+    console.warn(`[PARXSTREAM] Notice resolving stream for provider "${provider}":`, err.message);
+    res.json([]);
   }
 });
 
