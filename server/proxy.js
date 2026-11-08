@@ -185,7 +185,26 @@ async function handleProxyRequest(req, res) {
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Accept-Ranges');
 
-    if (response.headers['content-type']) {
+    let responseContentType = (response.headers['content-type'] || 'video/mp4').toLowerCase();
+    const disposition = (response.headers['content-disposition'] || '').toLowerCase();
+    const isVideo = cleanUrl.endsWith('.mkv') ||
+      cleanUrl.endsWith('.mp4') ||
+      cleanUrl.endsWith('.webm') ||
+      cleanUrl.endsWith('.m4v') ||
+      disposition.includes('.mkv') ||
+      disposition.includes('.mp4') ||
+      disposition.includes('.webm') ||
+      responseContentType.includes('video/') ||
+      responseContentType.includes('octet-stream');
+
+    if (isVideo) {
+      if (cleanUrl.endsWith('.webm') || responseContentType.includes('webm')) {
+        res.setHeader('Content-Type', 'video/webm');
+      } else {
+        // Use video/mp4 for MP4, MKV (H264/AAC), and video streams so Chromium and Safari media elements decode natively
+        res.setHeader('Content-Type', 'video/mp4');
+      }
+    } else if (response.headers['content-type']) {
       res.setHeader('Content-Type', response.headers['content-type']);
     }
     if (response.headers['content-length']) {

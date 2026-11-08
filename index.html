@@ -5217,6 +5217,14 @@
           if (!dl) return;
 
           state.activeProviderEpisodeIndex = index;
+          if (state.activeProviderMedia) {
+            state.activeProviderMedia.selectedDirectLinkTitle = dl.title || '';
+          }
+
+          const dlTitleLower = (dl.title || '').toLowerCase();
+          if (dlTitleLower.includes('hindi') || dlTitleLower.includes('dual') || dlTitleLower.includes('dubbed')) {
+            state.preferredAudioLanguage = 'hindi';
+          }
 
           const pills = document.querySelectorAll('#providerLinksList .provider-link-pill');
           pills.forEach((p, idx) => {
@@ -5245,31 +5253,50 @@
               server: 'VidLink Fast HD',
               link: isTv ? `https://vidlink.pro/tv/${id}/${s}/${ep}` : `https://vidlink.pro/movie/${id}`,
               type: 'embed',
-              quality: '1080p Ultra'
+              quality: '1080p Ultra',
+              audioLanguage: 'english'
             },
             {
               server: 'AutoEmbed Pro (Multi-Audio)',
               link: isTv ? `https://autoembed.me/tv/tmdb/${id}-${s}-${ep}` : `https://autoembed.me/movie/tmdb/${id}`,
               type: 'embed',
-              quality: 'Auto HD'
+              quality: 'Auto HD',
+              audioLanguage: 'multi'
+            },
+            {
+              server: 'MultiEmbed (Multi-Audio)',
+              link: isTv ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${ep}` : `https://multiembed.mov/?video_id=${id}&tmdb=1`,
+              type: 'embed',
+              quality: 'Multi HD',
+              audioLanguage: 'multi'
+            },
+            {
+              server: 'SmashyStream (Multi-Audio)',
+              link: isTv ? `https://player.smashy.stream/tv/${id}?s=${s}&e=${ep}` : `https://player.smashy.stream/movie/${id}`,
+              type: 'embed',
+              quality: 'Auto',
+              audioLanguage: 'multi'
             },
             {
               server: 'VidSrc PM (Global Fast)',
               link: isTv ? `https://vidsrc.pm/embed/tv/${id}/${s}/${ep}` : `https://vidsrc.pm/embed/movie/${id}`,
               type: 'embed',
-              quality: '1080p'
+              quality: '1080p',
+              audioLanguage: 'english'
             },
             {
               server: 'VidSrc SU (Fast Server)',
               link: isTv ? `https://vidsrc.su/embed/tv/${id}/${s}/${ep}` : `https://vidsrc.su/embed/movie/${id}`,
               type: 'embed',
-              quality: 'Auto'
+              quality: 'Auto',
+              audioLanguage: 'english'
             },
             {
               server: '2Embed Backup',
               link: isTv ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${ep}` : `https://www.2embed.cc/embed/${id}`,
               type: 'embed',
-              quality: 'HD'
+              quality: 'HD',
+              audioLanguage: 'english'
             }
           ];
         }
@@ -5301,27 +5328,62 @@
               }
             }
 
+            // Check if post title, option pill, or link contains Hindi / Dual Audio
+            const titleContext = (
+              (state.activeProviderMedia?.title || '') + ' ' +
+              (state.activeProviderMedia?.selectedDirectLinkTitle || '') + ' ' +
+              (link || '')
+            ).toLowerCase();
+            const hasHindiRelease = titleContext.includes('hindi') || titleContext.includes('dual') || titleContext.includes('dubbed');
+
+            if (hasHindiRelease && (!state.preferredAudioLanguage || state.preferredAudioLanguage === 'hindi')) {
+              state.preferredAudioLanguage = 'hindi';
+            }
+
             function isBrowserPlayable(stream) {
               if (!stream || !stream.link) return false;
               const l = stream.link.toLowerCase();
               const t = (stream.type || '').toLowerCase();
+              // Archive containers cannot be played in video player
+              if (l.includes('.zip') || l.includes('.rar') || l.includes('.tar') || l.includes('.iso') || l.includes('.7z')) return false;
+              // Web embeds, HLS, MP4, WebM, and MKV video
               if (t === 'embed' || l.includes('embed') || l.includes('/player')) return true;
               if (t === 'm3u8' || l.includes('.m3u8')) return true;
               if (t === 'mp4' || l.includes('.mp4')) return true;
               if (t === 'webm' || l.includes('.webm')) return true;
+              if (t === 'mkv' || l.includes('.mkv')) return true;
+              // Direct CDN streaming links from cloud storage (Google CDN, Cloudflare R2, Pixeldrain, FastDL, Filepress, HubCloud, etc.)
+              if (
+                l.includes('googleusercontent.com') ||
+                l.includes('r2.dev') ||
+                l.includes('pixeldrain.com') ||
+                l.includes('flapdoodle.cyou') ||
+                l.includes('fastdl') ||
+                l.includes('hubcloud') ||
+                l.startsWith('http')
+              ) {
+                return true;
+              }
               return false;
             }
 
             const webStreams = [];
             const mkvStreams = [];
             for (const s of rawStreams) {
-              if (isBrowserPlayable(s)) {
-                webStreams.push(s);
+              const sCopy = { ...s };
+              if (hasHindiRelease) {
+                sCopy.hasHindiAudio = true;
+                if (!sCopy.server.toLowerCase().includes('hindi')) {
+                  sCopy.server = `${sCopy.server} (Hindi Dubbed)`;
+                }
+              }
+              if (isBrowserPlayable(sCopy)) {
+                webStreams.push(sCopy);
               } else {
                 mkvStreams.push({
-                  ...s,
+                  ...sCopy,
                   isDownloadOnly: true,
-                  server: s.server ? `${s.server} (⬇ Download MKV)` : 'Direct MKV (⬇ Download)'
+                  server: `${sCopy.server} (⬇ Download)`
                 });
               }
             }
@@ -5340,7 +5402,11 @@
                 if (cpRes.ok) {
                   const cpSources = await cpRes.json();
                   if (Array.isArray(cpSources) && cpSources.length > 0) {
-                    webStreams.unshift(...cpSources);
+                    if (hasHindiRelease && webStreams.length > 0) {
+                      webStreams.push(...cpSources);
+                    } else {
+                      webStreams.unshift(...cpSources);
+                    }
                   }
                 }
               } catch (cpErr) {
@@ -5351,7 +5417,12 @@
             const fallbackStreams = getEmbedFallbackStreams(state.activeProviderMedia, type);
 
             let finalStreamList = [];
-            if (webStreams.length > 0) {
+            if (hasHindiRelease && webStreams.some(s => s.hasHindiAudio)) {
+              // Hindi-first priority: Direct Hindi CDN streams -> Multi-Audio embeds -> other web streams -> fallback embeds
+              const hindiDirect = webStreams.filter(s => s.hasHindiAudio);
+              const otherWeb = webStreams.filter(s => !s.hasHindiAudio);
+              finalStreamList = [...hindiDirect, ...fallbackStreams, ...otherWeb, ...mkvStreams];
+            } else if (webStreams.length > 0) {
               finalStreamList = [...webStreams, ...fallbackStreams, ...mkvStreams];
             } else {
               finalStreamList = [...fallbackStreams, ...mkvStreams];
@@ -5359,6 +5430,7 @@
 
             state.currentStreamList = finalStreamList;
             renderProviderStreamsUI(finalStreamList);
+            renderUniversalAudioUI();
 
             state.currentStreamIndex = 0;
             playStream(finalStreamList[0]);
@@ -5367,6 +5439,7 @@
             const fallbacks = getEmbedFallbackStreams(state.activeProviderMedia, type);
             state.currentStreamList = fallbacks;
             renderProviderStreamsUI(fallbacks);
+            renderUniversalAudioUI();
             state.currentStreamIndex = 0;
             playStream(fallbacks[0]);
           } finally {
@@ -5392,8 +5465,8 @@
           list.innerHTML = streamList.map((stream, idx) => {
             const serverName = stream.server || `Server ${idx + 1}`;
             const sLower = serverName.toLowerCase();
-            const hasHindi = sLower.includes('hindi') || sLower.includes('dual') || (Array.isArray(stream.audioTracks) && stream.audioTracks.some(a => (a.language || a.label || '').toLowerCase().includes('hin')));
-            const hasEnglish = sLower.includes('english') || sLower.includes('eng') || (Array.isArray(stream.audioTracks) && stream.audioTracks.some(a => (a.language || a.label || '').toLowerCase().includes('eng')));
+            const hasHindi = sLower.includes('hindi') || sLower.includes('dual') || stream.hasHindiAudio || (Array.isArray(stream.audioTracks) && stream.audioTracks.some(a => (a.language || a.label || '').toLowerCase().includes('hin')));
+            const hasEnglish = !hasHindi && (sLower.includes('english') || sLower.includes('eng') || stream.audioLanguage === 'english' || (Array.isArray(stream.audioTracks) && stream.audioTracks.some(a => (a.language || a.label || '').toLowerCase().includes('eng'))));
 
             let audioBadge = '';
             if (hasHindi) {
@@ -5430,13 +5503,14 @@
           if (!stream) return;
 
           if (stream.isDownloadOnly) {
-            showToast('Opening original MKV file for VLC / ExoPlayer download...', 'info');
+            showToast('Opening original video file download link...', 'info');
             window.open(stream.link, '_blank');
             return;
           }
 
           state.currentStreamIndex = index;
           renderProviderStreamsUI(state.currentStreamList);
+          renderUniversalAudioUI();
           showToast(`Switched to: ${stream.server || `Server ${index + 1}`}`, 'info');
           playStream(stream);
         }
@@ -5451,6 +5525,7 @@
             console.log(`[Failover] Auto-switching to next stream server: ${nextStream.server}`);
             showToast(`Server busy. Auto-switching to ${nextStream.server}...`, 'info');
             renderProviderStreamsUI(state.currentStreamList);
+            renderUniversalAudioUI();
             playStream(nextStream);
             return;
           }
@@ -5465,6 +5540,7 @@
             state.currentStreamList = fallbacks;
             state.currentStreamIndex = 0;
             renderProviderStreamsUI(fallbacks);
+            renderUniversalAudioUI();
             playStream(fallbacks[0]);
             return;
           }
@@ -5519,13 +5595,163 @@
         }
 
         /**
+         * Universal Audio UI: Renders interactive audio selector pills (Hindi Dubbed, English, etc.)
+         * for HLS streams, direct Vega dual-audio streams, and embed mirrors.
+         */
+        function renderUniversalAudioUI() {
+          const audioContainer = document.getElementById('providerAudioContainer');
+          const audioList = document.getElementById('providerAudioList');
+          if (!audioContainer || !audioList) return;
+
+          // Case A: HLS instance has embedded audio tracks
+          if (state.hlsInstance && Array.isArray(state.hlsInstance.audioTracks) && state.hlsInstance.audioTracks.length > 0) {
+            audioContainer.classList.remove('hidden');
+            audioList.innerHTML = state.hlsInstance.audioTracks.map((track, idx) => {
+              const label = formatAudioTrackLabel(track);
+              const isSelected = (state.hlsInstance.audioTrack === idx);
+              const isHindi = label.toLowerCase().includes('hindi');
+              const isEnglish = label.toLowerCase().includes('english');
+
+              return `
+                <button
+                  type="button"
+                  onclick="window.app.setAudioTrack(${idx})"
+                  class="audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+                    isSelected
+                      ? 'bg-amber-600 text-white shadow-md ring-1 ring-amber-400'
+                      : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                  }"
+                  title="Switch Audio to ${escapeHtml(label)}"
+                >
+                  <i class="fa-solid fa-volume-high text-[10px] ${isSelected ? 'text-amber-200' : 'text-gray-400'}"></i>
+                  <span>${escapeHtml(label)}</span>
+                  ${isHindi ? '<span class="bg-orange-500/30 text-orange-200 text-[8px] px-1 rounded font-bold uppercase">Dubbed</span>' : ''}
+                  ${isEnglish ? '<span class="bg-blue-500/30 text-blue-200 text-[8px] px-1 rounded font-bold uppercase">EN</span>' : ''}
+                  ${isSelected ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
+                </button>
+              `;
+            }).join('');
+            return;
+          }
+
+          // Case B: Title / Media / Stream List indicates multi-audio (Hindi + English)
+          const titleContext = (
+            (state.activeProviderMedia?.title || '') + ' ' +
+            (state.activeProviderMedia?.selectedDirectLinkTitle || '') + ' ' +
+            (state.modalMedia?.title || '')
+          ).toLowerCase();
+          const hasHindiStream = (state.currentStreamList || []).some(s => s.hasHindiAudio || (s.server || '').toLowerCase().includes('hindi') || (s.server || '').toLowerCase().includes('dual'));
+          const isDualAudio = titleContext.includes('hindi') || titleContext.includes('dual') || titleContext.includes('dubbed') || hasHindiStream;
+
+          if (isDualAudio) {
+            audioContainer.classList.remove('hidden');
+            const isHindiActive = state.preferredAudioLanguage === 'hindi' || (!state.preferredAudioLanguage && isDualAudio);
+            const isEnglishActive = state.preferredAudioLanguage === 'english';
+
+            audioList.innerHTML = `
+              <button
+                type="button"
+                onclick="window.app.selectAudioLanguage('hindi')"
+                class="audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+                  isHindiActive
+                    ? 'bg-amber-600 text-white shadow-md ring-1 ring-amber-400'
+                    : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                }"
+                title="Switch Audio to Hindi Dubbed"
+              >
+                <i class="fa-solid fa-volume-high text-[10px] ${isHindiActive ? 'text-amber-200' : 'text-gray-400'}"></i>
+                <span>Hindi (हिंदी)</span>
+                <span class="bg-orange-500/30 text-orange-200 text-[8px] px-1 rounded font-bold uppercase">Dubbed</span>
+                ${isHindiActive ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
+              </button>
+              <button
+                type="button"
+                onclick="window.app.selectAudioLanguage('english')"
+                class="audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+                  isEnglishActive
+                    ? 'bg-blue-600 text-white shadow-md ring-1 ring-blue-400'
+                    : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                }"
+                title="Switch Audio to English"
+              >
+                <i class="fa-solid fa-volume-high text-[10px] ${isEnglishActive ? 'text-blue-200' : 'text-gray-400'}"></i>
+                <span>English</span>
+                <span class="bg-blue-500/30 text-blue-200 text-[8px] px-1 rounded font-bold uppercase">EN</span>
+                ${isEnglishActive ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
+              </button>
+            `;
+          } else {
+            audioContainer.classList.add('hidden');
+          }
+        }
+
+        /**
+         * User selects preferred audio language (Hindi or English)
+         */
+        function selectAudioLanguage(lang) {
+          const lower = (lang || '').toLowerCase();
+          const wantHindi = lower.includes('hin');
+          state.preferredAudioLanguage = wantHindi ? 'hindi' : 'english';
+
+          // 1. If HLS stream is active with embedded audio tracks, switch track
+          if (state.hlsInstance && Array.isArray(state.hlsInstance.audioTracks) && state.hlsInstance.audioTracks.length > 0) {
+            const targetIdx = state.hlsInstance.audioTracks.findIndex(t => {
+              const lbl = formatAudioTrackLabel(t).toLowerCase();
+              return wantHindi ? (lbl.includes('hin') || lbl.includes('हिंदी')) : (lbl.includes('eng') || lbl.includes('english'));
+            });
+            if (targetIdx !== -1) {
+              setAudioTrack(targetIdx);
+              renderUniversalAudioUI();
+              return;
+            }
+          }
+
+          // 2. If browser HTMLMediaElement audioTracks API is supported
+          const video = document.getElementById('streamVideoPlayer');
+          if (video && video.audioTracks && video.audioTracks.length > 1) {
+            for (let i = 0; i < video.audioTracks.length; i++) {
+              const trk = video.audioTracks[i];
+              const trkLabel = ((trk.label || '') + ' ' + (trk.language || '')).toLowerCase();
+              const isMatch = wantHindi ? (trkLabel.includes('hin') || i === 0) : (trkLabel.includes('eng') || i === 1);
+              trk.enabled = isMatch;
+            }
+          }
+
+          // 3. Switch stream in currentStreamList to match chosen language
+          if (Array.isArray(state.currentStreamList) && state.currentStreamList.length > 0) {
+            let targetStreamIdx = -1;
+            if (wantHindi) {
+              targetStreamIdx = state.currentStreamList.findIndex(s => {
+                const sName = (s.server || '').toLowerCase();
+                return s.hasHindiAudio || sName.includes('hindi') || sName.includes('dual') || (!sName.includes('vidlink') && !sName.includes('autoembed') && s.type !== 'embed');
+              });
+            } else {
+              targetStreamIdx = state.currentStreamList.findIndex(s => {
+                const sName = (s.server || '').toLowerCase();
+                return sName.includes('english') || sName.includes('vidlink') || sName.includes('autoembed') || sName.includes('vidsrc');
+              });
+            }
+
+            if (targetStreamIdx !== -1 && targetStreamIdx !== state.currentStreamIndex) {
+              state.currentStreamIndex = targetStreamIdx;
+              renderProviderStreamsUI(state.currentStreamList);
+              playStream(state.currentStreamList[targetStreamIdx]);
+              showToast(`Switched to 🔊 ${wantHindi ? 'Hindi Dubbed' : 'English'} Audio`, 'success');
+              renderUniversalAudioUI();
+              return;
+            }
+          }
+
+          showToast(`Audio set to 🔊 ${wantHindi ? 'Hindi Dubbed' : 'English'}`, 'info');
+          renderUniversalAudioUI();
+        }
+
+        /**
          * Dynamic Resolution and Audio UI generator for HLS streams
          */
         function populateResolutionAndAudioUI(hls) {
           const resContainer = document.getElementById('providerResolutionContainer');
           const resList = document.getElementById('providerResolutionList');
-          const audioContainer = document.getElementById('providerAudioContainer');
-          const audioList = document.getElementById('providerAudioList');
 
           // 1. Resolution / Quality Selector
           if (hls && hls.levels && hls.levels.length > 1) {
@@ -5570,7 +5796,6 @@
 
           // 2. Audio Tracks Selector
           if (hls && hls.audioTracks && hls.audioTracks.length > 0) {
-            // Auto-switch to preferred audio language (e.g. Hindi or English) if found
             if (state.preferredAudioLanguage) {
               const targetIdx = hls.audioTracks.findIndex(t => {
                 const lbl = formatAudioTrackLabel(t).toLowerCase();
@@ -5580,38 +5805,8 @@
                 hls.audioTrack = targetIdx;
               }
             }
-
-            if (audioContainer) audioContainer.classList.remove('hidden');
-            if (audioList) {
-              audioList.innerHTML = hls.audioTracks.map((track, idx) => {
-                const label = formatAudioTrackLabel(track);
-                const isSelected = (hls.audioTrack === idx);
-                const isHindi = label.toLowerCase().includes('hindi');
-                const isEnglish = label.toLowerCase().includes('english');
-
-                return `
-                  <button
-                    type="button"
-                    onclick="window.app.setAudioTrack(${idx})"
-                    class="audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
-                      isSelected
-                        ? 'bg-amber-600 text-white shadow-md ring-1 ring-amber-400'
-                        : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
-                    }"
-                    title="Switch Audio to ${escapeHtml(label)}"
-                  >
-                    <i class="fa-solid fa-volume-high text-[10px] ${isSelected ? 'text-amber-200' : 'text-gray-400'}"></i>
-                    <span>${escapeHtml(label)}</span>
-                    ${isHindi ? '<span class="bg-orange-500/30 text-orange-200 text-[8px] px-1 rounded font-bold uppercase">Dubbed</span>' : ''}
-                    ${isEnglish ? '<span class="bg-blue-500/30 text-blue-200 text-[8px] px-1 rounded font-bold uppercase">EN</span>' : ''}
-                    ${isSelected ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
-                  </button>
-                `;
-              }).join('');
-            }
-          } else if (audioContainer) {
-            audioContainer.classList.add('hidden');
           }
+          renderUniversalAudioUI();
         }
 
         /**
@@ -5647,21 +5842,13 @@
           const lower = label.toLowerCase();
 
           // Persist user preference so next episode/movie auto-plays in chosen language
-          if (lower.includes('hindi')) {
+          if (lower.includes('hindi') || lower.includes('हिंदी')) {
             state.preferredAudioLanguage = 'hindi';
           } else if (lower.includes('english')) {
             state.preferredAudioLanguage = 'english';
           }
 
-          const pills = document.querySelectorAll('.audio-pill');
-          pills.forEach((p, idx) => {
-            if (idx === trackIndex) {
-              p.className = 'audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-amber-600 text-white shadow-md ring-1 ring-amber-400 flex items-center gap-1.5';
-            } else {
-              p.className = 'audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 flex items-center gap-1.5';
-            }
-          });
-
+          renderUniversalAudioUI();
           showToast(`Audio set to: ${label}`, 'success');
         }
 
@@ -5675,8 +5862,8 @@
             return;
           }
 
-          if (stream.isDownloadOnly || (stream.link && (stream.link.toLowerCase().includes('.mkv') || stream.link.toLowerCase().includes('.zip')))) {
-            console.warn('[PARXSTREAM] Stream is download-only (.mkv/.zip). Auto-switching to web mirror.');
+          if (stream.isDownloadOnly || (stream.link && (stream.link.toLowerCase().includes('.zip') || stream.link.toLowerCase().includes('.rar') || stream.link.toLowerCase().includes('.tar')))) {
+            console.warn('[PARXSTREAM] Stream is archive download only. Auto-switching to web mirror.');
             tryNextWorkingStream();
             return;
           }
@@ -5685,7 +5872,6 @@
           const video = document.getElementById('streamVideoPlayer');
           const loader = document.getElementById('playerLoading');
           const resContainer = document.getElementById('providerResolutionContainer');
-          const audioContainer = document.getElementById('providerAudioContainer');
 
           // Clear any pending playback stall timers
           if (state.streamPlaybackTimer) {
@@ -5693,12 +5879,36 @@
             state.streamPlaybackTimer = null;
           }
 
-          // Check if stream is an Embed or web player
-          const isEmbed = stream.type === 'embed' ||
+          // Direct Video Mode (.m3u8 / .mp4 / .webm / .mkv / Cloud CDN)
+          const isDirectVideo = stream.type === 'm3u8' ||
+            stream.type === 'mp4' ||
+            stream.type === 'mkv' ||
+            stream.type === 'webm' ||
+            stream.type === 'hls' ||
+            stream.type === 'direct' ||
+            stream.link.toLowerCase().includes('.m3u8') ||
+            stream.link.toLowerCase().includes('.mp4') ||
+            stream.link.toLowerCase().includes('.mkv') ||
+            stream.link.toLowerCase().includes('.webm') ||
+            stream.link.toLowerCase().includes('googleusercontent.com') ||
+            stream.link.toLowerCase().includes('r2.dev') ||
+            stream.link.toLowerCase().includes('pixeldrain.com') ||
+            stream.link.toLowerCase().includes('flapdoodle.cyou') ||
+            stream.link.toLowerCase().includes('/api/proxy') ||
+            stream.link.toLowerCase().includes('/api/cinepro/proxy');
+
+          const isEmbed = !isDirectVideo && (
+            stream.type === 'embed' ||
             stream.link.toLowerCase().includes('embed') ||
             stream.link.toLowerCase().includes('/player') ||
             stream.link.toLowerCase().includes('.html') ||
-            (!stream.link.includes('.m3u8') && !stream.link.includes('.mp4') && !stream.link.includes('.mkv') && !stream.link.includes('.webm') && stream.link.startsWith('http'));
+            stream.link.toLowerCase().includes('vidlink') ||
+            stream.link.toLowerCase().includes('autoembed') ||
+            stream.link.toLowerCase().includes('vidsrc') ||
+            stream.link.toLowerCase().includes('2embed') ||
+            stream.link.toLowerCase().includes('multiembed') ||
+            stream.link.toLowerCase().includes('smashy')
+          );
 
           if (isEmbed) {
             // Embed mode: Route directly to sandboxed full iframe
@@ -5714,7 +5924,7 @@
             }
 
             if (resContainer) resContainer.classList.add('hidden');
-            if (audioContainer) audioContainer.classList.add('hidden');
+            renderUniversalAudioUI();
 
             if (iframe) {
               iframe.classList.remove('hidden');
@@ -5728,7 +5938,7 @@
             return;
           }
 
-          // Direct Video Mode (.m3u8 / .mp4 / .webm)
+          // Direct Video Mode (.m3u8 / .mp4 / .webm / .mkv)
           if (iframe) {
             iframe.src = 'about:blank';
             iframe.classList.add('hidden');
@@ -5790,6 +6000,75 @@
               video.play().catch(() => {});
               if (loader) {
                 loader.classList.add('opacity-0');
+                loader.classList.add('pointer-events-none');
+              }
+              populateResolutionAndAudioUI(hls);
+            });
+
+            hls.on(Hls.Events.LEVEL_SWITCHED, () => {
+              populateResolutionAndAudioUI(hls);
+            });
+
+            hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, () => {
+              populateResolutionAndAudioUI(hls);
+            });
+
+            let errorCount = 0;
+            hls.on(Hls.Events.ERROR, (event, data) => {
+              if (data.fatal) {
+                errorCount++;
+                console.warn('[HLS Fatal Error]', data.type, data.details);
+                if (errorCount > 1) {
+                  tryNextWorkingStream();
+                  return;
+                }
+                switch (data.type) {
+                  case Hls.ErrorTypes.NETWORK_ERROR:
+                    hls.startLoad();
+                    break;
+                  case Hls.ErrorTypes.MEDIA_ERROR:
+                    hls.recoverMediaError();
+                    break;
+                  default:
+                    tryNextWorkingStream();
+                    break;
+                }
+              }
+            });
+
+            // Set 12-second stall watchdog timer: if video never starts, auto-try next mirror
+            state.streamPlaybackTimer = setTimeout(() => {
+              if (video.readyState === 0 && !video.currentTime) {
+                console.warn('[PARXSTREAM] HLS playback stalled, triggering automatic failover.');
+                tryNextWorkingStream();
+              }
+            }, 12000);
+
+          } else {
+            // Direct MP4 / MKV / CDN playback via proxy
+            video.src = proxiedUrl;
+            renderUniversalAudioUI();
+            video.onloadeddata = () => {
+              video.play().catch(() => {});
+              if (loader) {
+                loader.classList.add('opacity-0');
+                loader.classList.add('pointer-events-none');
+              }
+            };
+
+            video.onerror = () => {
+              console.warn('[PARXSTREAM] Video element error on direct source, auto-failing over...');
+              tryNextWorkingStream();
+            };
+
+            // Set 10-second stall watchdog timer
+            state.streamPlaybackTimer = setTimeout(() => {
+              if (video.readyState === 0 && !video.currentTime) {
+                console.warn('[PARXSTREAM] Video direct stream stalled, auto-failing over.');
+                tryNextWorkingStream();
+              }
+            }, 10000);
+          }
                 loader.classList.add('pointer-events-none');
               }
               populateResolutionAndAudioUI(hls);
@@ -5925,6 +6204,8 @@
           playStream,
           setResolution,
           setAudioTrack,
+          selectAudioLanguage,
+          renderUniversalAudioUI,
           tryNextWorkingStream,
           retryCurrentStream
         };
