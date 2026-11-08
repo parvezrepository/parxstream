@@ -1947,7 +1947,7 @@
 
           // Auto-rotate hero every 8 seconds if idle
           setInterval(() => {
-            if (state.currentTab === 'home' && state.selectedProvider === 'tmdb' && !state.modalMedia) {
+            if (state.currentTab === 'home' && (state.selectedProvider === 'tmdb' || state.selectedProvider === 'cinepro') && !state.modalMedia) {
               state.heroIndex = (state.heroIndex + 1) % state.heroList.length;
               renderHero();
             }
@@ -2518,8 +2518,8 @@
           const gridCatalog = document.getElementById('gridCatalogView');
           const providerCatalog = document.getElementById('providerCatalogView');
 
-          // If in Vega Provider mode
-          if (state.selectedProvider && state.selectedProvider !== 'tmdb') {
+          // If in external Vega Provider mode (CinePro uses TMDB dashboard with direct HLS playback)
+          if (state.selectedProvider && state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro') {
             if (hero) hero.classList.add('hidden');
             if (homeCatalog) homeCatalog.classList.add('hidden');
 
@@ -2863,7 +2863,7 @@
 
             clearTimeout(state.searchDebounceTimer);
             state.searchDebounceTimer = setTimeout(() => {
-              if (state.selectedProvider !== 'tmdb') {
+              if (state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro') {
                 executeProviderSearch(query);
               } else {
                 executeSearch(query);
@@ -3002,7 +3002,7 @@
           if (input) input.value = term;
           document.getElementById('searchClearBtn').classList.remove('hidden');
           state.searchQuery = term;
-          if (state.selectedProvider !== 'tmdb') {
+          if (state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro') {
             executeProviderSearch(term);
           } else {
             executeSearch(term);
@@ -3023,7 +3023,7 @@
           input.value = '';
           document.getElementById('searchClearBtn').classList.add('hidden');
           state.searchQuery = '';
-          if (state.selectedProvider !== 'tmdb') {
+          if (state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro') {
             state.providerSearchActive = false;
             state.providerPage = 1;
             loadProviderPosts();
@@ -4096,9 +4096,12 @@
 
             // Restore saved provider from localStorage or default to tmdb
             const saved = state.selectedProvider;
-            if (saved && saved !== 'tmdb') {
+            const isValidSaved = saved === 'cinepro' || (state.availableProviders.some((p) => p.value === saved));
+            if (saved && saved !== 'tmdb' && isValidSaved) {
               switchProvider(saved, false);
             } else {
+              state.selectedProvider = 'tmdb';
+              localStorage.setItem('cinestream_selected_provider', 'tmdb');
               updateSelectedProviderUI('tmdb');
             }
           } catch (err) {
@@ -4312,12 +4315,15 @@
           const providerCatalog = document.getElementById('providerCatalogView');
 
           if (providerValue === 'tmdb' || providerValue === 'cinepro') {
-            // Restore default TMDB views
+            // Restore default TMDB views (CinePro runs on top of TMDB catalog with 17 direct HLS stream engines)
             if (providerCatalog) providerCatalog.classList.add('hidden');
             if (hero) hero.classList.remove('hidden');
             if (homeCatalog) homeCatalog.classList.remove('hidden');
             if (gridCatalog) gridCatalog.classList.add('hidden');
             state.currentTab = 'home';
+            if (!state.liveCache || !state.liveCache.trending || state.liveCache.trending.length === 0) {
+              fetchLiveDashboard({ silent: true });
+            }
             if (showNotification) {
               showToast(
                 providerValue === 'cinepro'
@@ -4368,9 +4374,16 @@
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
 
-            state.providerCatalog = Array.isArray(data.catalog) && data.catalog.length > 0
+            const rawCatalog = Array.isArray(data.catalog) && data.catalog.length > 0
               ? data.catalog
               : [{ title: 'All Titles', filter: '' }];
+            state.providerCatalog = rawCatalog.map((tab) => {
+              if (typeof tab === 'string') return { title: tab, filter: tab };
+              return {
+                title: tab.title || tab.name || 'All Titles',
+                filter: tab.filter !== undefined ? tab.filter : (tab.title || '')
+              };
+            });
             state.providerCatalogIndex = 0;
             state.providerPage = 1;
             state.providerSearchActive = false;
@@ -4387,7 +4400,7 @@
                       : 'bg-dark-850 hover:bg-dark-800 text-gray-300 hover:text-white border border-white/5'
                   }"
                 >
-                  ${tab.title}
+                  ${escapeHtml(tab.title)}
                 </button>
               `).join('');
             }
@@ -4398,7 +4411,7 @@
             console.error('[Provider Catalog Error]', err);
             showToast(`Could not load catalog for ${providerValue}: ${err.message}`, 'error');
             // Try loading posts with default empty filter
-            state.providerCatalog = [{ title: 'Catalog', filter: '' }];
+            state.providerCatalog = [{ title: 'All Titles', filter: '' }];
             state.providerCatalogIndex = 0;
             state.providerPage = 1;
             await loadProviderPosts();
@@ -4450,7 +4463,7 @@
             if (emptyState) emptyState.classList.add('hidden');
           }
 
-          const currentTab = state.providerCatalog[state.providerCatalogIndex] || { filter: '' };
+          const currentTab = state.providerCatalog[state.providerCatalogIndex] || { title: 'All Titles', filter: '' };
           const filter = currentTab.filter || '';
 
           try {
@@ -4470,7 +4483,7 @@
               if (grid) grid.innerHTML = '';
               if (emptyState) {
                 emptyState.classList.remove('hidden');
-                document.getElementById('providerEmptyTitle').textContent = `No titles found in "${currentTab.title}"`;
+                document.getElementById('providerEmptyTitle').textContent = `No titles found in "${currentTab.title || 'this section'}"`;
               }
               if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
             } else {
@@ -4522,9 +4535,11 @@
          * Refresh currently active provider catalog
          */
         function refreshProviderCatalog() {
-          if (state.selectedProvider && state.selectedProvider !== 'tmdb') {
+          if (state.selectedProvider && state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro') {
             loadProviderCatalog(state.selectedProvider);
             showToast('Refreshing catalog...', 'info');
+          } else {
+            fetchLiveDashboard();
           }
         }
 
