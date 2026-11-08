@@ -12,6 +12,13 @@ const {
   getProviderStream,
 } = require('./providerManager');
 const { handleProxyRequest } = require('./proxy');
+const {
+  initCinePro,
+  getCineProMovieStreams,
+  getCineProTVStreams,
+  getCineProStatus,
+  cineproPort
+} = require('./cineproManager');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -154,7 +161,63 @@ apiRouter.get('/providers/:provider/stream', async (req, res) => {
   }
 });
 
-// 8. /proxy?url=...&headers=...
+// 8. CinePro Engine Routes
+apiRouter.get('/cinepro/status', (req, res) => {
+  res.json(getCineProStatus());
+});
+
+apiRouter.get('/cinepro/movie/:tmdbId', async (req, res) => {
+  const { tmdbId } = req.params;
+  try {
+    const streams = await getCineProMovieStreams(tmdbId);
+    res.json(streams);
+  } catch (err) {
+    console.error(`Error fetching CinePro movie ${tmdbId}:`, err.message);
+    res.status(500).json({ error: 'Failed to fetch CinePro streams', message: err.message });
+  }
+});
+
+apiRouter.get('/cinepro/tv/:tmdbId/:season/:episode', async (req, res) => {
+  const { tmdbId, season, episode } = req.params;
+  try {
+    const streams = await getCineProTVStreams(tmdbId, season, episode);
+    res.json(streams);
+  } catch (err) {
+    console.error(`Error fetching CinePro TV ${tmdbId} S${season}E${episode}:`, err.message);
+    res.status(500).json({ error: 'Failed to fetch CinePro TV streams', message: err.message });
+  }
+});
+
+apiRouter.all('/cinepro/proxy', async (req, res) => {
+  const data = req.query.data;
+  if (!data) {
+    return res.status(400).json({ error: 'Missing data query parameter' });
+  }
+  try {
+    const targetUrl = `http://127.0.0.1:${cineproPort}/v1/proxy?data=${encodeURIComponent(data)}`;
+    const headers = { ...req.headers };
+    delete headers.host;
+
+    const proxyRes = await axios({
+      method: req.method,
+      url: targetUrl,
+      headers,
+      responseType: 'stream',
+      validateStatus: () => true
+    });
+
+    res.status(proxyRes.status);
+    Object.entries(proxyRes.headers).forEach(([k, v]) => {
+      res.setHeader(k, v);
+    });
+    proxyRes.data.pipe(res);
+  } catch (err) {
+    console.error('[CinePro Proxy Error]', err.message);
+    res.status(500).json({ error: 'CinePro proxy failed', message: err.message });
+  }
+});
+
+// 9. /proxy?url=...&headers=...
 apiRouter.all('/proxy', handleProxyRequest);
 
 // Mount on both /api prefix and root / for robust routing across services and rewrites
@@ -163,10 +226,13 @@ app.use('/', apiRouter);
 
 // Start server if executed directly
 if (require.main === module) {
-  app.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, '0.0.0.0', async () => {
     console.log(`\n🎬 CineStream Provider Backend API running on http://localhost:${PORT}`);
     console.log(`   - Providers: http://localhost:${PORT}/api/providers`);
+    console.log(`   - CinePro:   http://localhost:${PORT}/api/cinepro/status`);
     console.log(`   - Proxy:     http://localhost:${PORT}/api/proxy?url=...`);
+    // Initialize CinePro Core engine in background
+    initCinePro().catch(e => console.warn('[CinePro] Engine start error:', e.message));
   });
 }
 

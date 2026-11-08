@@ -1045,6 +1045,9 @@
                   <i class="fa-solid fa-clapperboard text-[10px] text-purple-400"></i> Server 5 (2Embed)
                 </button>
 
+                <!-- CinePro Core Direct HLS Streams Container -->
+                <div id="cineproServerButtons" class="contents"></div>
+
                 <!-- Official Trailer -->
                 <button
                   id="serverBtnTrailer"
@@ -3201,6 +3204,75 @@
           if (state.apiKey || state.readToken) {
             fetchDeepTmdbDetails(media.id, isTv);
           }
+
+          // Fetch high-speed CinePro HLS direct streams in background
+          fetchCineproSourcesForModal(media.id, isTv, state.selectedSeason || 1, state.selectedEpisode || 1);
+        }
+
+        /**
+         * Query CinePro Engine for direct HLS multi-audio video streams
+         */
+        async function fetchCineproSourcesForModal(tmdbId, isTv, season = 1, episode = 1) {
+          const container = document.getElementById('cineproServerButtons');
+          if (!container) return;
+          container.innerHTML = '';
+
+          try {
+            const s = season || state.selectedSeason || 1;
+            const ep = episode || state.selectedEpisode || 1;
+            const url = isTv
+              ? `/api/cinepro/tv/${encodeURIComponent(tmdbId)}/${s}/${ep}`
+              : `/api/cinepro/movie/${encodeURIComponent(tmdbId)}`;
+            
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const sources = await res.json();
+            if (!Array.isArray(sources) || sources.length === 0) return;
+
+            state.currentCineproSources = sources;
+
+            container.innerHTML = sources.map((stream, idx) => `
+              <button
+                type="button"
+                onclick="window.app.playCineproStream(${idx})"
+                class="server-pill cinepro-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-emerald-500/30 transition flex items-center gap-1.5"
+                title="${escapeHtml(stream.server || `CinePro Server ${idx + 1}`)}"
+              >
+                <i class="fa-solid fa-bolt text-[10px] text-emerald-400"></i>
+                <span>${escapeHtml(stream.server || `CinePro ${idx + 1}`)}</span>
+                <span class="bg-emerald-500/20 text-emerald-300 text-[9px] px-1.5 py-0.2 rounded font-bold">HLS Direct</span>
+              </button>
+            `).join('');
+
+            // If CinePro provider is selected, auto-play first CinePro HLS source
+            if (state.selectedProvider === 'cinepro' && sources.length > 0) {
+              playCineproStream(0);
+            }
+          } catch (e) {
+            console.warn('[CineStream] CinePro streams fetch error:', e);
+          }
+        }
+
+        /**
+         * Plays a CinePro direct HLS stream in the HTML5 video element with custom audio and quality controls
+         */
+        function playCineproStream(index) {
+          const sources = state.currentCineproSources || [];
+          const stream = sources[index];
+          if (!stream || !stream.link) return;
+
+          // Highlight active pill
+          const pills = document.querySelectorAll('.server-pill');
+          pills.forEach(p => {
+            p.className = 'server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5';
+          });
+          const activePill = document.querySelectorAll('.cinepro-pill')[index];
+          if (activePill) {
+            activePill.className = 'server-pill cinepro-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-sm transition flex items-center gap-1.5';
+          }
+
+          showToast(`Playing via ${stream.server || 'CinePro Engine'} (Direct HLS)`, 'success');
+          playStream(stream);
         }
 
         /**
@@ -3417,12 +3489,18 @@
           populateEpisodesDropdown(state.selectedSeason);
           loadStreamPlayer();
           showToast(`Switched to Season ${state.selectedSeason}`, 'info');
+          if (state.modalMedia) {
+            fetchCineproSourcesForModal(state.modalMedia.id, true, state.selectedSeason, 1);
+          }
         }
 
         function onEpisodeChange(newEpisode) {
           state.selectedEpisode = parseInt(newEpisode, 10);
           loadStreamPlayer();
           showToast(`Playing Episode ${state.selectedEpisode}`, 'info');
+          if (state.modalMedia) {
+            fetchCineproSourcesForModal(state.modalMedia.id, true, state.selectedSeason, state.selectedEpisode);
+          }
         }
 
         function stepEpisode(direction) {
@@ -3771,126 +3849,6 @@
           }
         }
 
-        /**
-         * TMDB API Settings Modal
-         */
-        function openSettingsModal() {
-          const modal = document.getElementById('settingsModal');
-          if (!modal) return;
-          const keyInput = document.getElementById('tmdbApiKeyInput');
-          const tokenInput = document.getElementById('tmdbReadTokenInput');
-          if (keyInput) keyInput.value = state.apiKey || DEFAULT_TMDB_API_KEY;
-          if (tokenInput) tokenInput.value = state.readToken || DEFAULT_TMDB_READ_ACCESS_TOKEN;
-          modal.classList.remove('hidden');
-          updateSettingsModalUI();
-        }
-
-        function closeSettingsModal() {
-          const modal = document.getElementById('settingsModal');
-          if (modal) modal.classList.add('hidden');
-        }
-
-        function toggleApiKeyVisibility() {
-          const input = document.getElementById('tmdbApiKeyInput');
-          const icon = document.getElementById('apiKeyEyeIcon');
-          if (input.type === 'password') {
-            input.type = 'text';
-            icon.className = 'fa-solid fa-eye-slash';
-          } else {
-            input.type = 'password';
-            icon.className = 'fa-solid fa-eye';
-          }
-        }
-
-        async function testApiKey() {
-          const keyInput = document.getElementById('tmdbApiKeyInput');
-          const tokenInput = document.getElementById('tmdbReadTokenInput');
-          const key = keyInput ? keyInput.value.trim() : '';
-          const token = tokenInput ? tokenInput.value.trim() : '';
-
-          if (!key && !token) {
-            showToast('Please enter an API Key or Read Access Token to test.', 'error');
-            return;
-          }
-
-          showToast('Testing TMDB connection...', 'info');
-
-          try {
-            const url = new URL(`${TMDB_API_BASE}/authentication`);
-            if (key) url.searchParams.set('api_key', key);
-            const headers = { Accept: 'application/json' };
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-
-            const res = await fetch(url.toString(), { headers });
-            const data = await res.json();
-            if (data.success || res.ok) {
-              showToast('Success! TMDB credentials are valid and active.', 'success');
-            } else {
-              showToast(`Validation failed: ${data.status_message || 'Invalid credentials'}`, 'error');
-            }
-          } catch (err) {
-            showToast('Network error while testing credentials.', 'error');
-          }
-        }
-
-        async function saveApiKey() {
-          const keyInput = document.getElementById('tmdbApiKeyInput');
-          const tokenInput = document.getElementById('tmdbReadTokenInput');
-          const key = keyInput ? keyInput.value.trim() : '';
-          const token = tokenInput ? tokenInput.value.trim() : '';
-
-          if (!key && !token) {
-            showToast('Please provide TMDB credentials or click Demo Offline.', 'error');
-            return;
-          }
-
-          state.apiKey = key;
-          state.readToken = token;
-          localStorage.setItem(STORAGE_KEY_API, key);
-          localStorage.setItem(STORAGE_KEY_TOKEN, token);
-
-          updateApiStatusUI();
-          closeSettingsModal();
-          showToast('TMDB credentials saved! Synchronizing live catalog...', 'success');
-
-          showRowSkeletons();
-          await fetchLiveDashboard({ silent: false });
-        }
-
-        async function restoreDefaultKeys() {
-          state.apiKey = DEFAULT_TMDB_API_KEY;
-          state.readToken = DEFAULT_TMDB_READ_ACCESS_TOKEN;
-          localStorage.setItem(STORAGE_KEY_API, DEFAULT_TMDB_API_KEY);
-          localStorage.setItem(STORAGE_KEY_TOKEN, DEFAULT_TMDB_READ_ACCESS_TOKEN);
-
-          const keyInput = document.getElementById('tmdbApiKeyInput');
-          const tokenInput = document.getElementById('tmdbReadTokenInput');
-          if (keyInput) keyInput.value = DEFAULT_TMDB_API_KEY;
-          if (tokenInput) tokenInput.value = DEFAULT_TMDB_READ_ACCESS_TOKEN;
-
-          updateApiStatusUI();
-          updateSettingsModalUI();
-          showToast('Restored CineStream verified TMDB credentials.', 'success');
-          showRowSkeletons();
-          await fetchLiveDashboard({ silent: false });
-        }
-
-        function useDemoMode() {
-          state.apiKey = '';
-          state.readToken = '';
-          localStorage.setItem(STORAGE_KEY_API, '');
-          localStorage.setItem(STORAGE_KEY_TOKEN, '');
-          const keyInput = document.getElementById('tmdbApiKeyInput');
-          const tokenInput = document.getElementById('tmdbReadTokenInput');
-          if (keyInput) keyInput.value = '';
-          if (tokenInput) tokenInput.value = '';
-
-          updateApiStatusUI();
-          closeSettingsModal();
-          showToast('Switched to Demo Catalog (offline mock mode).', 'info');
-          renderCatalog(DEMO_CATALOG);
-        }
-
         function updateApiStatusUI() {
           const dot = document.getElementById('apiStatusDot');
           const text = document.getElementById('apiStatusText');
@@ -4014,11 +3972,8 @@
           window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
               const dModal = document.getElementById('detailsModal');
-              const sModal = document.getElementById('settingsModal');
               if (dModal && !dModal.classList.contains('hidden')) {
                 closeModal();
-              } else if (sModal && !sModal.classList.contains('hidden')) {
-                closeSettingsModal();
               }
             }
             if (e.key === '/' && document.activeElement !== document.getElementById('searchInput') && document.activeElement.tagName !== 'INPUT') {
@@ -4037,14 +3992,6 @@
               closeModal();
             }
           });
-          const sModal = document.getElementById('settingsModal');
-          if (sModal) {
-            sModal.addEventListener('click', (e) => {
-              if (e.target.id === 'settingsModal') {
-                closeSettingsModal();
-              }
-            });
-          }
 
           // Auto-sync when returning to tab
           document.addEventListener('visibilitychange', () => {
@@ -4104,6 +4051,7 @@
           if (!container) return;
 
           const isTmdbSelected = state.selectedProvider === 'tmdb';
+          const isCineproSelected = state.selectedProvider === 'cinepro';
 
           let html = `
             <button
@@ -4123,6 +4071,26 @@
                 </div>
               </div>
               ${isTmdbSelected ? '<i class="fa-solid fa-check text-xs text-brand-500 mr-1"></i>' : ''}
+            </button>
+
+            <!-- CinePro Core Multi-Engine Option -->
+            <button
+              type="button"
+              onclick="window.app.switchProvider('cinepro')"
+              class="w-full flex items-center justify-between p-2 rounded-xl text-left transition ${
+                isCineproSelected ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-300' : 'hover:bg-dark-800 text-gray-200'
+              }"
+            >
+              <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded-lg bg-emerald-950/80 flex items-center justify-center p-0.5 border border-emerald-500/30 shrink-0">
+                  <i class="fa-solid fa-bolt text-xs text-emerald-400"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-white">CinePro Core (17 HLS Engines)</p>
+                  <p class="text-[10px] text-emerald-400/80">Direct M3U8 • Multi-Audio • Zero Ads</p>
+                </div>
+              </div>
+              ${isCineproSelected ? '<i class="fa-solid fa-check text-xs text-emerald-400 mr-1"></i>' : ''}
             </button>
           `;
 
@@ -4208,6 +4176,25 @@
           const mIconEl = document.getElementById('mobileSelectedProviderIcon');
           const mBadgeEl = document.getElementById('mobileProviderBadge');
 
+          if (providerValue === 'cinepro') {
+            const iconSvg = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/26a1.svg';
+            if (nameEl) nameEl.textContent = 'CinePro (17 Engines)';
+            if (iconEl) iconEl.src = iconSvg;
+            if (badgeEl) {
+              badgeEl.textContent = '17 HLS';
+              badgeEl.className = 'hidden sm:inline bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-emerald-500/30';
+            }
+            if (mTopNameEl) mTopNameEl.textContent = 'CinePro';
+            if (mTopIconEl) mTopIconEl.src = iconSvg;
+            if (mNameEl) mNameEl.textContent = 'CinePro Core';
+            if (mIconEl) mIconEl.src = iconSvg;
+            if (mBadgeEl) {
+              mBadgeEl.textContent = '17 HLS';
+              mBadgeEl.className = 'bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-emerald-500/30';
+            }
+            return;
+          }
+
           if (providerValue === 'tmdb') {
             if (nameEl) nameEl.textContent = 'TMDB (Default)';
             if (iconEl) iconEl.src = 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png';
@@ -4246,7 +4233,7 @@
         }
 
         /**
-         * Switch active provider (TMDB vs external Vega provider)
+         * Switch active provider (TMDB vs external Vega provider vs CinePro)
          */
         function switchProvider(providerValue, showNotification = true) {
           state.selectedProvider = providerValue;
@@ -4261,14 +4248,21 @@
           const gridCatalog = document.getElementById('gridCatalogView');
           const providerCatalog = document.getElementById('providerCatalogView');
 
-          if (providerValue === 'tmdb') {
+          if (providerValue === 'tmdb' || providerValue === 'cinepro') {
             // Restore default TMDB views
             if (providerCatalog) providerCatalog.classList.add('hidden');
             if (hero) hero.classList.remove('hidden');
             if (homeCatalog) homeCatalog.classList.remove('hidden');
             if (gridCatalog) gridCatalog.classList.add('hidden');
             state.currentTab = 'home';
-            if (showNotification) showToast('Switched to TMDB (Multi-Server) mode', 'info');
+            if (showNotification) {
+              showToast(
+                providerValue === 'cinepro'
+                  ? 'Switched to CinePro Core (17 HLS Engines active)'
+                  : 'Switched to TMDB (Multi-Server) mode',
+                'info'
+              );
+            }
           } else {
             // Switch to Provider Catalog view
             if (hero) hero.classList.add('hidden');
@@ -5204,6 +5198,28 @@
               }
             }
 
+            // If TMDB ID is available for this title, also query CinePro 17 HLS engines
+            const tmdbId = state.activeProviderMedia ? state.activeProviderMedia.tmdbId : null;
+            if (tmdbId) {
+              try {
+                const isTv = type === 'series' || type === 'tv';
+                const s = state.providerActiveSeason || 1;
+                const ep = state.providerActiveEpisode || 1;
+                const cpUrl = isTv
+                  ? `/api/cinepro/tv/${encodeURIComponent(tmdbId)}/${s}/${ep}`
+                  : `/api/cinepro/movie/${encodeURIComponent(tmdbId)}`;
+                const cpRes = await fetch(cpUrl);
+                if (cpRes.ok) {
+                  const cpSources = await cpRes.json();
+                  if (Array.isArray(cpSources) && cpSources.length > 0) {
+                    webStreams.unshift(...cpSources);
+                  }
+                }
+              } catch (cpErr) {
+                console.warn('[CineStream] CinePro stream resolution notice:', cpErr);
+              }
+            }
+
             const fallbackStreams = getEmbedFallbackStreams(state.activeProviderMedia, type);
 
             let finalStreamList = [];
@@ -5665,14 +5681,8 @@
           toggleHeroWatchlist,
           toggleCardWatchlist,
           toggleModalWatchlist,
-          openSettingsModal,
-          closeSettingsModal,
-          toggleApiKeyVisibility,
-          testApiKey,
-          saveApiKey,
-          restoreDefaultKeys,
-          syncNow,
-          useDemoMode,
+          playCineproStream,
+          fetchCineproSourcesForModal,
           shareCurrentMedia,
           clearSearch,
           setTypeFilter,
