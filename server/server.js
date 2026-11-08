@@ -247,7 +247,7 @@ app.use('/', apiRouter);
 // Start server if executed directly
 if (require.main === module) {
   app.listen(PORT, '0.0.0.0', async () => {
-    console.log(`\n🎬 CineStream Provider Backend API running on http://localhost:${PORT}`);
+    console.log(`\n🎬 PARXSTREAM Provider Backend API running on http://localhost:${PORT}`);
     console.log(`   - Providers: http://localhost:${PORT}/api/providers`);
     console.log(`   - CinePro:   http://localhost:${PORT}/api/cinepro/status`);
     console.log(`   - Proxy:     http://localhost:${PORT}/api/proxy?url=...`);

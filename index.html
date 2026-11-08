@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CineStream - Movie & TV Series Streaming Hub</title>
+    <title>PARXSTREAM - Movie & TV Series Streaming Hub</title>
     <meta name="description" content="Watch trending movies and TV series with multiple streaming servers, official trailers, live TMDB search, and custom watchlist." />
-    <meta property="og:title" content="CineStream - Movie & TV Series Streaming Hub" />
+    <meta property="og:title" content="PARXSTREAM - Movie & TV Series Streaming Hub" />
     <meta property="og:description" content="Watch trending movies and TV series with multiple streaming servers, official trailers, live TMDB search, and custom watchlist." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -160,7 +160,7 @@
             </div>
             <div class="flex flex-col">
               <span class="font-display text-2xl sm:text-3xl tracking-wider text-white font-bold leading-none">
-                CINE<span class="text-brand-500">STREAM</span>
+                PARX<span class="text-brand-500">STREAM</span>
               </span>
               <span class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold -mt-0.5">Stream Without Limits</span>
             </div>
@@ -1366,7 +1366,7 @@
     <footer class="bg-dark-900 border-t border-white/5 py-10 mt-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
         <div class="flex items-center gap-2">
-          <span class="font-display text-xl text-white font-bold tracking-wider">CINE<span class="text-brand-500">STREAM</span></span>
+          <span class="font-display text-xl text-white font-bold tracking-wider">PARX<span class="text-brand-500">STREAM</span></span>
           <span class="text-gray-600">•</span>
           <span>Open-Source Streaming Playground</span>
         </div>
@@ -1376,10 +1376,10 @@
       </div>
     </footer>
 
-    <!-- CineStream Core Vanilla Application Script -->
+    <!-- PARXSTREAM Core Vanilla Application Script -->
     <script>
       /**
-       * CineStream Application Core
+       * PARXSTREAM Application Core
        * Modular, responsive Movie & TV Streaming application
        */
       (function() {
@@ -1402,7 +1402,7 @@
         const MAX_CONTINUE_WATCHING = 15;
 
         // Fallback default poster SVG in case an image fails to load
-        const FALLBACK_POSTER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='750' viewBox='0 0 500 750'><rect width='500' height='750' fill='%23121520'/><text x='50%25' y='48%25' fill='%23666f88' font-size='32' font-family='sans-serif' text-anchor='middle'>CineStream</text><text x='50%25' y='53%25' fill='%23434b60' font-size='18' font-family='sans-serif' text-anchor='middle'>No Image Available</text></svg>";
+        const FALLBACK_POSTER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='750' viewBox='0 0 500 750'><rect width='500' height='750' fill='%23121520'/><text x='50%25' y='48%25' fill='%23666f88' font-size='32' font-family='sans-serif' text-anchor='middle'>PARXSTREAM</text><text x='50%25' y='53%25' fill='%23434b60' font-size='18' font-family='sans-serif' text-anchor='middle'>No Image Available</text></svg>";
 
         // Comprehensive Pre-populated Demo Catalog (Rich Offline State)
         const DEMO_CATALOG = {
@@ -1980,7 +1980,7 @@
           // Auto-sync feeds every 15 minutes in background
           state.autoSyncTimer = setInterval(() => {
             if (!document.hidden && (state.apiKey || state.readToken)) {
-              console.log('[CineStream] Auto-syncing TMDB catalog in background...');
+              console.log('[PARXSTREAM] Auto-syncing TMDB catalog in background...');
               fetchLiveDashboard({ silent: true });
             }
           }, 15 * 60 * 1000);
@@ -2341,7 +2341,7 @@
           heroBackdrop.style.backgroundImage = `url('${backdropUrl}')`;
 
           document.getElementById('heroTitle').textContent = movie.title || movie.name;
-          document.getElementById('heroOverview').textContent = movie.overview || 'Experience this cinematic masterpiece on CineStream with high definition streaming and surround audio.';
+          document.getElementById('heroOverview').textContent = movie.overview || 'Experience this cinematic masterpiece on PARXSTREAM with high definition streaming and surround audio.';
           document.getElementById('heroRating').textContent = movie.vote_average || '8.2';
           
           const isTv = (movie.media_type === 'tv');
@@ -3249,7 +3249,7 @@
               playCineproStream(0);
             }
           } catch (e) {
-            console.warn('[CineStream] CinePro streams fetch error:', e);
+            console.warn('[PARXSTREAM] CinePro streams fetch error:', e);
           }
         }
 
@@ -3955,7 +3955,7 @@
           const title = state.modalMedia.title || state.modalMedia.name;
           const url = window.location.href;
           if (navigator.clipboard) {
-            navigator.clipboard.writeText(`${title} - Watch on CineStream: ${url}`).then(() => {
+            navigator.clipboard.writeText(`${title} - Watch on PARXSTREAM: ${url}`).then(() => {
               showToast('Link copied to clipboard!', 'success');
             }).catch(() => {
               showToast('Share link: ' + url, 'info');
@@ -3996,7 +3996,7 @@
           // Auto-sync when returning to tab
           document.addEventListener('visibilitychange', () => {
             if (!document.hidden && (state.apiKey || state.readToken)) {
-              console.log('[CineStream] Tab visible - refreshing live feeds...');
+              console.log('[PARXSTREAM] Tab visible - refreshing live feeds...');
               fetchLiveDashboard({ silent: true });
             }
           });
@@ -4667,7 +4667,7 @@
               };
             }
           } catch (e) {
-            console.warn('[CineStream] TMDB resolution warning:', e);
+            console.warn('[PARXSTREAM] TMDB resolution warning:', e);
           }
           return null;
         }
@@ -5169,7 +5169,7 @@
                   if (Array.isArray(json)) rawStreams = json;
                 }
               } catch (e) {
-                console.warn('[CineStream] Provider stream endpoint warning:', e);
+                console.warn('[PARXSTREAM] Provider stream endpoint warning:', e);
               }
             }
 
@@ -5216,7 +5216,7 @@
                   }
                 }
               } catch (cpErr) {
-                console.warn('[CineStream] CinePro stream resolution notice:', cpErr);
+                console.warn('[PARXSTREAM] CinePro stream resolution notice:', cpErr);
               }
             }
 
@@ -5261,22 +5261,37 @@
 
           container.classList.remove('hidden');
 
-          list.innerHTML = streamList.map((stream, idx) => `
-            <button
-              type="button"
-              onclick="window.app.selectProviderStream(${idx})"
-              class="provider-stream-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
-                idx === state.currentStreamIndex
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
-              }"
-              title="${escapeHtml(stream.server || `Server ${idx + 1}`)} (${escapeHtml(stream.quality || 'HD')})"
-            >
-              <i class="fa-solid ${stream.isDownloadOnly ? 'fa-download text-purple-400' : 'fa-bolt text-amber-300'} text-[10px]"></i>
-              <span>${escapeHtml(stream.server || `Server ${idx + 1}`)}</span>
-              <span class="bg-black/40 text-[9px] px-1.5 py-0.2 rounded font-bold">${escapeHtml(stream.quality || 'HD')}</span>
-            </button>
-          `).join('');
+          list.innerHTML = streamList.map((stream, idx) => {
+            const serverName = stream.server || `Server ${idx + 1}`;
+            const sLower = serverName.toLowerCase();
+            const hasHindi = sLower.includes('hindi') || sLower.includes('dual') || (Array.isArray(stream.audioTracks) && stream.audioTracks.some(a => (a.language || a.label || '').toLowerCase().includes('hin')));
+            const hasEnglish = sLower.includes('english') || sLower.includes('eng') || (Array.isArray(stream.audioTracks) && stream.audioTracks.some(a => (a.language || a.label || '').toLowerCase().includes('eng')));
+
+            let audioBadge = '';
+            if (hasHindi) {
+              audioBadge = '<span class="bg-amber-500/25 text-amber-300 border border-amber-500/40 text-[9px] px-1.5 py-0.2 rounded font-bold ml-1">🔊 Hindi</span>';
+            } else if (hasEnglish) {
+              audioBadge = '<span class="bg-blue-500/25 text-blue-300 border border-blue-500/40 text-[9px] px-1.5 py-0.2 rounded font-bold ml-1">🔊 English</span>';
+            }
+
+            return `
+              <button
+                type="button"
+                onclick="window.app.selectProviderStream(${idx})"
+                class="provider-stream-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+                  idx === state.currentStreamIndex
+                    ? 'bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-400'
+                    : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                }"
+                title="${escapeHtml(serverName)} (${escapeHtml(stream.quality || 'HD')})"
+              >
+                <i class="fa-solid ${stream.isDownloadOnly ? 'fa-download text-purple-400' : 'fa-bolt text-amber-300'} text-[10px]"></i>
+                <span>${escapeHtml(serverName)}</span>
+                <span class="bg-black/40 text-[9px] px-1.5 py-0.2 rounded font-bold">${escapeHtml(stream.quality || 'HD')}</span>
+                ${audioBadge}
+              </button>
+            `;
+          }).join('');
         }
 
         /**
@@ -5354,6 +5369,34 @@
         }
 
         /**
+         * Converts raw language code or track string into human-friendly label (e.g. Hindi, English, Japanese)
+         */
+        function formatAudioTrackLabel(track) {
+          if (!track) return 'Audio';
+          const name = typeof track === 'string' ? track : (track.name || track.label || track.lang || track.language || '');
+          const lower = name.toLowerCase().trim();
+
+          if (lower.includes('hin') || lower === 'hi') return 'Hindi (हिंदी)';
+          if (lower.includes('eng') || lower === 'en') return 'English';
+          if (lower.includes('jap') || lower.includes('jpn') || lower === 'ja') return 'Japanese (日本語)';
+          if (lower.includes('tam') || lower === 'ta') return 'Tamil (தமிழ்)';
+          if (lower.includes('tel') || lower === 'te') return 'Telugu (తెలుగు)';
+          if (lower.includes('ben') || lower.includes('ban') || lower === 'bn') return 'Bengali (বাংলা)';
+          if (lower.includes('kor') || lower === 'ko') return 'Korean (한국어)';
+          if (lower.includes('spa') || lower === 'es') return 'Spanish (Español)';
+          if (lower.includes('fre') || lower.includes('fra') || lower === 'fr') return 'French (Français)';
+          if (lower.includes('ger') || lower.includes('deu') || lower === 'de') return 'German (Deutsch)';
+          if (lower.includes('ita') || lower === 'it') return 'Italian (Italiano)';
+          if (lower.includes('rus') || lower === 'ru') return 'Russian (Русский)';
+          if (lower.includes('por') || lower === 'pt') return 'Portuguese';
+          if (lower.includes('orig') || lower === 'original') return 'Original Audio';
+          if (lower.includes('dual')) return 'Dual Audio (Hin/Eng)';
+          if (lower.includes('multi')) return 'Multi-Audio';
+
+          return name ? (name.charAt(0).toUpperCase() + name.slice(1)) : 'Default Audio';
+        }
+
+        /**
          * Dynamic Resolution and Audio UI generator for HLS streams
          */
         function populateResolutionAndAudioUI(hls) {
@@ -5404,22 +5447,45 @@
           }
 
           // 2. Audio Tracks Selector
-          if (hls && hls.audioTracks && hls.audioTracks.length > 1) {
+          if (hls && hls.audioTracks && hls.audioTracks.length > 0) {
+            // Auto-switch to preferred audio language (e.g. Hindi or English) if found
+            if (state.preferredAudioLanguage) {
+              const targetIdx = hls.audioTracks.findIndex(t => {
+                const lbl = formatAudioTrackLabel(t).toLowerCase();
+                return lbl.includes(state.preferredAudioLanguage);
+              });
+              if (targetIdx !== -1 && hls.audioTrack !== targetIdx) {
+                hls.audioTrack = targetIdx;
+              }
+            }
+
             if (audioContainer) audioContainer.classList.remove('hidden');
             if (audioList) {
-              audioList.innerHTML = hls.audioTracks.map((track, idx) => `
-                <button
-                  type="button"
-                  onclick="window.app.setAudioTrack(${idx})"
-                  class="audio-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${
-                    hls.audioTrack === idx
-                      ? 'bg-amber-600 text-white shadow-sm'
-                      : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
-                  }"
-                >
-                  <i class="fa-solid fa-volume-high text-[9px] mr-1"></i> ${escapeHtml(track.name || track.lang || `Track ${idx + 1}`)}
-                </button>
-              `).join('');
+              audioList.innerHTML = hls.audioTracks.map((track, idx) => {
+                const label = formatAudioTrackLabel(track);
+                const isSelected = (hls.audioTrack === idx);
+                const isHindi = label.toLowerCase().includes('hindi');
+                const isEnglish = label.toLowerCase().includes('english');
+
+                return `
+                  <button
+                    type="button"
+                    onclick="window.app.setAudioTrack(${idx})"
+                    class="audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-amber-600 text-white shadow-md ring-1 ring-amber-400'
+                        : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                    }"
+                    title="Switch Audio to ${escapeHtml(label)}"
+                  >
+                    <i class="fa-solid fa-volume-high text-[10px] ${isSelected ? 'text-amber-200' : 'text-gray-400'}"></i>
+                    <span>${escapeHtml(label)}</span>
+                    ${isHindi ? '<span class="bg-orange-500/30 text-orange-200 text-[8px] px-1 rounded font-bold uppercase">Dubbed</span>' : ''}
+                    ${isEnglish ? '<span class="bg-blue-500/30 text-blue-200 text-[8px] px-1 rounded font-bold uppercase">EN</span>' : ''}
+                    ${isSelected ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
+                  </button>
+                `;
+              }).join('');
             }
           } else if (audioContainer) {
             audioContainer.classList.add('hidden');
@@ -5448,23 +5514,33 @@
         }
 
         /**
-         * User selects audio track
+         * User selects audio track (Hindi, English, etc.)
          */
         function setAudioTrack(trackIndex) {
           if (!state.hlsInstance) return;
           state.hlsInstance.audioTrack = trackIndex;
 
+          const track = state.hlsInstance.audioTracks[trackIndex];
+          const label = formatAudioTrackLabel(track);
+          const lower = label.toLowerCase();
+
+          // Persist user preference so next episode/movie auto-plays in chosen language
+          if (lower.includes('hindi')) {
+            state.preferredAudioLanguage = 'hindi';
+          } else if (lower.includes('english')) {
+            state.preferredAudioLanguage = 'english';
+          }
+
           const pills = document.querySelectorAll('.audio-pill');
           pills.forEach((p, idx) => {
             if (idx === trackIndex) {
-              p.className = 'audio-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition bg-amber-600 text-white shadow-sm';
+              p.className = 'audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-amber-600 text-white shadow-md ring-1 ring-amber-400 flex items-center gap-1.5';
             } else {
-              p.className = 'audio-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5';
+              p.className = 'audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 flex items-center gap-1.5';
             }
           });
 
-          const track = state.hlsInstance.audioTracks[trackIndex];
-          showToast(`Audio track: ${track?.name || track?.lang || `Track ${trackIndex + 1}`}`, 'info');
+          showToast(`Audio set to: ${label}`, 'success');
         }
 
         /**
@@ -5472,13 +5548,13 @@
          */
         function playStream(stream) {
           if (!stream || !stream.link) {
-            console.warn('[CineStream] Invalid stream link, auto-failing over...');
+            console.warn('[PARXSTREAM] Invalid stream link, auto-failing over...');
             tryNextWorkingStream();
             return;
           }
 
           if (stream.isDownloadOnly || (stream.link && (stream.link.toLowerCase().includes('.mkv') || stream.link.toLowerCase().includes('.zip')))) {
-            console.warn('[CineStream] Stream is download-only (.mkv/.zip). Auto-switching to web mirror.');
+            console.warn('[PARXSTREAM] Stream is download-only (.mkv/.zip). Auto-switching to web mirror.');
             tryNextWorkingStream();
             return;
           }
@@ -5547,9 +5623,12 @@
             state.hlsInstance = null;
           }
 
-          // Construct stream proxy URL with custom headers
-          const customHeaders = stream.headers || {};
-          const proxiedUrl = `/api/proxy?url=${encodeURIComponent(stream.link)}&headers=${encodeURIComponent(JSON.stringify(customHeaders))}`;
+          // Construct stream proxy URL
+          let proxiedUrl = stream.link;
+          if (stream.link.startsWith('http://') || stream.link.startsWith('https://')) {
+            const customHeaders = stream.headers || {};
+            proxiedUrl = `/api/proxy?url=${encodeURIComponent(stream.link)}&headers=${encodeURIComponent(JSON.stringify(customHeaders))}`;
+          }
           state.currentStreamUrl = proxiedUrl;
 
           // Clear previous subtitles
@@ -5598,6 +5677,10 @@
               populateResolutionAndAudioUI(hls);
             });
 
+            hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, () => {
+              populateResolutionAndAudioUI(hls);
+            });
+
             let errorCount = 0;
             hls.on(Hls.Events.ERROR, (event, data) => {
               if (data.fatal) {
@@ -5624,7 +5707,7 @@
             // Set 12-second stall watchdog timer: if video never starts, auto-try next mirror
             state.streamPlaybackTimer = setTimeout(() => {
               if (video.readyState === 0 && !video.currentTime) {
-                console.warn('[CineStream] HLS playback stalled, triggering automatic failover.');
+                console.warn('[PARXSTREAM] HLS playback stalled, triggering automatic failover.');
                 tryNextWorkingStream();
               }
             }, 12000);
@@ -5641,14 +5724,14 @@
             };
 
             video.onerror = () => {
-              console.warn('[CineStream] Video element error on direct source, auto-failing over...');
+              console.warn('[PARXSTREAM] Video element error on direct source, auto-failing over...');
               tryNextWorkingStream();
             };
 
             // Set 10-second stall watchdog timer
             state.streamPlaybackTimer = setTimeout(() => {
               if (video.readyState === 0 && !video.currentTime) {
-                console.warn('[CineStream] Video direct stream stalled, auto-failing over.');
+                console.warn('[PARXSTREAM] Video direct stream stalled, auto-failing over.');
                 tryNextWorkingStream();
               }
             }, 10000);

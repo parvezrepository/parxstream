@@ -1,5 +1,5 @@
 {
-  "name": "cinestream-server",
+  "name": "parxstream-server",
   "version": "1.0.0",
   "type": "commonjs",
   "main": "server.js",
