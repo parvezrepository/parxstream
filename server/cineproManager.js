@@ -53,6 +53,13 @@ async function initCinePro() {
       const providersDir = path.join(__dirname, 'cinepro-core/dist/providers');
       await registry.discoverProviders(providersDir);
 
+      // Disable unresponsive or dead providers to ensure ultra-fast 2s stream resolution
+      registry.getProviders().forEach(p => {
+        if (p.id.toLowerCase() === 'videasy') {
+          p.enabled = false;
+        }
+      });
+
       registeredProvidersList = registry.getProviders().map(p => ({
         id: p.id,
         name: p.name,

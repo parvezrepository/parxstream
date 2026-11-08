@@ -27,6 +27,12 @@
       }
     },
     {
+      "source": "/v1/proxy(.*)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
       "source": "/(.*)",
       "destination": {
         "service": "app"

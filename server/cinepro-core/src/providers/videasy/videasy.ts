@@ -137,7 +137,7 @@ export class VideasyProvider extends BaseProvider {
     ): Promise<ProviderResult | null> {
         const params = this.buildParams(server, media);
         const url = `${server.url}?${new URLSearchParams(params as Record<string, string>)}`;
-        const response = await fetch(url, { headers: this.HEADERS });
+        const response = await fetch(url, { headers: this.HEADERS, signal: AbortSignal.timeout(3000) });
 
         if (!response.ok) {
             return this.emptyResult('invalid response', media);

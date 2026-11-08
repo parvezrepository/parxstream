@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
 const {
   getEnabledProviders,
   getProvider,
@@ -188,7 +189,7 @@ apiRouter.get('/cinepro/tv/:tmdbId/:season/:episode', async (req, res) => {
   }
 });
 
-apiRouter.all('/cinepro/proxy', async (req, res) => {
+const handleCineproProxy = async (req, res) => {
   const data = req.query.data;
   if (!data) {
     return res.status(400).json({ error: 'Missing data query parameter' });
@@ -202,20 +203,39 @@ apiRouter.all('/cinepro/proxy', async (req, res) => {
       method: req.method,
       url: targetUrl,
       headers,
-      responseType: 'stream',
+      responseType: 'arraybuffer',
       validateStatus: () => true
     });
 
-    res.status(proxyRes.status);
+    const contentType = (proxyRes.headers['content-type'] || '').toLowerCase();
+    const isM3u8 = contentType.includes('mpegurl') || contentType.includes('application/x-mpegurl') || contentType.includes('text/') || (typeof data === 'string' && data.includes('.m3u8'));
+
     Object.entries(proxyRes.headers).forEach(([k, v]) => {
-      res.setHeader(k, v);
+      if (k.toLowerCase() !== 'content-length') {
+        res.setHeader(k, v);
+      }
     });
-    proxyRes.data.pipe(res);
+    res.status(proxyRes.status);
+
+    if (isM3u8) {
+      let text = Buffer.from(proxyRes.data).toString('utf8');
+      // Rewrite any internal /v1/proxy?data= references to /api/cinepro/proxy?data=
+      text = text.replace(/\/v1\/proxy\?data=/g, '/api/cinepro/proxy?data=');
+      res.setHeader('content-type', 'application/vnd.apple.mpegurl; charset=utf-8');
+      res.send(text);
+    } else {
+      res.setHeader('content-length', proxyRes.data.length);
+      res.send(proxyRes.data);
+    }
   } catch (err) {
     console.error('[CinePro Proxy Error]', err.message);
     res.status(500).json({ error: 'CinePro proxy failed', message: err.message });
   }
-});
+};
+
+apiRouter.all('/cinepro/proxy', handleCineproProxy);
+apiRouter.all('/v1/proxy', handleCineproProxy);
+app.all('/v1/proxy', handleCineproProxy);
 
 // 9. /proxy?url=...&headers=...
 apiRouter.all('/proxy', handleProxyRequest);
