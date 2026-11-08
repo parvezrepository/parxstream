@@ -211,7 +211,7 @@
     "version": "2.11",
     "icon": "https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/netflixMirror.webp",
     "type": "global",
-    "disabled": false,
+    "disabled": true,
     "hasSettings": true
   },
   {
@@ -220,7 +220,7 @@
     "version": "2.10",
     "icon": "https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/primeMirror.webp",
     "type": "global",
-    "disabled": false,
+    "disabled": true,
     "hasSettings": true
   },
   {
@@ -229,7 +229,7 @@
     "version": "2.2",
     "icon": "https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/disneyMirror.webp",
     "type": "global",
-    "disabled": false,
+    "disabled": true,
     "hasSettings": true
   },
   {
