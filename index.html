@@ -190,23 +190,23 @@
         </div>
 
         <!-- Right Side: Live Search & API Settings -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
           
           <!-- Search Bar Container -->
           <div class="relative flex items-center">
             <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
               <input
                 id="searchInput"
                 type="text"
-                placeholder="Search movies, TV shows, anime..."
-                class="w-44 sm:w-64 md:w-72 bg-dark-850/90 border border-white/10 rounded-full pl-9 pr-8 py-2 text-xs sm:text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all duration-300"
+                placeholder="Search movies, TV, anime..."
+                class="w-28 xs:w-36 sm:w-64 md:w-72 bg-dark-850/90 border border-white/10 rounded-full pl-8 pr-7 sm:pl-9 sm:pr-8 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all duration-300"
                 autocomplete="off"
               />
               <button
                 id="searchClearBtn"
                 onclick="window.app.clearSearch()"
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden"
                 title="Clear search"
               >
                 <i class="fa-solid fa-xmark"></i>
@@ -221,77 +221,119 @@
             <button id="filterTvBtn" onclick="window.app.setTypeFilter('tv')" class="type-filter-btn px-2.5 py-1 rounded-lg text-gray-400 hover:text-white transition">Series</button>
           </div>
 
-          <!-- Provider Switcher Dropdown (Vega / TMDB) -->
-          <div class="relative" id="providerDropdownWrapper">
+          <!-- Provider Switcher Dropdown (Desktop) -->
+          <div class="relative hidden md:block" id="providerDropdownWrapper">
             <button
               id="providerSelectorBtn"
               onclick="window.app.toggleProviderDropdown()"
-              class="flex items-center gap-2 bg-dark-850 hover:bg-dark-800 border border-white/10 hover:border-brand-500/50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold text-gray-200 transition shadow-sm"
+              class="flex items-center gap-1.5 sm:gap-2 bg-dark-850 hover:bg-dark-800 border border-white/10 hover:border-brand-500/50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold text-gray-200 transition shadow-sm shrink-0"
               title="Switch Content Provider (Vega & MultiStream)"
               aria-label="Switch Provider"
             >
               <img id="selectedProviderIcon" src="https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png" onerror="this.src='https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg'" class="w-4 h-4 rounded object-contain shrink-0" />
-              <span id="selectedProviderName" class="max-w-[70px] sm:max-w-[100px] truncate text-[11px] sm:text-xs">TMDB (Default)</span>
+              <span id="selectedProviderName" class="max-w-[65px] xs:max-w-[85px] sm:max-w-[110px] truncate text-[11px] sm:text-xs">TMDB (Default)</span>
               <span id="providerBadge" class="hidden sm:inline bg-brand-600/30 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30">Live</span>
               <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
             </button>
-
-            <!-- Dropdown Menu -->
-            <div
-              id="providerDropdownMenu"
-              class="hidden absolute right-0 mt-2 w-72 sm:w-80 bg-dark-900 border border-white/10 rounded-2xl shadow-2xl z-50 p-2.5 backdrop-blur-2xl divide-y divide-white/5"
-            >
-              <div class="pb-2">
-                <div class="flex items-center justify-between pb-1.5 px-1">
-                  <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Select Streaming Provider</span>
-                  <span id="providersTotalCount" class="text-[10px] text-gray-500 font-medium">39 Available</span>
-                </div>
-                <div class="relative">
-                  <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-[10px]"></i>
-                  <input
-                    id="providerSearchInput"
-                    oninput="window.app.filterProviderList(this.value)"
-                    placeholder="Search provider (e.g. Vega, Auto, Drive)..."
-                    class="w-full bg-dark-850 border border-white/10 rounded-lg pl-7 pr-2 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-500"
-                  />
-                </div>
-              </div>
-              <div id="providerListContainer" class="pt-2 space-y-1 max-h-72 overflow-y-auto pr-1">
-                <!-- Dynamically populated provider items -->
-              </div>
-            </div>
           </div>
+
+          <!-- Quick Mobile Top Provider Button -->
+          <button
+            id="mobileTopProviderBtn"
+            type="button"
+            onclick="window.app.toggleProviderDropdown()"
+            class="md:hidden flex items-center gap-1 bg-dark-850 hover:bg-dark-800 border border-brand-500/40 px-2 py-1.5 rounded-xl text-xs font-semibold text-gray-200 transition shadow-sm shrink-0"
+            title="Switch Provider"
+          >
+            <img id="mobileTopProviderIcon" src="https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png" onerror="this.src='https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg'" class="w-3.5 h-3.5 rounded-full object-contain shrink-0" />
+            <span id="mobileTopProviderName" class="max-w-[55px] xs:max-w-[70px] truncate text-[11px] text-brand-300 font-bold">TMDB</span>
+            <i class="fa-solid fa-chevron-down text-[8px] text-gray-400"></i>
+          </button>
         </div>
       </div>
 
-      <!-- Mobile Navigation Drawer / Sub-bar -->
-      <div class="md:hidden flex items-center justify-around py-2 px-3 border-t border-white/5 bg-dark-900/90 text-xs">
-        <button onclick="window.app.navigateTab('home')" class="text-white flex flex-col items-center gap-1 py-1">
-          <i class="fa-solid fa-house text-sm text-brand-500"></i>
-          <span>Home</span>
-        </button>
-        <button onclick="window.app.navigateTab('movie')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1">
-          <i class="fa-solid fa-film text-sm"></i>
-          <span>Movies</span>
-        </button>
-        <button onclick="window.app.navigateTab('tv')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1">
-          <i class="fa-solid fa-tv text-sm"></i>
-          <span>Series</span>
-        </button>
-        <button onclick="window.app.navigateTab('anime')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1">
-          <i class="fa-solid fa-dragon text-sm text-rose-400"></i>
-          <span>Anime</span>
-        </button>
-        <button onclick="window.app.navigateTab('watchlist')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1 relative">
-          <i class="fa-solid fa-bookmark text-sm text-amber-400"></i>
-          <span>My List</span>
-          <span id="mobileWatchlistBadge" class="absolute top-0 right-2 w-2 h-2 rounded-full bg-brand-500 hidden"></span>
+      <!-- Dedicated Mobile Provider Sub-Bar (Visible exclusively on mobile screens) -->
+      <div id="mobileProviderSubBar" class="md:hidden flex items-center justify-between px-3 py-1.5 bg-dark-900/98 border-t border-white/10 backdrop-blur-md gap-2 shadow-sm">
+        <button
+          id="mobileProviderSelectorBtn"
+          type="button"
+          onclick="window.app.toggleProviderDropdown()"
+          class="flex-1 flex items-center justify-between bg-dark-850 hover:bg-dark-800 active:bg-dark-750 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-200 shadow-sm transition"
+        >
+          <div class="flex items-center gap-2 truncate">
+            <img id="mobileSelectedProviderIcon" src="https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png" onerror="this.src='https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg'" class="w-4 h-4 rounded-full object-contain shrink-0" />
+            <span class="text-gray-400 font-normal text-[11px]">Provider:</span>
+            <span id="mobileSelectedProviderName" class="text-brand-300 font-bold truncate">TMDB (Default)</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0 ml-2">
+            <span id="mobileProviderBadge" class="bg-brand-600/30 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30">Live</span>
+            <span class="text-[10px] text-gray-400 font-normal">Switch</span>
+            <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
+          </div>
         </button>
       </div>
     </header>
 
+    <!-- Global Provider Modal (Responsive for Desktop & Mobile) -->
+    <div
+      id="providerDropdownMenu"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+    >
+      <!-- Dark Frosted Backdrop -->
+      <div onclick="window.app.toggleProviderDropdown(false)" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+      <!-- Provider Selector Modal Card -->
+      <div class="relative w-full max-w-md bg-dark-900 border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] z-10 animate-fade-in divide-y divide-white/5">
+        <!-- Header -->
+        <div class="p-3.5 pb-2.5">
+          <div class="flex items-center justify-between pb-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-brand-600/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-layer-group"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Select Streaming Provider</h3>
+                <p id="providersTotalCount" class="text-[10px] text-gray-400">39 Available Global & Regional Sources</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onclick="window.app.toggleProviderDropdown(false)"
+              class="w-7 h-7 rounded-full bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white flex items-center justify-center text-xs transition"
+              title="Close"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <!-- Search input -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+            <input
+              id="providerSearchInput"
+              oninput="window.app.filterProviderList(this.value)"
+              placeholder="Search provider (e.g. Vega, Auto, Drive, MovieBox)..."
+              class="w-full bg-dark-850 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-500"
+            />
+          </div>
+        </div>
+
+        <!-- Scrollable Provider List Container -->
+        <div id="providerListContainer" class="p-2 space-y-1 max-h-[58vh] overflow-y-auto">
+          <!-- Dynamically populated provider items -->
+        </div>
+
+        <!-- Footer -->
+        <div class="px-3.5 py-2 bg-dark-950/80 text-[10px] text-gray-400 flex items-center justify-between">
+          <span>Selection auto-persists in browser</span>
+          <span class="text-brand-400 font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-bolt text-[9px] text-amber-400"></i> Vega Core
+          </span>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Content Body -->
-    <main class="flex-1 pt-16 sm:pt-20">
+    <main class="flex-1 pt-24 sm:pt-28 md:pt-20 pb-20 md:pb-6">
 
       <!-- Dynamic Hero Banner Section -->
       <section id="heroSection" class="relative w-full h-[540px] sm:h-[620px] lg:h-[700px] overflow-hidden bg-dark-950 flex items-end pb-12 sm:pb-20">
@@ -1133,6 +1175,22 @@
               <div id="providerStreamsList" class="flex items-center gap-1.5 flex-wrap"></div>
             </div>
 
+            <!-- Provider Resolution / Quality Selector Row -->
+            <div id="providerResolutionContainer" class="hidden flex items-center gap-2 flex-wrap pt-2 border-t border-white/5">
+              <span class="text-xs font-semibold text-sky-400 flex items-center gap-1.5 mr-1">
+                <i class="fa-solid fa-sliders text-xs"></i> Quality:
+              </span>
+              <div id="providerResolutionList" class="flex items-center gap-1.5 flex-wrap"></div>
+            </div>
+
+            <!-- Provider Audio Track Selector Row -->
+            <div id="providerAudioContainer" class="hidden flex items-center gap-2 flex-wrap pt-2 border-t border-white/5">
+              <span class="text-xs font-semibold text-amber-400 flex items-center gap-1.5 mr-1">
+                <i class="fa-solid fa-volume-high text-xs"></i> Audio Track:
+              </span>
+              <div id="providerAudioList" class="flex items-center gap-1.5 flex-wrap"></div>
+            </div>
+
           </div>
 
           <!-- Responsive 16:9 Video Player Container -->
@@ -1868,8 +1926,17 @@
           // Close provider dropdown when clicking outside
           document.addEventListener('click', (e) => {
             const wrapper = document.getElementById('providerDropdownWrapper');
+            const mobileBtn = document.getElementById('mobileTopProviderBtn');
+            const mobileSubBar = document.getElementById('mobileProviderSubBar');
             const menu = document.getElementById('providerDropdownMenu');
-            if (wrapper && menu && !wrapper.contains(e.target)) {
+            if (!menu || menu.classList.contains('hidden')) return;
+
+            const isClickInsideTrigger = (wrapper && wrapper.contains(e.target)) ||
+                                         (mobileBtn && mobileBtn.contains(e.target)) ||
+                                         (mobileSubBar && mobileSubBar.contains(e.target));
+            const isClickInsideCard = menu.querySelector('.bg-dark-900')?.contains(e.target);
+
+            if (!isClickInsideTrigger && !isClickInsideCard) {
               menu.classList.add('hidden');
             }
           });
@@ -2905,7 +2972,11 @@
           if (input) input.value = term;
           document.getElementById('searchClearBtn').classList.remove('hidden');
           state.searchQuery = term;
-          executeSearch(term);
+          if (state.selectedProvider !== 'tmdb') {
+            executeProviderSearch(term);
+          } else {
+            executeSearch(term);
+          }
         }
 
         function onLanguageFilterChange(lang) {
@@ -4079,6 +4150,11 @@
           const nameEl = document.getElementById('selectedProviderName');
           const iconEl = document.getElementById('selectedProviderIcon');
           const badgeEl = document.getElementById('providerBadge');
+          const mTopNameEl = document.getElementById('mobileTopProviderName');
+          const mTopIconEl = document.getElementById('mobileTopProviderIcon');
+          const mNameEl = document.getElementById('mobileSelectedProviderName');
+          const mIconEl = document.getElementById('mobileSelectedProviderIcon');
+          const mBadgeEl = document.getElementById('mobileProviderBadge');
 
           if (providerValue === 'tmdb') {
             if (nameEl) nameEl.textContent = 'TMDB (Default)';
@@ -4087,13 +4163,32 @@
               badgeEl.textContent = 'TMDB';
               badgeEl.className = 'hidden sm:inline bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-emerald-500/30';
             }
+            if (mTopNameEl) mTopNameEl.textContent = 'TMDB';
+            if (mTopIconEl) mTopIconEl.src = 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png';
+            if (mNameEl) mNameEl.textContent = 'TMDB (Default)';
+            if (mIconEl) mIconEl.src = 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png';
+            if (mBadgeEl) {
+              mBadgeEl.textContent = 'TMDB';
+              mBadgeEl.className = 'bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-emerald-500/30';
+            }
           } else {
             const p = state.availableProviders.find((x) => x.value === providerValue);
-            if (nameEl) nameEl.textContent = p ? p.display_name : providerValue;
-            if (iconEl) iconEl.src = (p && p.icon) ? p.icon : 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg';
+            const dName = p ? p.display_name : providerValue;
+            const dIcon = (p && p.icon) ? p.icon : 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg';
+
+            if (nameEl) nameEl.textContent = dName;
+            if (iconEl) iconEl.src = dIcon;
             if (badgeEl) {
-              badgeEl.textContent = 'Provider';
+              badgeEl.textContent = 'Live';
               badgeEl.className = 'hidden sm:inline bg-brand-600/30 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30';
+            }
+            if (mTopNameEl) mTopNameEl.textContent = dName;
+            if (mTopIconEl) mTopIconEl.src = dIcon;
+            if (mNameEl) mNameEl.textContent = dName;
+            if (mIconEl) mIconEl.src = dIcon;
+            if (mBadgeEl) {
+              mBadgeEl.textContent = 'Live';
+              mBadgeEl.className = 'bg-brand-600/30 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30';
             }
           }
         }
@@ -4561,34 +4656,60 @@
             const linkList = Array.isArray(meta.linkList) ? meta.linkList : [];
             state.activeProviderMedia.linkList = linkList;
 
+            const isTv = meta.type === 'series' || meta.type === 'tv' || (linkList.some(item => /season|episode/i.test(item.title || '')));
+
             if (linkList.length === 0) {
-              // Direct stream link or fallback
               if (meta.link) {
-                await fetchAndPlayProviderStream(meta.link, meta.type || 'movie');
+                await fetchAndPlayProviderStream(meta.link, isTv ? 'series' : 'movie');
               } else {
-                showToast('No streaming links available for this title.', 'error');
+                // Auto fallback to fast embed mirrors
+                const fallbacks = getEmbedFallbackStreams(meta, isTv ? 'series' : 'movie');
+                state.currentStreamList = fallbacks;
+                renderProviderStreamsUI(fallbacks);
+                playStream(fallbacks[0]);
               }
               return;
             }
 
-            // Check if multiple seasons or versions exist
-            if (linkList.length > 1 && pSeasonsRow && pSeasonsList) {
+            // Always display Season / Version row when entries are present or when it's a TV show
+            if (pSeasonsRow && pSeasonsList) {
               pSeasonsRow.classList.remove('hidden');
-              pSeasonsList.innerHTML = linkList.map((item, idx) => `
-                <button
-                  type="button"
-                  onclick="window.app.selectProviderSeason(${idx})"
-                  class="provider-season-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition border ${
-                    idx === 0
-                      ? 'bg-purple-600 text-white border-purple-500 shadow-sm'
-                      : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border-white/5'
-                  }"
-                >
-                  <i class="fa-solid fa-layer-group text-[9px] mr-1"></i> ${escapeHtml(item.title || `Season ${idx + 1}`)}
-                </button>
-              `).join('');
-            } else if (pSeasonsRow) {
-              pSeasonsRow.classList.add('hidden');
+              const seasonHeaderLabel = pSeasonsRow.querySelector('span');
+              if (seasonHeaderLabel) {
+                seasonHeaderLabel.innerHTML = isTv
+                  ? '<i class="fa-solid fa-layer-group text-xs text-purple-400"></i> Seasons:'
+                  : '<i class="fa-solid fa-film text-xs text-purple-400"></i> Versions:';
+              }
+
+              pSeasonsList.innerHTML = linkList.map((item, idx) => {
+                // Clean long provider title into a readable badge
+                let displayTitle = item.title || (isTv ? `Season ${idx + 1}` : `Version ${idx + 1}`);
+                const seasonMatch = displayTitle.match(/season\s*(\d+)/i);
+                const qualityMatch = displayTitle.match(/(\d{3,4}p|4k|uhd|bluray|hdrip|web-dl)/i);
+                
+                if (seasonMatch) {
+                  displayTitle = `Season ${seasonMatch[1]}` + (qualityMatch ? ` (${qualityMatch[1].toUpperCase()})` : '');
+                } else if (qualityMatch) {
+                  displayTitle = `${qualityMatch[1].toUpperCase()}` + (item.quality ? ` • ${item.quality}` : '');
+                } else if (displayTitle.length > 25) {
+                  displayTitle = displayTitle.substring(0, 22) + '...';
+                }
+
+                return `
+                  <button
+                    type="button"
+                    onclick="window.app.selectProviderSeason(${idx})"
+                    class="provider-season-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition border ${
+                      idx === 0
+                        ? 'bg-purple-600 text-white border-purple-500 shadow-sm'
+                        : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border-white/5'
+                    }"
+                    title="${escapeHtml(item.title || '')}"
+                  >
+                    <i class="fa-solid ${isTv ? 'fa-layer-group' : 'fa-film'} text-[9px] mr-1"></i> ${escapeHtml(displayTitle)}
+                  </button>
+                `;
+              }).join('');
             }
 
             // Select initial season / quality
@@ -4596,6 +4717,13 @@
           } catch (err) {
             console.error('[Provider Meta Error]', err);
             showToast(`Could not load media: ${err.message}`, 'error');
+            // Try emergency fallback embed
+            if (post) {
+              const fallbacks = getEmbedFallbackStreams({ title: post.title, imdbId: post.imdbId }, 'movie');
+              state.currentStreamList = fallbacks;
+              renderProviderStreamsUI(fallbacks);
+              playStream(fallbacks[0]);
+            }
           } finally {
             if (loader) {
               setTimeout(() => {
@@ -4634,7 +4762,7 @@
           // Case A: dynamic episodesLink
           if (seasonItem.episodesLink) {
             if (pLinks) pLinks.classList.remove('hidden');
-            if (pLinksTitle) pLinksTitle.innerHTML = '<i class="fa-solid fa-tv text-xs"></i> Select Episode:';
+            if (pLinksTitle) pLinksTitle.innerHTML = '<i class="fa-solid fa-tv text-xs text-brand-400"></i> Select Episode:';
             if (pLinksCount) pLinksCount.textContent = 'Loading episodes...';
             if (pLinksList) {
               pLinksList.innerHTML = `
@@ -4665,13 +4793,16 @@
                     </button>
                   `).join('');
                 }
+                state.activeProviderEpisodeIndex = 0;
                 await fetchAndPlayProviderStream(epList[0].link, 'series');
               } else {
-                if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-gray-500 py-2">No episodes found.</span>`;
+                if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-gray-500 py-2">No direct episodes found. Loading mirror player...</span>`;
+                await fetchAndPlayProviderStream(seasonItem.link || state.activeProviderMedia.link || '', 'series');
               }
             } catch (err) {
               console.error('[Provider Episodes Error]', err);
-              if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-rose-400 py-2">Error loading episodes.</span>`;
+              if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-rose-400 py-2">Episodes feed unavailable. Loading mirror player...</span>`;
+              await fetchAndPlayProviderStream(seasonItem.link || state.activeProviderMedia.link || '', 'series');
             }
             return;
           }
@@ -4680,8 +4811,8 @@
           if (Array.isArray(seasonItem.directLinks) && seasonItem.directLinks.length > 0) {
             if (pLinks) pLinks.classList.remove('hidden');
             const isTv = state.activeProviderMedia.type === 'series' || state.activeProviderMedia.type === 'tv' || (seasonItem.title && seasonItem.title.toLowerCase().includes('season'));
-            if (pLinksTitle) pLinksTitle.innerHTML = isTv ? '<i class="fa-solid fa-tv text-xs"></i> Select Episode:' : '<i class="fa-solid fa-film text-xs"></i> Select Version / Quality:';
-            if (pLinksCount) pLinksCount.textContent = `${seasonItem.directLinks.length} ${isTv ? 'Episodes' : 'Versions'}`;
+            if (pLinksTitle) pLinksTitle.innerHTML = isTv ? '<i class="fa-solid fa-tv text-xs text-brand-400"></i> Select Episode:' : '<i class="fa-solid fa-film text-xs text-brand-400"></i> Select Option:';
+            if (pLinksCount) pLinksCount.textContent = `${seasonItem.directLinks.length} ${isTv ? 'Episodes' : 'Options'}`;
 
             state.activeProviderMedia.directLinks = seasonItem.directLinks;
 
@@ -4692,11 +4823,12 @@
                   onclick="window.app.selectProviderDirectLink(${idx})"
                   class="provider-link-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-brand-600 transition border border-white/5 ${idx === 0 ? 'bg-brand-600 text-white border-brand-500 shadow-sm' : ''}"
                 >
-                  <i class="fa-solid ${isTv ? 'fa-play' : 'fa-film'} text-[9px] mr-1"></i> ${escapeHtml(dl.title || `Option ${idx + 1}`)}
+                  <i class="fa-solid ${isTv ? 'fa-play' : 'fa-film'} text-[9px] mr-1"></i> ${escapeHtml(dl.title || `Episode ${idx + 1}`)}
                 </button>
               `).join('');
             }
 
+            state.activeProviderEpisodeIndex = 0;
             await fetchAndPlayProviderStream(seasonItem.directLinks[0].link, seasonItem.directLinks[0].type || state.activeProviderMedia.type || 'movie');
             return;
           }
@@ -4714,6 +4846,8 @@
           const episodes = state.activeProviderMedia?.episodes || [];
           const ep = episodes[index];
           if (!ep) return;
+
+          state.activeProviderEpisodeIndex = index;
 
           // Update active link pill UI
           const pills = document.querySelectorAll('#providerLinksList .provider-link-pill');
@@ -4737,6 +4871,8 @@
           const dl = directLinks[index];
           if (!dl) return;
 
+          state.activeProviderEpisodeIndex = index;
+
           const pills = document.querySelectorAll('#providerLinksList .provider-link-pill');
           pills.forEach((p, idx) => {
             if (idx === index) {
@@ -4748,6 +4884,49 @@
 
           showToast(`Switching to ${dl.title}`, 'info');
           await fetchAndPlayProviderStream(dl.link, dl.type || 'movie');
+        }
+
+        /**
+         * Construct high-speed embed fallback streams if provider returns dead streams or fails
+         */
+        function getEmbedFallbackStreams(meta, type) {
+          const isTv = type === 'series' || type === 'tv' || (meta && (meta.type === 'series' || meta.type === 'tv'));
+          const id = (meta && (meta.imdbId || meta.tmdbId || meta.id)) || 'tt1160419';
+          const s = state.activeProviderSeasonIndex !== undefined ? (state.activeProviderSeasonIndex + 1) : 1;
+          const ep = state.activeProviderEpisodeIndex !== undefined ? (state.activeProviderEpisodeIndex + 1) : 1;
+
+          return [
+            {
+              server: 'VidLink Fast HD',
+              link: isTv ? `https://vidlink.pro/tv/${id}/${s}/${ep}` : `https://vidlink.pro/movie/${id}`,
+              type: 'embed',
+              quality: '1080p'
+            },
+            {
+              server: 'AutoEmbed Pro (Multi-Audio)',
+              link: isTv ? `https://player.autoembed.cc/embed/tv/${id}/${s}/${ep}` : `https://player.autoembed.cc/embed/movie/${id}`,
+              type: 'embed',
+              quality: 'Auto HD'
+            },
+            {
+              server: 'VidSrc PM (Global Mirror)',
+              link: isTv ? `https://vidsrc.pm/embed/tv/${id}/${s}/${ep}` : `https://vidsrc.pm/embed/movie/${id}`,
+              type: 'embed',
+              quality: '1080p'
+            },
+            {
+              server: 'VidSrc SU (Fast Server)',
+              link: isTv ? `https://vidsrc.su/embed/tv/${id}/${s}/${ep}` : `https://vidsrc.su/embed/movie/${id}`,
+              type: 'embed',
+              quality: 'Auto'
+            },
+            {
+              server: '2Embed Backup',
+              link: isTv ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${ep}` : `https://www.2embed.cc/embed/${id}`,
+              type: 'embed',
+              quality: 'HD'
+            }
+          ];
         }
 
         /**
@@ -4763,18 +4942,23 @@
           }
 
           try {
+            if (!link) {
+              throw new Error('Empty link parameter');
+            }
+
             const streamUrl = `/api/providers/${encodeURIComponent(state.selectedProvider)}/stream?link=${encodeURIComponent(link)}&type=${encodeURIComponent(type)}`;
             const res = await fetch(streamUrl);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const streams = await res.json();
-            const streamList = Array.isArray(streams) ? streams : [];
+            let streamList = Array.isArray(streams) ? streams : [];
+
+            // If provider returned 0 streams, auto-fallback to high-speed embed mirrors
+            if (streamList.length === 0) {
+              console.warn('[CineStream] Provider returned 0 direct streams. Auto-engaging backup mirrors.');
+              streamList = getEmbedFallbackStreams(state.activeProviderMedia, type);
+            }
 
             state.currentStreamList = streamList;
-
-            if (streamList.length === 0) {
-              showToast('No working streams returned from this provider server.', 'error');
-              return;
-            }
 
             // Render Server Selector Pills for each resolved server
             renderProviderStreamsUI(streamList);
@@ -4784,7 +4968,12 @@
             playStream(streamList[0]);
           } catch (err) {
             console.error('[Provider Stream Error]', err);
-            showToast(`Stream resolution error: ${err.message}`, 'error');
+            // Fallback to embed mirrors instead of freezing
+            const fallbacks = getEmbedFallbackStreams(state.activeProviderMedia, type);
+            state.currentStreamList = fallbacks;
+            renderProviderStreamsUI(fallbacks);
+            state.currentStreamIndex = 0;
+            playStream(fallbacks[0]);
           } finally {
             if (loader) {
               setTimeout(() => {
@@ -4810,14 +4999,14 @@
               type="button"
               onclick="window.app.selectProviderStream(${idx})"
               class="provider-stream-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
-                idx === 0
+                idx === state.currentStreamIndex
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
               }"
-              title="${escapeHtml(stream.server)} (${escapeHtml(stream.quality || 'HD')})"
+              title="${escapeHtml(stream.server || `Server ${idx + 1}`)} (${escapeHtml(stream.quality || 'HD')})"
             >
               <i class="fa-solid fa-bolt text-[10px] text-amber-300"></i>
-              <span>${escapeHtml(stream.server)}</span>
+              <span>${escapeHtml(stream.server || `Server ${idx + 1}`)}</span>
               <span class="bg-black/40 text-[9px] px-1.5 py-0.2 rounded font-bold">${escapeHtml(stream.quality || 'HD')}</span>
             </button>
           `).join('');
@@ -4831,35 +5020,245 @@
           if (!stream) return;
 
           state.currentStreamIndex = index;
-
-          const buttons = document.querySelectorAll('.provider-stream-btn');
-          buttons.forEach((btn, idx) => {
-            if (idx === index) {
-              btn.className = 'provider-stream-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-sm';
-            } else {
-              btn.className = 'provider-stream-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5';
-            }
-          });
-
-          showToast(`Switched to server: ${stream.server}`, 'info');
+          renderProviderStreamsUI(state.currentStreamList);
+          showToast(`Switched to: ${stream.server || `Server ${index + 1}`}`, 'info');
           playStream(stream);
         }
 
         /**
-         * Play stream in video player (HLS / MP4 via /api/proxy)
+         * Automatic Server Failover: Switches to next available mirror if current server fails
+         */
+        function tryNextWorkingStream() {
+          if (state.currentStreamIndex + 1 < (state.currentStreamList || []).length) {
+            state.currentStreamIndex++;
+            const nextStream = state.currentStreamList[state.currentStreamIndex];
+            console.log(`[Failover] Auto-switching to next stream server: ${nextStream.server}`);
+            showToast(`Server busy. Auto-switching to ${nextStream.server}...`, 'info');
+            renderProviderStreamsUI(state.currentStreamList);
+            playStream(nextStream);
+            return;
+          }
+
+          // If all direct provider streams failed, switch to fast embed fallbacks
+          const isEmbedFallbackActive = (state.currentStreamList || []).some(s => s.server && s.server.includes('VidLink'));
+          if (!isEmbedFallbackActive && state.activeProviderMedia) {
+            console.log('[Failover] All direct provider servers exhausted. Engaging backup mirrors.');
+            showToast('Direct links busy. Auto-switched to Fast Backup Mirror...', 'info');
+            const fallbacks = getEmbedFallbackStreams(state.activeProviderMedia, state.activeProviderMedia.type);
+            state.currentStreamList = fallbacks;
+            state.currentStreamIndex = 0;
+            renderProviderStreamsUI(fallbacks);
+            playStream(fallbacks[0]);
+            return;
+          }
+
+          // If literally all options failed, display helpful retry card
+          const loader = document.getElementById('playerLoading');
+          if (loader) {
+            loader.classList.remove('opacity-0');
+            loader.classList.remove('pointer-events-none');
+            const span = loader.querySelector('span');
+            if (span) {
+              span.innerHTML = `
+                <div class="text-center p-3">
+                  <p class="text-amber-400 font-bold mb-1">Server Temporarily Busy</p>
+                  <p class="text-[11px] text-gray-400 mb-3">All streams for this title were slow or unavailable. Try again or switch provider:</p>
+                  <div class="flex items-center justify-center gap-2">
+                    <button onclick="window.app.retryCurrentStream()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition">Retry Stream</button>
+                    <button onclick="window.app.toggleProviderDropdown()" class="px-3 py-1.5 bg-dark-800 hover:bg-dark-700 text-gray-200 rounded-lg text-xs font-semibold border border-white/10 transition">Switch Provider</button>
+                  </div>
+                </div>
+              `;
+            }
+          }
+        }
+
+        function retryCurrentStream() {
+          if (state.currentStreamList && state.currentStreamList.length > 0) {
+            state.currentStreamIndex = 0;
+            playStream(state.currentStreamList[0]);
+          }
+        }
+
+        /**
+         * Dynamic Resolution and Audio UI generator for HLS streams
+         */
+        function populateResolutionAndAudioUI(hls) {
+          const resContainer = document.getElementById('providerResolutionContainer');
+          const resList = document.getElementById('providerResolutionList');
+          const audioContainer = document.getElementById('providerAudioContainer');
+          const audioList = document.getElementById('providerAudioList');
+
+          // 1. Resolution / Quality Selector
+          if (hls && hls.levels && hls.levels.length > 1) {
+            if (resContainer) resContainer.classList.remove('hidden');
+            if (resList) {
+              let html = `
+                <button
+                  type="button"
+                  onclick="window.app.setResolution(-1)"
+                  class="quality-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${
+                    hls.currentLevel === -1
+                      ? 'bg-sky-600 text-white shadow-sm'
+                      : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                  }"
+                >
+                  Auto
+                </button>
+              `;
+
+              hls.levels.forEach((lvl, idx) => {
+                const label = lvl.height ? `${lvl.height}p` : `Level ${idx + 1}`;
+                html += `
+                  <button
+                    type="button"
+                    onclick="window.app.setResolution(${idx})"
+                    class="quality-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${
+                      hls.currentLevel === idx
+                        ? 'bg-sky-600 text-white shadow-sm'
+                        : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                    }"
+                  >
+                    ${label}
+                  </button>
+                `;
+              });
+
+              resList.innerHTML = html;
+            }
+          } else if (resContainer) {
+            resContainer.classList.add('hidden');
+          }
+
+          // 2. Audio Tracks Selector
+          if (hls && hls.audioTracks && hls.audioTracks.length > 1) {
+            if (audioContainer) audioContainer.classList.remove('hidden');
+            if (audioList) {
+              audioList.innerHTML = hls.audioTracks.map((track, idx) => `
+                <button
+                  type="button"
+                  onclick="window.app.setAudioTrack(${idx})"
+                  class="audio-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${
+                    hls.audioTrack === idx
+                      ? 'bg-amber-600 text-white shadow-sm'
+                      : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                  }"
+                >
+                  <i class="fa-solid fa-volume-high text-[9px] mr-1"></i> ${escapeHtml(track.name || track.lang || `Track ${idx + 1}`)}
+                </button>
+              `).join('');
+            }
+          } else if (audioContainer) {
+            audioContainer.classList.add('hidden');
+          }
+        }
+
+        /**
+         * User selects HLS video quality level (-1 for Auto, 0, 1, ... for specific height)
+         */
+        function setResolution(levelIndex) {
+          if (!state.hlsInstance) return;
+          state.hlsInstance.currentLevel = levelIndex;
+
+          const pills = document.querySelectorAll('.quality-pill');
+          pills.forEach((p, idx) => {
+            const isMatch = (levelIndex === -1 && idx === 0) || (levelIndex + 1 === idx);
+            if (isMatch) {
+              p.className = 'quality-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition bg-sky-600 text-white shadow-sm';
+            } else {
+              p.className = 'quality-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5';
+            }
+          });
+
+          const label = levelIndex === -1 ? 'Auto' : `${state.hlsInstance.levels[levelIndex]?.height || ''}p`;
+          showToast(`Resolution set to ${label}`, 'info');
+        }
+
+        /**
+         * User selects audio track
+         */
+        function setAudioTrack(trackIndex) {
+          if (!state.hlsInstance) return;
+          state.hlsInstance.audioTrack = trackIndex;
+
+          const pills = document.querySelectorAll('.audio-pill');
+          pills.forEach((p, idx) => {
+            if (idx === trackIndex) {
+              p.className = 'audio-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition bg-amber-600 text-white shadow-sm';
+            } else {
+              p.className = 'audio-pill px-2.5 py-1 rounded-md text-[11px] font-semibold transition bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5';
+            }
+          });
+
+          const track = state.hlsInstance.audioTracks[trackIndex];
+          showToast(`Audio track: ${track?.name || track?.lang || `Track ${trackIndex + 1}`}`, 'info');
+        }
+
+        /**
+         * Intelligent Playback Router: plays Embeds in iframe, HLS / MP4 in video player with auto-failover
          */
         function playStream(stream) {
           if (!stream || !stream.link) {
-            showToast('Invalid stream URL', 'error');
+            console.warn('[CineStream] Invalid stream link, auto-failing over...');
+            tryNextWorkingStream();
             return;
           }
 
           const iframe = document.getElementById('streamIframe');
           const video = document.getElementById('streamVideoPlayer');
           const loader = document.getElementById('playerLoading');
+          const resContainer = document.getElementById('providerResolutionContainer');
+          const audioContainer = document.getElementById('providerAudioContainer');
 
-          if (iframe) iframe.classList.add('hidden');
-          if (video) video.classList.remove('hidden');
+          // Clear any pending playback stall timers
+          if (state.streamPlaybackTimer) {
+            clearTimeout(state.streamPlaybackTimer);
+            state.streamPlaybackTimer = null;
+          }
+
+          // Check if stream is an Embed or web player
+          const isEmbed = stream.type === 'embed' ||
+            stream.link.toLowerCase().includes('embed') ||
+            stream.link.toLowerCase().includes('/player') ||
+            stream.link.toLowerCase().includes('.html') ||
+            (!stream.link.includes('.m3u8') && !stream.link.includes('.mp4') && !stream.link.includes('.mkv') && !stream.link.includes('.webm') && stream.link.startsWith('http'));
+
+          if (isEmbed) {
+            // Embed mode: Route directly to sandboxed full iframe
+            if (video) {
+              try { video.pause(); } catch (e) {}
+              video.removeAttribute('src');
+              video.innerHTML = '';
+              video.classList.add('hidden');
+            }
+            if (state.hlsInstance) {
+              try { state.hlsInstance.destroy(); } catch (e) {}
+              state.hlsInstance = null;
+            }
+
+            if (resContainer) resContainer.classList.add('hidden');
+            if (audioContainer) audioContainer.classList.add('hidden');
+
+            if (iframe) {
+              iframe.classList.remove('hidden');
+              iframe.src = stream.link;
+            }
+
+            if (loader) {
+              loader.classList.add('opacity-0');
+              loader.classList.add('pointer-events-none');
+            }
+            return;
+          }
+
+          // Direct Video Mode (.m3u8 / .mp4 / .webm)
+          if (iframe) {
+            iframe.src = 'about:blank';
+            iframe.classList.add('hidden');
+          }
+          if (video) {
+            video.classList.remove('hidden');
+          }
 
           // Destroy previous HLS instance if active
           if (state.hlsInstance) {
@@ -4899,7 +5298,8 @@
             const hls = new Hls({
               enableWorker: true,
               lowLatencyMode: true,
-              backBufferLength: 90,
+              backBufferLength: 60,
+              maxBufferLength: 30,
             });
             state.hlsInstance = hls;
 
@@ -4907,18 +5307,27 @@
             hls.attachMedia(video);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-              video.play().catch(() => {
-                // Autoplay was prevented, user can click play
-              });
+              video.play().catch(() => {});
               if (loader) {
                 loader.classList.add('opacity-0');
                 loader.classList.add('pointer-events-none');
               }
+              populateResolutionAndAudioUI(hls);
             });
 
+            hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
+              populateResolutionAndAudioUI(hls);
+            });
+
+            let errorCount = 0;
             hls.on(Hls.Events.ERROR, (event, data) => {
               if (data.fatal) {
+                errorCount++;
                 console.warn('[HLS Fatal Error]', data.type, data.details);
+                if (errorCount > 1) {
+                  tryNextWorkingStream();
+                  return;
+                }
                 switch (data.type) {
                   case Hls.ErrorTypes.NETWORK_ERROR:
                     hls.startLoad();
@@ -4927,22 +5336,43 @@
                     hls.recoverMediaError();
                     break;
                   default:
-                    hls.destroy();
-                    // Fallback to native video src
-                    video.src = proxiedUrl;
-                    video.play().catch(() => {});
+                    tryNextWorkingStream();
                     break;
                 }
               }
             });
+
+            // Set 12-second stall watchdog timer: if video never starts, auto-try next mirror
+            state.streamPlaybackTimer = setTimeout(() => {
+              if (video.readyState === 0 && !video.currentTime) {
+                console.warn('[CineStream] HLS playback stalled, triggering automatic failover.');
+                tryNextWorkingStream();
+              }
+            }, 12000);
+
           } else {
-            // Native video playback (MP4 or Safari native HLS)
+            // Direct MP4 or Safari native HLS playback
             video.src = proxiedUrl;
-            video.play().catch(() => {});
-            if (loader) {
-              loader.classList.add('opacity-0');
-              loader.classList.add('pointer-events-none');
-            }
+            video.onloadeddata = () => {
+              video.play().catch(() => {});
+              if (loader) {
+                loader.classList.add('opacity-0');
+                loader.classList.add('pointer-events-none');
+              }
+            };
+
+            video.onerror = () => {
+              console.warn('[CineStream] Video element error on direct source, auto-failing over...');
+              tryNextWorkingStream();
+            };
+
+            // Set 10-second stall watchdog timer
+            state.streamPlaybackTimer = setTimeout(() => {
+              if (video.readyState === 0 && !video.currentTime) {
+                console.warn('[CineStream] Video direct stream stalled, auto-failing over.');
+                tryNextWorkingStream();
+              }
+            }, 10000);
           }
         }
 
@@ -5010,7 +5440,11 @@
           selectProviderEpisode,
           selectProviderDirectLink,
           selectProviderStream,
-          playStream
+          playStream,
+          setResolution,
+          setAudioTrack,
+          tryNextWorkingStream,
+          retryCurrentStream
         };
 
         // Initialize when DOM is ready
@@ -5022,5 +5456,29 @@
 
       })();
     </script>
+    <!-- Mobile Bottom Navigation Bar (Fixed for quick thumb reach) -->
+    <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-950/95 backdrop-blur-xl border-t border-white/10 flex items-center justify-around py-2 px-3 text-xs shadow-2xl">
+      <button onclick="window.app.navigateTab('home')" class="text-white flex flex-col items-center gap-1 py-1">
+        <i class="fa-solid fa-house text-sm text-brand-500"></i>
+        <span>Home</span>
+      </button>
+      <button onclick="window.app.navigateTab('movie')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1">
+        <i class="fa-solid fa-film text-sm"></i>
+        <span>Movies</span>
+      </button>
+      <button onclick="window.app.navigateTab('tv')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1">
+        <i class="fa-solid fa-tv text-sm"></i>
+        <span>Series</span>
+      </button>
+      <button onclick="window.app.navigateTab('anime')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1">
+        <i class="fa-solid fa-dragon text-sm text-rose-400"></i>
+        <span>Anime</span>
+      </button>
+      <button onclick="window.app.navigateTab('watchlist')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 py-1 relative">
+        <i class="fa-solid fa-bookmark text-sm text-amber-400"></i>
+        <span>My List</span>
+        <span id="mobileWatchlistBadge" class="absolute top-0 right-2 w-2 h-2 rounded-full bg-brand-500 hidden"></span>
+      </button>
+    </nav>
   </body>
 </html>
