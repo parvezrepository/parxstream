@@ -1891,6 +1891,81 @@
         const DEFAULT_TMDB_API_KEY = '3c7e2985716f8f6a43a41e0dfff8bb96';
         const DEFAULT_TMDB_READ_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzYzdlMjk4NTcxNmY4ZjZhNDNhNDFlMGRmZmY4YmI5NiIsIm5iZiI6MTc5NDA0MjgwMS4yMDIsInN1YiI6IjZhZWVlYmIxNzc3MzRhNzNkOTMyMDc4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.g94o-sgA3YwCHuih_C_B-85vF2xbhnvX13wjOcRS7mg';
 
+        // Built-in verified Vega streaming provider definitions (High-Availability Offline & Dual-Mode Fallback)
+        const FALLBACK_PROVIDERS = [
+          { display_name: 'VMovies', value: 'vega', version: '2.52', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/vega.png', type: 'global', disabled: false },
+          { display_name: 'MoviesDrive', value: 'drive', version: '2.30', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/drive.png', type: 'global', disabled: false },
+          { display_name: '4khdHub', value: '4khdhub', version: '2.21', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/4khdhub.png', type: 'global', disabled: false },
+          { display_name: 'World4uFree', value: 'world4u', version: '1.8', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/world4u.png', type: 'global', disabled: false },
+          { display_name: 'KatMoviesHd', value: 'katmovies', version: '1.39', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/katmovies.png', type: 'global', disabled: false },
+          { display_name: 'MoviesMod', value: 'mod', version: '2.1', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/mod.png', type: 'global', disabled: false },
+          { display_name: 'UHDMovies', value: 'uhd', version: '2.2', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/uhd.webp', type: 'global', disabled: false },
+          { display_name: 'MovieBox Web', value: 'movieBoxWeb', version: '2.7', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/movieBoxWeb.png', type: 'global', disabled: false },
+          { display_name: 'GokuHD', value: 'gokuHD', version: '1.7', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/gokuHD.png', type: 'global', disabled: false },
+          { display_name: 'DramaCool', value: 'dramacool', version: '1.4', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/dramacool.png', type: 'global', disabled: false },
+          { display_name: 'EonMovies', value: 'eonMovies', version: '1.16', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/eonMovies.png', type: 'global', disabled: false },
+          { display_name: 'Movies4U', value: 'movies4u', version: '1.32', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/movies4u.png', type: 'global', disabled: false },
+          { display_name: 'KmMovies', value: 'kmMovies', version: '2.35', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/kmMovies.png', type: 'global', disabled: false },
+          { display_name: 'Zeefliz', value: 'zeefliz', version: '1.33', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/zeefliz.jpg', type: 'global', disabled: false },
+          { display_name: 'HdHub4u', value: 'hdhub4u', version: '2.30', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/hdhub4u.png', type: 'global', disabled: false },
+          { display_name: 'MoviezWap', value: 'moviezwap', version: '1.4', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/moviezwap.png', type: 'india', disabled: false },
+          { display_name: 'ShowBox', value: 'showbox', version: '1.8', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/showbox.png', type: 'english', disabled: false },
+          { display_name: 'RogMovies', value: 'luxMovies', version: '2.37', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/luxMovies.png', type: 'india', disabled: false },
+          { display_name: 'Castle TV', value: 'castle', version: '1.2', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/castle.png', type: 'global', disabled: false },
+          { display_name: 'AnimeSalt', value: 'animesalt', version: '1.2', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/animesalt.png', type: 'anime', disabled: false },
+          { display_name: 'AnimeWorld', value: 'animeworld', version: '1.0', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/animeworld.png', type: 'anime', disabled: false },
+          { display_name: 'MovieLinkBD', value: 'movielinkdb', version: '1.01', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/movielinkdb.png', type: 'india', disabled: false },
+          { display_name: 'MX Player', value: 'mxplayer', version: '1.1', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/mxplayer.png', type: 'india', disabled: false },
+          { display_name: 'YouTube', value: 'youtube', version: '1.4', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/youtube.png', type: 'global', disabled: false },
+          { display_name: '1Flex', value: '1flex', version: '1.0.6', icon: 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/1flex.png', type: 'global', disabled: false }
+        ];
+
+        // Universal Cloud & Local API Bridge (cPanel & Vercel Dual-Mode)
+        // Automatically connects to high-speed cloud backend if running statically on cPanel
+        const CLOUD_API_BASE = 'https://parxstream.vercel.app';
+        let _isCloudApiActive = (
+          window.location.hostname.includes('parxstream.top') ||
+          window.location.hostname.endsWith('.top') ||
+          window.location.protocol === 'file:'
+        );
+
+        function resolveApiUrl(endpoint) {
+          if (!endpoint) return '';
+          if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+            return endpoint;
+          }
+          const cleanPath = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+          if (_isCloudApiActive) {
+            return `${CLOUD_API_BASE}${cleanPath}`;
+          }
+          return cleanPath;
+        }
+
+        async function apiFetch(endpoint, options = {}) {
+          let targetUrl = resolveApiUrl(endpoint);
+          try {
+            const res = await fetch(targetUrl, options);
+            const ct = (res.headers.get('content-type') || '').toLowerCase();
+            // In cPanel Apache with SPA fallback, non-existent /api routes return 200 with text/html (index.html)
+            const isHtmlFallback = ct.includes('text/html');
+            if (!res.ok || (isHtmlFallback && !targetUrl.startsWith('http'))) {
+              if (!targetUrl.startsWith('http')) {
+                _isCloudApiActive = true;
+                const cloudUrl = `${CLOUD_API_BASE}${targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`}`;
+                return await fetch(cloudUrl, options);
+              }
+            }
+            return res;
+          } catch (err) {
+            if (!targetUrl.startsWith('http')) {
+              _isCloudApiActive = true;
+              const cloudUrl = `${CLOUD_API_BASE}${targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`}`;
+              return await fetch(cloudUrl, options);
+            }
+            throw err;
+          }
+        }
+
         // LocalStorage Keys
         const STORAGE_KEY_API = 'cinestream_tmdb_key';
         const STORAGE_KEY_TOKEN = 'cinestream_tmdb_token';
@@ -2380,7 +2455,7 @@
 
           // Vega Providers Integration State
           selectedProvider: localStorage.getItem('cinestream_selected_provider') || 'tmdb',
-          availableProviders: [],
+          availableProviders: [...FALLBACK_PROVIDERS],
           providerCatalog: [],
           providerCatalogIndex: 0,
           providerPosts: [],
@@ -3943,7 +4018,7 @@
               ? `/api/cinepro/tv/${encodeURIComponent(tmdbId)}/${s}/${ep}`
               : `/api/cinepro/movie/${encodeURIComponent(tmdbId)}`;
             
-            const res = await fetch(url);
+            const res = await apiFetch(url);
             if (!res.ok) return;
             const sources = await res.json();
             if (!Array.isArray(sources) || sources.length === 0) return;
@@ -5344,17 +5419,29 @@
         // ==========================================
 
         /**
-         * Fetch enabled providers list from /api/providers
+         * Fetch enabled providers list from /api/providers (Dual-Mode: Cloud Fallback + Built-in Registry)
          */
         async function loadAvailableProviders() {
           try {
-            const res = await fetch('/api/providers');
+            // Render immediately with cached/fallback providers to ensure zero-lag instant UI
+            if (state.availableProviders && state.availableProviders.length > 0) {
+              const countEl = document.getElementById('providersTotalCount');
+              if (countEl) countEl.textContent = `${state.availableProviders.length} Available Global & Regional Sources`;
+              renderProviderDropdown(state.availableProviders);
+            }
+
+            const res = await apiFetch('/api/providers');
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const providers = await res.json();
-            state.availableProviders = Array.isArray(providers) ? providers : [];
+            const data = await res.json();
+            const providers = Array.isArray(data) ? data : (data.providers || []);
+            if (providers && providers.length > 0) {
+              state.availableProviders = providers;
+            } else if (!state.availableProviders || state.availableProviders.length === 0) {
+              state.availableProviders = [...FALLBACK_PROVIDERS];
+            }
 
             const countEl = document.getElementById('providersTotalCount');
-            if (countEl) countEl.textContent = `${state.availableProviders.length} Available`;
+            if (countEl) countEl.textContent = `${state.availableProviders.length} Available Global & Regional Sources`;
 
             renderProviderDropdown(state.availableProviders);
 
@@ -5369,7 +5456,13 @@
               updateSelectedProviderUI('tmdb');
             }
           } catch (err) {
-            console.warn('[Providers] Could not load providers from backend:', err);
+            console.warn('[Providers] Live fetch failed, using built-in provider registry:', err);
+            if (!state.availableProviders || state.availableProviders.length === 0) {
+              state.availableProviders = [...FALLBACK_PROVIDERS];
+            }
+            const countEl = document.getElementById('providersTotalCount');
+            if (countEl) countEl.textContent = `${state.availableProviders.length} Available Global & Regional Sources`;
+            renderProviderDropdown(state.availableProviders);
           }
         }
 
@@ -5636,7 +5729,7 @@
           showProviderGridSkeletons();
 
           try {
-            const res = await fetch(`/api/providers/${encodeURIComponent(providerValue)}/catalog`);
+            const res = await apiFetch(`/api/providers/${encodeURIComponent(providerValue)}/catalog`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
 
@@ -5734,7 +5827,7 @@
 
           try {
             const url = `/api/providers/${encodeURIComponent(state.selectedProvider)}/posts?filter=${encodeURIComponent(filter)}&page=${state.providerPage}`;
-            const res = await fetch(url);
+            const res = await apiFetch(url);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const posts = await res.json();
             const postList = (Array.isArray(posts) ? posts : []).filter(p => !BD_CONTENT_REGEX.test(p.title || '') && !BD_CONTENT_REGEX.test(p.link || ''));
@@ -5850,7 +5943,7 @@
 
           try {
             const url = `/api/providers/${encodeURIComponent(state.selectedProvider)}/search?q=${encodeURIComponent(query)}&page=${state.providerPage}`;
-            const res = await fetch(url);
+            const res = await apiFetch(url);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const posts = await res.json();
             const postList = (Array.isArray(posts) ? posts : []).filter(p => !BD_CONTENT_REGEX.test(p.title || '') && !BD_CONTENT_REGEX.test(p.link || ''));
@@ -6259,7 +6352,7 @@
 
           try {
             // 1. Fetch metadata from /api/providers/:provider/meta?link=...
-            const metaRes = await fetch(`/api/providers/${encodeURIComponent(state.selectedProvider)}/meta?link=${encodeURIComponent(post.link)}`);
+            const metaRes = await apiFetch(`/api/providers/${encodeURIComponent(state.selectedProvider)}/meta?link=${encodeURIComponent(post.link)}`);
             if (!metaRes.ok) throw new Error(`HTTP ${metaRes.status}`);
             const meta = await metaRes.json();
             state.activeProviderMedia = meta;
@@ -6462,7 +6555,7 @@
             }
 
             try {
-              const epRes = await fetch(`/api/providers/${encodeURIComponent(state.selectedProvider)}/episodes?url=${encodeURIComponent(seasonItem.episodesLink)}`);
+              const epRes = await apiFetch(`/api/providers/${encodeURIComponent(state.selectedProvider)}/episodes?url=${encodeURIComponent(seasonItem.episodesLink)}`);
               const episodes = await epRes.json();
               const epList = (Array.isArray(episodes) ? episodes : []).filter(ep => ep && (ep.link || ep.url) && String(ep.link || ep.url).trim().length > 0);
 
@@ -6662,7 +6755,7 @@
             if (link) {
               try {
                 const streamUrl = `/api/providers/${encodeURIComponent(state.selectedProvider)}/stream?link=${encodeURIComponent(link)}&type=${encodeURIComponent(type)}`;
-                const res = await fetch(streamUrl);
+                const res = await apiFetch(streamUrl);
                 if (res.ok) {
                   const json = await res.json();
                   if (Array.isArray(json)) rawStreams = json;
@@ -6742,7 +6835,7 @@
                 const cpUrl = isTv
                   ? `/api/cinepro/tv/${encodeURIComponent(tmdbId)}/${s}/${ep}`
                   : `/api/cinepro/movie/${encodeURIComponent(tmdbId)}`;
-                const cpRes = await fetch(cpUrl);
+                const cpRes = await apiFetch(cpUrl);
                 if (cpRes.ok) {
                   const cpSources = await cpRes.json();
                   if (Array.isArray(cpSources) && cpSources.length > 0) {
@@ -7454,7 +7547,7 @@
           let proxiedUrl = stream.link;
           if (stream.link.startsWith('http://') || stream.link.startsWith('https://')) {
             const customHeaders = stream.headers || {};
-            proxiedUrl = `/api/proxy?url=${encodeURIComponent(stream.link)}&headers=${encodeURIComponent(JSON.stringify(customHeaders))}`;
+            proxiedUrl = resolveApiUrl(`/api/proxy?url=${encodeURIComponent(stream.link)}&headers=${encodeURIComponent(JSON.stringify(customHeaders))}`);
           }
           state.currentStreamUrl = proxiedUrl;
 
@@ -7465,7 +7558,7 @@
           if (Array.isArray(stream.subtitles) && stream.subtitles.length > 0) {
             stream.subtitles.forEach((sub, idx) => {
               if (sub.uri) {
-                const subProxied = `/api/proxy?url=${encodeURIComponent(sub.uri)}&headers=${encodeURIComponent(JSON.stringify(customHeaders))}`;
+                const subProxied = resolveApiUrl(`/api/proxy?url=${encodeURIComponent(sub.uri)}&headers=${encodeURIComponent(JSON.stringify(customHeaders))}`);
                 const track = document.createElement('track');
                 track.kind = 'subtitles';
                 track.label = sub.title || sub.language || `Subtitle ${idx + 1}`;
@@ -7601,7 +7694,7 @@
           }
 
           try {
-            const res = await fetch('/api/dmca/takedown', {
+            const res = await apiFetch('/api/dmca/takedown', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ owner, email, title, url })
@@ -8004,6 +8097,9 @@
           removeFromContinueWatchingList,
           clearAllContinueWatching,
           renderContinueWatchingRow,
+          // API & Network Bridge
+          resolveApiUrl,
+          apiFetch,
           // Vega Providers Methods
           loadAvailableProviders,
           toggleProviderDropdown,

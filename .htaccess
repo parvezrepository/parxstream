@@ -11,24 +11,13 @@
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # If backend proxy is configured on cPanel (e.g., port 5001), proxy /api requests
-    # Uncomment the following lines if running Node.js with Apache Reverse Proxy:
-    # RewriteRule ^api/(.*)$ http://127.0.0.1:5001/api/$1 [P,L]
-    # RewriteRule ^v1/(.*)$ http://127.0.0.1:5001/v1/$1 [P,L]
-
-    # If requested file or directory exists in dist/ or root, serve it directly
-    RewriteCond %{DOCUMENT_ROOT}/dist%{REQUEST_URI} -f
-    RewriteRule ^(.*)$ /dist/$1 [L]
-
+    # Let real files and directories be served directly
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # SPA Fallback: Send all other routes to index.html (or dist/index.html if available)
-    RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
-    RewriteRule ^.*$ /dist/index.html [L]
-
-    RewriteRule ^.*$ /index.html [L]
+    # SPA Fallback: Route all other requests to index.html
+    RewriteRule ^ index.html [L]
 </IfModule>
 
 # 2. Prevent Directory Browsing
