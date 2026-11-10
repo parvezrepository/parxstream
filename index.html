@@ -1883,6 +1883,7 @@
         // TMDB Image CDN Constants
         const TMDB_IMAGE_ORIGINAL = 'https://image.tmdb.org/t/p/w1280';
         const TMDB_IMAGE_POSTER = 'https://image.tmdb.org/t/p/w500';
+        const TMDB_IMAGE_BACKDROP = 'https://image.tmdb.org/t/p/w780';
         const TMDB_API_BASE = 'https://api.themoviedb.org/3';
 
         // Verified Pre-configured TMDB Production Credentials
@@ -2956,7 +2957,7 @@
           return `
             <div
               class="group relative shrink-0 w-36 sm:w-44 md:w-48 aspect-poster rounded-xl overflow-hidden bg-dark-900 border border-white/10 hover:border-brand-500/50 hover:shadow-xl hover:shadow-brand-600/10 transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer"
-              onclick="window.app.openDetailsModal('${item.id}', undefined, undefined, undefined, false, '${mediaType}')"
+              onclick="window.app.openDetailsModal('${item.id}', 'vidking', 1, 1, false, '${mediaType}')"
             >
               <!-- Poster Image with Fallback -->
               <img
@@ -2989,7 +2990,7 @@
                 <!-- Hover Buttons -->
                 <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/15" onclick="event.stopPropagation()">
                   <button
-                    onclick="window.app.openDetailsModal('${item.id}', 'vidlink', undefined, undefined, false, '${mediaType}')"
+                    onclick="window.app.openDetailsModal('${item.id}', 'vidlink', 1, 1, false, '${mediaType}')"
                     class="flex-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 transition shadow-md"
                     title="Play Movie / Series"
                   >
@@ -3591,314 +3592,339 @@
         /**
          * Details & Streaming Modal Management
          */
-        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason, initialEpisode, autoPlay = false, explicitType) {
-          // Reset auto-failover state on each fresh title open
-          state.autoFailoverAttempt = 0;
-          if (state.serverWatchdogTimer) {
-            clearTimeout(state.serverWatchdogTimer);
-            state.serverWatchdogTimer = null;
-          }
-          // Ensure TMDB server toolbar is visible and Provider controls toolbar is hidden
-          const tmdbToolbar = document.getElementById('tmdbServerToolbar');
-          const providerToolbar = document.getElementById('providerControlsToolbar');
-          if (tmdbToolbar) tmdbToolbar.classList.remove('hidden');
-          if (providerToolbar) providerToolbar.classList.add('hidden');
+        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason = 1, initialEpisode = 1, autoPlay = false, explicitType) {
+          try {
+            // Reset auto-failover state on each fresh title open
+            state.autoFailoverAttempt = 0;
+            if (state.serverWatchdogTimer) {
+              clearTimeout(state.serverWatchdogTimer);
+              state.serverWatchdogTimer = null;
+            }
 
-          const pSeasons = document.getElementById('providerSeasonsRow');
-          const pTvControls = document.getElementById('providerTvControlsRow');
-          const pLinks = document.getElementById('providerLinksContainer');
-          const pStreams = document.getElementById('providerStreamsContainer');
-          const pRes = document.getElementById('providerResolutionContainer');
-          const pAudio = document.getElementById('providerAudioContainer');
-          if (pSeasons) pSeasons.classList.add('hidden');
-          if (pTvControls) pTvControls.classList.add('hidden');
-          if (pLinks) pLinks.classList.add('hidden');
-          if (pStreams) pStreams.classList.add('hidden');
-          if (pRes) pRes.classList.add('hidden');
-          if (pAudio) pAudio.classList.add('hidden');
+            // 1. INSTANTLY OPEN MODAL (Zero delay, instant perceived response for user)
+            const modalEl = document.getElementById('detailsModal');
+            if (modalEl) {
+              modalEl.style.display = 'flex';
+              modalEl.classList.remove('hidden');
+            }
+            document.body.style.overflow = 'hidden';
 
-          // Pause and hide custom video element; show iframe player for TMDB
-          const videoEl = document.getElementById('streamVideoPlayer');
-          const iframeEl = document.getElementById('streamIframe');
-          if (videoEl) {
-            try { videoEl.pause(); } catch (e) {}
-            videoEl.classList.add('hidden');
-          }
-          if (iframeEl) iframeEl.classList.remove('hidden');
+            const playerWrapper = document.getElementById('playerSectionWrapper');
+            if (playerWrapper) {
+              playerWrapper.style.display = 'block';
+              playerWrapper.classList.remove('hidden');
+            }
 
-          // Find media item in all possible sources with priority to mediaRegistry
-          let media = state.mediaRegistry?.get(String(id));
-          if (!media) {
-            media = (state.lastSearchResults || []).find(m => String(m.id) === String(id));
-          }
-          if (!media && state.gridItems) {
-            media = state.gridItems.find(m => String(m.id) === String(id));
-          }
-          if (!media && state.watchlist) {
-            media = state.watchlist.find(m => String(m.id) === String(id));
-          }
-          if (!media && state.continueWatching) {
-            media = state.continueWatching.find(m => String(m.id) === String(id));
-          }
-          if (!media && state.liveCache) {
-            const allLive = [
-              ...(state.liveCache.trending || []),
-              ...(state.liveCache.popularMovies || []),
-              ...(state.liveCache.topTv || []),
-              ...(state.liveCache.actionSciFi || []),
-              ...(state.liveCache.nowPlaying || []),
-              ...(state.liveCache.anime || []),
-              ...(state.liveCache.cartoons || []),
-              ...(state.liveCache.hindi || [])
-            ];
-            media = allLive.find(m => String(m.id) === String(id));
-          }
-          if (!media) {
-            media = ALL_DEMO_ITEMS.find(m => String(m.id) === String(id));
-          }
+            // Ensure TMDB server toolbar is visible and Provider controls toolbar is hidden
+            const tmdbToolbar = document.getElementById('tmdbServerToolbar');
+            const providerToolbar = document.getElementById('providerControlsToolbar');
+            if (tmdbToolbar) tmdbToolbar.classList.remove('hidden');
+            if (providerToolbar) providerToolbar.classList.add('hidden');
 
-          // Rock-solid TV series vs Movies detection (Zero Conflict)
-          let isTv = false;
-          if (explicitType === 'tv') {
-            isTv = true;
-          } else if (explicitType === 'movie') {
-            isTv = false;
-          } else if (media) {
-            if (media.media_type === 'movie' || media.type === 'movie') {
-              isTv = false;
-            } else if (media.media_type === 'tv' || media.type === 'series' || media.type === 'tv') {
+            const pSeasons = document.getElementById('providerSeasonsRow');
+            const pTvControls = document.getElementById('providerTvControlsRow');
+            const pLinks = document.getElementById('providerLinksContainer');
+            const pStreams = document.getElementById('providerStreamsContainer');
+            const pRes = document.getElementById('providerResolutionContainer');
+            const pAudio = document.getElementById('providerAudioContainer');
+            if (pSeasons) pSeasons.classList.add('hidden');
+            if (pTvControls) pTvControls.classList.add('hidden');
+            if (pLinks) pLinks.classList.add('hidden');
+            if (pStreams) pStreams.classList.add('hidden');
+            if (pRes) pRes.classList.add('hidden');
+            if (pAudio) pAudio.classList.add('hidden');
+
+            // Pause and hide custom video element; show iframe player for TMDB
+            const videoEl = document.getElementById('streamVideoPlayer');
+            const iframeEl = document.getElementById('streamIframe');
+            if (videoEl) {
+              try { videoEl.pause(); } catch (e) {}
+              videoEl.classList.add('hidden');
+            }
+            if (iframeEl) iframeEl.classList.remove('hidden');
+
+            // Find media item in all possible sources with priority to mediaRegistry
+            let media = state.mediaRegistry?.get(String(id));
+            if (!media) {
+              media = (state.lastSearchResults || []).find(m => String(m.id) === String(id));
+            }
+            if (!media && state.gridItems) {
+              media = state.gridItems.find(m => String(m.id) === String(id));
+            }
+            if (!media && state.watchlist) {
+              media = state.watchlist.find(m => String(m.id) === String(id));
+            }
+            if (!media && state.continueWatching) {
+              media = state.continueWatching.find(m => String(m.id) === String(id));
+            }
+            if (!media && state.liveCache) {
+              const allLive = [
+                ...(state.liveCache.trending || []),
+                ...(state.liveCache.popularMovies || []),
+                ...(state.liveCache.topTv || []),
+                ...(state.liveCache.actionSciFi || []),
+                ...(state.liveCache.nowPlaying || []),
+                ...(state.liveCache.anime || []),
+                ...(state.liveCache.cartoons || []),
+                ...(state.liveCache.hindi || [])
+              ];
+              media = allLive.find(m => String(m.id) === String(id));
+            }
+            if (!media) {
+              media = ALL_DEMO_ITEMS.find(m => String(m.id) === String(id));
+            }
+
+            // Rock-solid TV series vs Movies detection (Zero Conflict)
+            let isTv = false;
+            if (explicitType === 'tv') {
               isTv = true;
-            } else if (media.first_air_date && !media.release_date) {
-              isTv = true;
-            } else if (media.release_date && !media.first_air_date) {
+            } else if (explicitType === 'movie') {
               isTv = false;
-            } else if (media.name && !media.title) {
-              isTv = true;
-            } else if (media.title && !media.name) {
-              isTv = false;
+            } else if (media) {
+              if (media.media_type === 'movie' || media.type === 'movie') {
+                isTv = false;
+              } else if (media.media_type === 'tv' || media.type === 'series' || media.type === 'tv') {
+                isTv = true;
+              } else if (media.first_air_date && !media.release_date) {
+                isTv = true;
+              } else if (media.release_date && !media.first_air_date) {
+                isTv = false;
+              } else if (media.name && !media.title) {
+                isTv = true;
+              } else if (media.title && !media.name) {
+                isTv = false;
+              } else {
+                isTv = (state.currentTab === 'tv');
+              }
             } else {
               isTv = (state.currentTab === 'tv');
             }
-          } else {
-            isTv = (state.currentTab === 'tv');
-          }
 
-          if (!media) {
-            media = { id: id, title: 'Selected Title', media_type: isTv ? 'tv' : 'movie', overview: 'Loading details...', poster_path: '', backdrop_path: '', vote_average: 8.0 };
-          } else {
-            media.media_type = isTv ? 'tv' : 'movie';
-          }
+            if (!media) {
+              media = { id: id, title: 'Selected Title', media_type: isTv ? 'tv' : 'movie', overview: 'Loading details...', poster_path: '', backdrop_path: '', vote_average: 8.0 };
+            } else {
+              media.media_type = isTv ? 'tv' : 'movie';
+            }
 
-          state.modalMedia = media;
-          state.currentServer = preferredServer;
-          state.selectedSeason = initialSeason || 1;
-          state.selectedEpisode = initialEpisode || 1;
+            state.modalMedia = media;
+            state.currentServer = preferredServer;
+            state.selectedSeason = initialSeason || 1;
+            state.selectedEpisode = initialEpisode || 1;
 
-          // Render basic modal metadata
-          const title = media.title || media.name || 'Title';
-          const titleEl = document.getElementById('modalMediaTitle');
-          const newTitleEl = document.getElementById('newModalTitle');
-          if (titleEl) titleEl.textContent = title;
-          if (newTitleEl) newTitleEl.textContent = title;
+            // Render basic modal metadata safely
+            const title = media.title || media.name || 'Title';
+            const titleEl = document.getElementById('modalMediaTitle');
+            const newTitleEl = document.getElementById('newModalTitle');
+            if (titleEl) titleEl.textContent = title;
+            if (newTitleEl) newTitleEl.textContent = title;
 
-          const oldTypeBadge = document.getElementById('modalMediaTypeBadge');
-          if (oldTypeBadge) {
-            oldTypeBadge.textContent = isTv ? 'TV Series' : 'Movie';
-            oldTypeBadge.className = isTv
-              ? 'bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded'
-              : 'bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded';
-          }
+            const oldTypeBadge = document.getElementById('modalMediaTypeBadge');
+            if (oldTypeBadge) {
+              oldTypeBadge.textContent = isTv ? 'TV Series' : 'Movie';
+              oldTypeBadge.className = isTv
+                ? 'bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded'
+                : 'bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded';
+            }
 
-          const newTypeBadge = document.getElementById('newModalTypeBadge');
-          if (newTypeBadge) {
-            newTypeBadge.textContent = isTv ? 'TV' : 'Movie';
-            newTypeBadge.className = isTv
-              ? 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30'
-              : 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30';
-          }
+            const newTypeBadge = document.getElementById('newModalTypeBadge');
+            if (newTypeBadge) {
+              newTypeBadge.textContent = isTv ? 'TV' : 'Movie';
+              newTypeBadge.className = isTv
+                ? 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                : 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30';
+            }
 
-          const year = (media.release_date || media.first_air_date || '2024').substring(0, 4);
-          const yearEl = document.getElementById('modalMediaYear');
-          if (yearEl) yearEl.textContent = `(${year})`;
-          const relDateEl = document.getElementById('modalReleaseDate');
-          if (relDateEl) relDateEl.textContent = media.release_date || media.first_air_date || 'Recent Release';
-          const ratingEl = document.getElementById('modalRating');
-          if (ratingEl) ratingEl.textContent = media.vote_average ? media.vote_average.toFixed(1) : '8.0';
-          const votesEl = document.getElementById('modalVotes');
-          if (votesEl) votesEl.textContent = `(${media.vote_count ? media.vote_count.toLocaleString() : '3,200'} votes)`;
-          const overviewEl = document.getElementById('modalOverview');
-          if (overviewEl) overviewEl.textContent = media.overview || 'Synopsis not available.';
-          const runtimeEl = document.getElementById('modalRuntimeOrSeasons');
-          if (runtimeEl) runtimeEl.textContent = isTv ? `${media.seasons_count || 1} Seasons` : (media.runtime || '2h 15m');
+            const year = String(media.release_date || media.first_air_date || '2024').substring(0, 4);
+            const yearEl = document.getElementById('modalMediaYear');
+            if (yearEl) yearEl.textContent = `(${year})`;
+            const relDateEl = document.getElementById('modalReleaseDate');
+            if (relDateEl) relDateEl.textContent = media.release_date || media.first_air_date || 'Recent Release';
+            const ratingEl = document.getElementById('modalRating');
+            if (ratingEl) ratingEl.textContent = media.vote_average ? Number(media.vote_average).toFixed(1) : '8.0';
+            const votesEl = document.getElementById('modalVotes');
+            if (votesEl) votesEl.textContent = `(${media.vote_count ? Number(media.vote_count).toLocaleString() : '3,200'} votes)`;
+            const overviewEl = document.getElementById('modalOverview');
+            if (overviewEl) overviewEl.textContent = media.overview || 'Synopsis not available.';
+            const runtimeEl = document.getElementById('modalRuntimeOrSeasons');
+            if (runtimeEl) runtimeEl.textContent = isTv ? `${media.seasons_count || 1} Seasons` : (media.runtime || '2h 15m');
 
-          // Render metadata row matching uploaded screenshot
-          const infoRowEl = document.getElementById('newModalInfoRow');
-          if (infoRowEl) {
+            // Render metadata row matching uploaded screenshot
+            const infoRowEl = document.getElementById('newModalInfoRow');
+            if (infoRowEl) {
+              if (isTv) {
+                const seasonsText = `${media.seasons_count || 1} Seasons`;
+                const epsText = media.episodes_count ? ` • ${media.episodes_count} Episodes` : '';
+                const dateRange = (media.first_air_date ? String(media.first_air_date).substring(0, 4) : '2025');
+                const ratingVal = media.vote_average ? Number(media.vote_average).toFixed(1) : '8.6';
+                const voteCountNum = Number(media.vote_count) || 1200;
+                const voteCountText = voteCountNum > 1000 ? (voteCountNum / 1000).toFixed(1) + 'k' : String(voteCountNum);
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-users text-amber-400 text-xs"></i> ${seasonsText}${epsText}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${dateRange}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-amber-400 font-bold">⭐ ${ratingVal} (${voteCountText})</span>
+                `;
+              } else {
+                const runtimeText = media.runtime ? (typeof media.runtime === 'number' ? `${Math.floor(media.runtime/60)}h ${media.runtime%60}m` : media.runtime) : '1h 34m';
+                const yearText = String(media.release_date || '2026').substring(0, 4);
+                const ratingVal = media.vote_average ? Number(media.vote_average).toFixed(1) : '7.5';
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-sky-400 text-xs"></i> ${runtimeText}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${yearText}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-sky-400 font-bold">⭐ ${ratingVal}</span>
+                `;
+              }
+            }
+
+            // Section & Action visibility
+            const btnViewEpisodes = document.getElementById('btnViewEpisodes');
+            const btnPlayNow = document.getElementById('btnPlayNow');
+            const detailsSeasonSection = document.getElementById('detailsSeasonSection');
+            const detailsYouMayLikeSection = document.getElementById('detailsYouMayLikeSection');
+            const storylineBar = document.getElementById('storylineBar');
+            const castsBar = document.getElementById('castsBar');
+            const photosBar = document.getElementById('photosBar');
+
             if (isTv) {
-              const seasonsText = `${media.seasons_count || 1} Seasons`;
-              const epsText = media.episodes_count ? ` • ${media.episodes_count} Episodes` : '';
-              const dateRange = (media.first_air_date ? media.first_air_date.substring(0, 4) : '2025');
-              const ratingVal = media.vote_average ? media.vote_average.toFixed(1) : '8.6';
-              const voteCountText = media.vote_count ? (media.vote_count > 1000 ? (media.vote_count/1000).toFixed(1) + 'k' : media.vote_count) : '1.2k';
-              infoRowEl.innerHTML = `
-                <span class="flex items-center gap-1.5"><i class="fa-solid fa-users text-amber-400 text-xs"></i> ${seasonsText}${epsText}</span>
-                <span class="text-gray-500">•</span>
-                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${dateRange}</span>
-                <span class="text-gray-500">•</span>
-                <span class="text-amber-400 font-bold">⭐ ${ratingVal} (${voteCountText})</span>
-              `;
+              if (btnViewEpisodes) btnViewEpisodes.classList.remove('hidden');
+              if (btnPlayNow) btnPlayNow.classList.add('hidden');
+              if (detailsSeasonSection) detailsSeasonSection.classList.remove('hidden');
+              if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.add('hidden');
+              if (storylineBar) storylineBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
+              if (castsBar) castsBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
+              if (photosBar) photosBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
             } else {
-              const runtimeText = media.runtime ? (typeof media.runtime === 'number' ? `${Math.floor(media.runtime/60)}h ${media.runtime%60}m` : media.runtime) : '1h 34m';
-              const yearText = (media.release_date || '2026').substring(0, 4);
-              const ratingVal = media.vote_average ? media.vote_average.toFixed(1) : '7.5';
-              infoRowEl.innerHTML = `
-                <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-sky-400 text-xs"></i> ${runtimeText}</span>
-                <span class="text-gray-500">•</span>
-                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${yearText}</span>
-                <span class="text-gray-500">•</span>
-                <span class="text-sky-400 font-bold">⭐ ${ratingVal}</span>
-              `;
+              if (btnViewEpisodes) btnViewEpisodes.classList.add('hidden');
+              if (btnPlayNow) btnPlayNow.classList.remove('hidden');
+              if (detailsSeasonSection) detailsSeasonSection.classList.add('hidden');
+              if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.remove('hidden');
+              if (storylineBar) storylineBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
+              if (castsBar) castsBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
+              if (photosBar) photosBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
             }
-          }
 
-          // Section & Action visibility
-          const btnViewEpisodes = document.getElementById('btnViewEpisodes');
-          const btnPlayNow = document.getElementById('btnPlayNow');
-          const detailsSeasonSection = document.getElementById('detailsSeasonSection');
-          const detailsYouMayLikeSection = document.getElementById('detailsYouMayLikeSection');
-          const storylineBar = document.getElementById('storylineBar');
-          const castsBar = document.getElementById('castsBar');
-          const photosBar = document.getElementById('photosBar');
+            // Poster Thumbnail
+            const posterUrl = media.poster_path
+              ? (String(media.poster_path).startsWith('http') ? media.poster_path : `${TMDB_IMAGE_POSTER}${media.poster_path}`)
+              : FALLBACK_POSTER;
+            const posterImgEl = document.getElementById('modalPosterImg');
+            if (posterImgEl) posterImgEl.src = posterUrl;
 
-          if (isTv) {
-            if (btnViewEpisodes) btnViewEpisodes.classList.remove('hidden');
-            if (btnPlayNow) btnPlayNow.classList.add('hidden');
-            if (detailsSeasonSection) detailsSeasonSection.classList.remove('hidden');
-            if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.add('hidden');
-            if (storylineBar) storylineBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
-            if (castsBar) castsBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
-            if (photosBar) photosBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
-          } else {
-            if (btnViewEpisodes) btnViewEpisodes.classList.add('hidden');
-            if (btnPlayNow) btnPlayNow.classList.remove('hidden');
-            if (detailsSeasonSection) detailsSeasonSection.classList.add('hidden');
-            if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.remove('hidden');
-            if (storylineBar) storylineBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
-            if (castsBar) castsBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
-            if (photosBar) photosBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
-          }
-
-          // Poster
-          const posterUrl = media.poster_path
-            ? (media.poster_path.startsWith('http') ? media.poster_path : `${TMDB_IMAGE_POSTER}${media.poster_path}`)
-            : FALLBACK_POSTER;
-          document.getElementById('modalPosterImg').src = posterUrl;
-
-          // Smart Audio Tracker setup: if media is Indian/Hindi or dubbed, auto-set selector
-          const isHindiMedia = media.original_language === 'hi' || /hindi|dubbed|bollywood/i.test((media.title || '') + ' ' + (media.overview || ''));
-          const universalAudioEl = document.getElementById('universalAudioSelect');
-          const universalAudioBadge = document.getElementById('audioTrackBadge');
-          if (universalAudioEl) {
-            if (isHindiMedia || state.preferredAudioLanguage === 'hindi') {
-              universalAudioEl.value = 'hindi';
-              if (universalAudioBadge) {
-                universalAudioBadge.textContent = 'Hindi Dubbed';
-                universalAudioBadge.className = 'bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30';
-                universalAudioBadge.classList.remove('hidden');
-              }
-              if (preferredServer === 'vidking') {
-                preferredServer = 'autoembed';
-                state.currentServer = 'autoembed';
-              }
-            } else {
-              universalAudioEl.value = state.preferredAudioLanguage || 'auto';
-              if (universalAudioBadge && state.preferredAudioLanguage !== 'hindi') {
-                universalAudioBadge.classList.add('hidden');
+            // Smart Audio Tracker setup: if media is Indian/Hindi or dubbed, auto-set selector
+            const isHindiMedia = media.original_language === 'hi' || /hindi|dubbed|bollywood/i.test((media.title || '') + ' ' + (media.overview || ''));
+            const universalAudioEl = document.getElementById('universalAudioSelect');
+            const universalAudioBadge = document.getElementById('audioTrackBadge');
+            if (universalAudioEl) {
+              if (isHindiMedia || state.preferredAudioLanguage === 'hindi') {
+                universalAudioEl.value = 'hindi';
+                if (universalAudioBadge) {
+                  universalAudioBadge.textContent = 'Hindi Dubbed';
+                  universalAudioBadge.className = 'bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30';
+                  universalAudioBadge.classList.remove('hidden');
+                }
+                if (preferredServer === 'vidking') {
+                  preferredServer = 'autoembed';
+                  state.currentServer = 'autoembed';
+                }
+              } else {
+                universalAudioEl.value = state.preferredAudioLanguage || 'auto';
+                if (universalAudioBadge && state.preferredAudioLanguage !== 'hindi') {
+                  universalAudioBadge.classList.add('hidden');
+                }
               }
             }
-          }
 
-          // Genres
-          const genresEl = document.getElementById('modalGenresList');
-          if (genresEl) {
-            if (media.genres && media.genres.length > 0) {
-              genresEl.innerHTML = media.genres.map(g => `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">${escapeHtml(g.name)}</span>`).join('');
-            } else {
-              genresEl.innerHTML = `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">Streaming HD</span>`;
+            // Genres
+            const genresEl = document.getElementById('modalGenresList');
+            if (genresEl) {
+              if (media.genres && media.genres.length > 0) {
+                genresEl.innerHTML = media.genres.map(g => `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">${escapeHtml(g.name)}</span>`).join('');
+              } else {
+                genresEl.innerHTML = `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">Streaming HD</span>`;
+              }
             }
-          }
 
-          // Initial Cast
-          const castEl = document.getElementById('modalCastList');
-          if (castEl) {
-            if (media.cast && media.cast.length > 0) {
-              castEl.innerHTML = media.cast.map(c => `
-                <div class="shrink-0 flex items-center gap-3 bg-dark-850/90 hover:bg-dark-800 px-3 py-2 rounded-2xl border border-white/10 transition group shadow-sm">
-                  <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 bg-dark-700 shadow-md">
-                    ${c.profile_path ? `<img src="${TMDB_IMAGE_POSTER}${c.profile_path}" alt="${escapeHtml(c.name)}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>` : `<div class="w-full h-full flex items-center justify-center font-bold text-gray-300 text-sm">${c.name.charAt(0)}</div>`}
+            // Initial Cast
+            const castEl = document.getElementById('modalCastList');
+            if (castEl) {
+              if (media.cast && media.cast.length > 0) {
+                castEl.innerHTML = media.cast.map(c => `
+                  <div class="shrink-0 flex items-center gap-3 bg-dark-850/90 hover:bg-dark-800 px-3 py-2 rounded-2xl border border-white/10 transition group shadow-sm">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 bg-dark-700 shadow-md">
+                      ${c.profile_path ? `<img src="${TMDB_IMAGE_POSTER}${c.profile_path}" alt="${escapeHtml(c.name)}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>` : `<div class="w-full h-full flex items-center justify-center font-bold text-gray-300 text-sm">${c.name.charAt(0)}</div>`}
+                    </div>
+                    <div class="text-left leading-tight min-w-0 pr-1">
+                      <p class="text-xs font-bold text-white truncate max-w-[110px]">${escapeHtml(c.name)}</p>
+                      <p class="text-[10px] text-gray-400 truncate max-w-[110px] mt-0.5">${escapeHtml(c.character || 'Cast')}</p>
+                    </div>
                   </div>
-                  <div class="text-left leading-tight min-w-0 pr-1">
-                    <p class="text-xs font-bold text-white truncate max-w-[110px]">${escapeHtml(c.name)}</p>
-                    <p class="text-[10px] text-gray-400 truncate max-w-[110px] mt-0.5">${escapeHtml(c.character || 'Cast')}</p>
-                  </div>
-                </div>
-              `).join('');
-            } else {
-              castEl.innerHTML = `<span class="text-xs text-gray-400">Cast details loading...</span>`;
+                `).join('');
+              } else {
+                castEl.innerHTML = `<span class="text-xs text-gray-400">Cast details loading...</span>`;
+              }
             }
+
+            // Initial Photos
+            try {
+              renderModalPhotos(media.backdrop_path ? [{ file_path: media.backdrop_path }] : []);
+            } catch (photoErr) {
+              console.warn('[renderModalPhotos minor issue]', photoErr);
+            }
+
+            // TV Season & Episode Selectors
+            const tvSelectors = document.getElementById('tvSelectors');
+            if (isTv) {
+              if (tvSelectors) tvSelectors.classList.remove('hidden');
+              setupTvSelectors(media);
+            } else {
+              if (tvSelectors) tvSelectors.classList.add('hidden');
+            }
+
+            // Watchlist button in modal
+            updateModalWatchlistBtn();
+
+            // Dynamic Backdrop Banner Glow
+            const backdropEl = document.getElementById('modalBackdropGlow');
+            if (backdropEl) {
+              const bgUrl = media.backdrop_path
+                ? (String(media.backdrop_path).startsWith('http') ? media.backdrop_path : `${TMDB_IMAGE_ORIGINAL}${media.backdrop_path}`)
+                : (media.poster_path ? (String(media.poster_path).startsWith('http') ? media.poster_path : `${TMDB_IMAGE_POSTER}${media.poster_path}`) : '');
+              backdropEl.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : 'none';
+            }
+
+            updateServerButtonsUI();
+            loadStreamPlayer();
+
+            // Render initial fallback suggested items from live cache
+            renderModalSuggested(media);
+
+            // Fetch deep details if TMDB API is active
+            if (state.apiKey || state.readToken) {
+              fetchDeepTmdbDetails(media.id, isTv);
+            }
+
+            // Fetch high-speed CinePro HLS direct streams in background
+            fetchCineproSourcesForModal(media.id, isTv, state.selectedSeason || 1, state.selectedEpisode || 1);
+          } catch (topModalError) {
+            console.error('[openDetailsModal Top Level Catch]', topModalError);
+            // Ensure modal and player always open regardless of any metadata parse issues
+            const modalEl = document.getElementById('detailsModal');
+            if (modalEl) {
+              modalEl.style.display = 'flex';
+              modalEl.classList.remove('hidden');
+            }
+            document.body.style.overflow = 'hidden';
+            const playerWrapper = document.getElementById('playerSectionWrapper');
+            if (playerWrapper) {
+              playerWrapper.style.display = 'block';
+              playerWrapper.classList.remove('hidden');
+            }
+            updateServerButtonsUI();
+            loadStreamPlayer();
           }
-
-          // Initial Photos
-          renderModalPhotos(media.backdrop_path ? [{ file_path: media.backdrop_path }] : []);
-
-          // TV Season & Episode Selectors
-          const tvSelectors = document.getElementById('tvSelectors');
-          if (isTv) {
-            if (tvSelectors) tvSelectors.classList.remove('hidden');
-            setupTvSelectors(media);
-          } else {
-            if (tvSelectors) tvSelectors.classList.add('hidden');
-          }
-
-          // Watchlist button in modal
-          updateModalWatchlistBtn();
-
-          // Dynamic Backdrop Banner Glow
-          const backdropEl = document.getElementById('modalBackdropGlow');
-          if (backdropEl) {
-            const bgUrl = media.backdrop_path
-              ? (media.backdrop_path.startsWith('http') ? media.backdrop_path : `${TMDB_IMAGE_ORIGINAL}${media.backdrop_path}`)
-              : (media.poster_path ? (media.poster_path.startsWith('http') ? media.poster_path : `${TMDB_IMAGE_POSTER}${media.poster_path}`) : '');
-            backdropEl.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : 'none';
-          }
-
-          // Open modal dialog in Details View
-          const modalEl = document.getElementById('detailsModal');
-          if (modalEl) {
-            modalEl.style.display = 'flex';
-            modalEl.classList.remove('hidden');
-          }
-          document.body.style.overflow = 'hidden';
-
-          // Instant streaming on open (Zero unnecessary clicks, buttery smooth)
-          const playerWrapper = document.getElementById('playerSectionWrapper');
-          if (playerWrapper) {
-            playerWrapper.style.display = 'block';
-            playerWrapper.classList.remove('hidden');
-          }
-          updateServerButtonsUI();
-          loadStreamPlayer();
-
-          // Render initial fallback suggested items from live cache
-          renderModalSuggested(media);
-
-          // Fetch deep details if TMDB API is active
-          if (state.apiKey || state.readToken) {
-            fetchDeepTmdbDetails(media.id, isTv);
-          }
-
-          // Fetch high-speed CinePro HLS direct streams in background
-          fetchCineproSourcesForModal(media.id, isTv, state.selectedSeason || 1, state.selectedEpisode || 1);
         }
 
         /**
