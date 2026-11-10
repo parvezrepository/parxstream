@@ -1414,6 +1414,30 @@
 
                 <!-- Action Buttons Row (Direct Actions, Zero Unnecessary Clicks) -->
                 <div class="flex items-center gap-3 flex-wrap pt-2">
+                  <!-- Play Now Button (for Movies, matching resident evil screenshot) -->
+                  <button
+                    id="btnPlayNow"
+                    type="button"
+                    onclick="window.app.revealPlayerAndPlay()"
+                    class="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-sky-500/25 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                    title="Play Movie Now"
+                  >
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>Play Now</span>
+                  </button>
+
+                  <!-- View Episodes Button (for TV Series, matching mobland screenshot) -->
+                  <button
+                    id="btnViewEpisodes"
+                    type="button"
+                    onclick="window.app.scrollToSection('detailsSeasonSection')"
+                    class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/25 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                    title="View All Seasons & Episodes"
+                  >
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>View Episodes</span>
+                  </button>
+
                   <!-- YouTube Trailer Button -->
                   <button
                     id="btnTrailerAction"
@@ -1426,17 +1450,7 @@
                     <span>Trailer</span>
                   </button>
 
-                  <!-- Download Button -->
-                  <button
-                    id="btnDownloadAction"
-                    type="button"
-                    onclick="window.app.openDownloadModal()"
-                    class="px-5 py-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
-                    title="Download Movie or Episode with IDM / High-Speed"
-                  >
-                    <i class="fa-solid fa-arrow-down-to-bracket text-xs"></i>
-                    <span>Download</span>
-                  </button>
+                  <!-- Side Download Button hidden: using sleek IDM floating badge on player container -->
 
                   <!-- Share Button -->
                   <button
@@ -2772,7 +2786,9 @@
          * Resumes a media immediately into the modal player
          */
         function resumeMedia(id, season = 1, episode = 1, server = 'autoembed') {
-          openDetailsModal(id, server, season, episode);
+          const item = (state.continueWatching || []).find(c => String(c.id) === String(id));
+          const mType = item?.media_type || (item?.season ? 'tv' : undefined);
+          openDetailsModal(id, server, season, episode, false, mType);
           showToast('Resuming playback...', 'info');
         }
 
@@ -2922,6 +2938,9 @@
          * Generates the HTML string for a Movie/TV Card
          */
         function createMediaCardHTML(item) {
+          if (!state.mediaRegistry) state.mediaRegistry = new Map();
+          state.mediaRegistry.set(String(item.id), item);
+
           const posterUrl = item.poster_path
             ? (item.poster_path.startsWith('http') ? item.poster_path : `${TMDB_IMAGE_POSTER}${item.poster_path}`)
             : FALLBACK_POSTER;
@@ -2929,13 +2948,15 @@
           const title = (item.title || item.name || 'Untitled').replace(/"/g, '&quot;');
           const year = (item.release_date || item.first_air_date || '').substring(0, 4);
           const rating = item.vote_average ? item.vote_average.toFixed(1) : '7.5';
-          const isTv = item.media_type === 'tv';
+          const isTv = item.media_type === 'tv' || (!item.title && !!item.name) || (!!item.first_air_date && !item.release_date);
+          const mediaType = isTv ? 'tv' : 'movie';
+          item.media_type = mediaType;
           const inWatchlist = state.watchlist.some(w => w.id === item.id);
 
           return `
             <div
               class="group relative shrink-0 w-36 sm:w-44 md:w-48 aspect-poster rounded-xl overflow-hidden bg-dark-900 border border-white/10 hover:border-brand-500/50 hover:shadow-xl hover:shadow-brand-600/10 transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer"
-              onclick="window.app.openDetailsModal('${item.id}')"
+              onclick="window.app.openDetailsModal('${item.id}', undefined, undefined, undefined, false, '${mediaType}')"
             >
               <!-- Poster Image with Fallback -->
               <img
@@ -2968,7 +2989,7 @@
                 <!-- Hover Buttons -->
                 <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/15" onclick="event.stopPropagation()">
                   <button
-                    onclick="window.app.openDetailsModal('${item.id}', 'vidlink')"
+                    onclick="window.app.openDetailsModal('${item.id}', 'vidlink', undefined, undefined, false, '${mediaType}')"
                     class="flex-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 transition shadow-md"
                     title="Play Movie / Series"
                   >
@@ -3570,7 +3591,13 @@
         /**
          * Details & Streaming Modal Management
          */
-        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason, initialEpisode, autoPlay = false) {
+        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason, initialEpisode, autoPlay = false, explicitType) {
+          // Reset auto-failover state on each fresh title open
+          state.autoFailoverAttempt = 0;
+          if (state.serverWatchdogTimer) {
+            clearTimeout(state.serverWatchdogTimer);
+            state.serverWatchdogTimer = null;
+          }
           // Ensure TMDB server toolbar is visible and Provider controls toolbar is hidden
           const tmdbToolbar = document.getElementById('tmdbServerToolbar');
           const providerToolbar = document.getElementById('providerControlsToolbar');
@@ -3599,8 +3626,11 @@
           }
           if (iframeEl) iframeEl.classList.remove('hidden');
 
-          // Find media item in all possible sources using string-safe comparison
-          let media = (state.lastSearchResults || []).find(m => String(m.id) === String(id));
+          // Find media item in all possible sources with priority to mediaRegistry
+          let media = state.mediaRegistry?.get(String(id));
+          if (!media) {
+            media = (state.lastSearchResults || []).find(m => String(m.id) === String(id));
+          }
           if (!media && state.gridItems) {
             media = state.gridItems.find(m => String(m.id) === String(id));
           }
@@ -3627,12 +3657,16 @@
             media = ALL_DEMO_ITEMS.find(m => String(m.id) === String(id));
           }
 
-          // Accurate detection for TV series vs Movies
+          // Rock-solid TV series vs Movies detection (Zero Conflict)
           let isTv = false;
-          if (media) {
-            if (media.media_type === 'movie') {
+          if (explicitType === 'tv') {
+            isTv = true;
+          } else if (explicitType === 'movie') {
+            isTv = false;
+          } else if (media) {
+            if (media.media_type === 'movie' || media.type === 'movie') {
               isTv = false;
-            } else if (media.media_type === 'tv') {
+            } else if (media.media_type === 'tv' || media.type === 'series' || media.type === 'tv') {
               isTv = true;
             } else if (media.first_air_date && !media.release_date) {
               isTv = true;
@@ -3759,6 +3793,30 @@
             ? (media.poster_path.startsWith('http') ? media.poster_path : `${TMDB_IMAGE_POSTER}${media.poster_path}`)
             : FALLBACK_POSTER;
           document.getElementById('modalPosterImg').src = posterUrl;
+
+          // Smart Audio Tracker setup: if media is Indian/Hindi or dubbed, auto-set selector
+          const isHindiMedia = media.original_language === 'hi' || /hindi|dubbed|bollywood/i.test((media.title || '') + ' ' + (media.overview || ''));
+          const universalAudioEl = document.getElementById('universalAudioSelect');
+          const universalAudioBadge = document.getElementById('audioTrackBadge');
+          if (universalAudioEl) {
+            if (isHindiMedia || state.preferredAudioLanguage === 'hindi') {
+              universalAudioEl.value = 'hindi';
+              if (universalAudioBadge) {
+                universalAudioBadge.textContent = 'Hindi Dubbed';
+                universalAudioBadge.className = 'bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30';
+                universalAudioBadge.classList.remove('hidden');
+              }
+              if (preferredServer === 'vidking') {
+                preferredServer = 'autoembed';
+                state.currentServer = 'autoembed';
+              }
+            } else {
+              universalAudioEl.value = state.preferredAudioLanguage || 'auto';
+              if (universalAudioBadge && state.preferredAudioLanguage !== 'hindi') {
+                universalAudioBadge.classList.add('hidden');
+              }
+            }
+          }
 
           // Genres
           const genresEl = document.getElementById('modalGenresList');
@@ -3930,8 +3988,9 @@
           try {
             let fullData = await fetchTmdb(endpoint, { append_to_response: 'credits,videos,external_ids,images' }).catch(() => null);
 
-            // Self-healing check: if the initial endpoint returned 404 or missing ID, check opposite type
-            if (!fullData || fullData.status_code === 34 || (!fullData.id && !fullData.title && !fullData.name)) {
+            // Strict Type Safety: Only fallback to opposite endpoint if media type was strictly unknown
+            const isTypeLocked = !!(state.modalMedia && (state.modalMedia.release_date || state.modalMedia.first_air_date || state.modalMedia.media_type));
+            if (!isTypeLocked && (!fullData || fullData.status_code === 34 || (!fullData.id && !fullData.title && !fullData.name))) {
               const altEndpoint = isTv ? `/movie/${id}` : `/tv/${id}`;
               const altData = await fetchTmdb(altEndpoint, { append_to_response: 'credits,videos,external_ids,images' }).catch(() => null);
               if (altData && (altData.id || altData.title || altData.name)) {
@@ -3954,11 +4013,25 @@
                     ? 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30'
                     : 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30';
                 }
+
+                const btnViewEpisodes = document.getElementById('btnViewEpisodes');
+                const btnPlayNow = document.getElementById('btnPlayNow');
+                const detailsSeasonSection = document.getElementById('detailsSeasonSection');
+                const detailsYouMayLikeSection = document.getElementById('detailsYouMayLikeSection');
                 const tvSelectors = document.getElementById('tvSelectors');
+
                 if (isTv) {
+                  if (btnViewEpisodes) btnViewEpisodes.classList.remove('hidden');
+                  if (btnPlayNow) btnPlayNow.classList.add('hidden');
+                  if (detailsSeasonSection) detailsSeasonSection.classList.remove('hidden');
+                  if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.add('hidden');
                   if (tvSelectors) tvSelectors.classList.remove('hidden');
                   setupTvSelectors(state.modalMedia, altData.seasons);
                 } else {
+                  if (btnViewEpisodes) btnViewEpisodes.classList.add('hidden');
+                  if (btnPlayNow) btnPlayNow.classList.remove('hidden');
+                  if (detailsSeasonSection) detailsSeasonSection.classList.add('hidden');
+                  if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.remove('hidden');
                   if (tvSelectors) tvSelectors.classList.add('hidden');
                 }
 
@@ -4124,7 +4197,7 @@
             return `
               <div
                 class="group relative shrink-0 w-28 sm:w-32 aspect-poster rounded-xl overflow-hidden bg-dark-900 border border-white/10 hover:border-brand-500/60 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                onclick="window.app.openDetailsModal('${item.id}')"
+                onclick="window.app.openDetailsModal('${item.id}', undefined, undefined, undefined, false, '${item.media_type || (item.first_air_date ? 'tv' : 'movie')}')"
                 title="${title}"
               >
                 <img
@@ -4562,13 +4635,27 @@
         /**
          * Loads video stream iframe based on active server, media type, and TMDB ID
          */
-        function loadStreamPlayer() {
+        /**
+         * Loads video stream iframe based on active server, media type, and TMDB ID
+         * Features continuous auto-server failover until stream plays!
+         */
+        function loadStreamPlayer(isAutoFailover = false) {
           const media = state.modalMedia;
           if (!media) return;
 
           const iframe = document.getElementById('streamIframe');
           const video = document.getElementById('streamVideoPlayer');
           const loader = document.getElementById('playerLoading');
+
+          // Reset existing watchdog
+          if (state.serverWatchdogTimer) {
+            clearTimeout(state.serverWatchdogTimer);
+            state.serverWatchdogTimer = null;
+          }
+
+          if (!isAutoFailover) {
+            state.autoFailoverAttempt = 0;
+          }
 
           // Ensure video player is paused and hidden, iframe is displayed
           if (video) {
@@ -4583,13 +4670,27 @@
           }
           if (iframe) iframe.classList.remove('hidden');
 
-          loader.classList.remove('opacity-0');
-          loader.classList.remove('pointer-events-none');
+          if (loader) {
+            loader.classList.remove('opacity-0');
+            loader.classList.remove('pointer-events-none');
+            const loaderText = loader.querySelector('p');
+            if (loaderText) {
+              const serverNames = {
+                'vidking': 'VidKing HD (Cinextma)',
+                'autoembed': 'AutoEmbed Pro (Multi-Audio)',
+                'vidlink': 'VidLink HD',
+                'vidsrc_pm': 'VidSrc PM',
+                'vidsrc_su': 'VidSrc SU',
+                'twoembed': '2Embed Multi-Server'
+              };
+              loaderText.textContent = `Connecting to ${serverNames[state.currentServer] || state.currentServer}...`;
+            }
+          }
 
           let streamUrl = '';
           const tmdbId = media.id;
           const imdbId = media.imdb_id || '';
-          const isTv = media.media_type === 'tv';
+          const isTv = media.media_type === 'tv' || media.type === 'series';
 
           if (state.currentServer === 'vidking') {
             // VidKing HD (Cinextma Engine): High quality, fast 1080p, multi-audio
@@ -4597,6 +4698,13 @@
               streamUrl = `https://vidking.net/embed/tv/${tmdbId}/${state.selectedSeason}/${state.selectedEpisode}?autoplay=1`;
             } else {
               streamUrl = `https://vidking.net/embed/movie/${tmdbId}?autoplay=1`;
+            }
+          } else if (state.currentServer === 'autoembed') {
+            // AutoEmbed: Direct embed & Multi-Language (Best for Hindi / Dual Audio)
+            if (isTv) {
+              streamUrl = `https://autoembed.me/tv/tmdb/${tmdbId}-${state.selectedSeason}-${state.selectedEpisode}`;
+            } else {
+              streamUrl = `https://autoembed.me/movie/tmdb/${tmdbId}`;
             }
           } else if (state.currentServer === 'vidlink') {
             // VidLink Pro: Ultra fast 1080p, subtitles, audio track switcher
@@ -4611,13 +4719,6 @@
               streamUrl = `https://vidsrc.pm/embed/tv/${tmdbId}/${state.selectedSeason}/${state.selectedEpisode}`;
             } else {
               streamUrl = `https://vidsrc.pm/embed/movie/${tmdbId}`;
-            }
-          } else if (state.currentServer === 'autoembed') {
-            // AutoEmbed: Direct embed & Multi-Language
-            if (isTv) {
-              streamUrl = `https://autoembed.me/tv/tmdb/${tmdbId}-${state.selectedSeason}-${state.selectedEpisode}`;
-            } else {
-              streamUrl = `https://autoembed.me/movie/tmdb/${tmdbId}`;
             }
           } else if (state.currentServer === 'vidsrc_su') {
             // VidSrc SU: Fast clean HTML5 player
@@ -4641,6 +4742,24 @@
           }
 
           state.currentStreamUrl = streamUrl;
+
+          // Wire iframe load & error events with self-healing watchdog
+          iframe.onload = () => {
+            if (state.serverWatchdogTimer) {
+              clearTimeout(state.serverWatchdogTimer);
+              state.serverWatchdogTimer = null;
+            }
+            if (loader) {
+              loader.classList.add('opacity-0');
+              loader.classList.add('pointer-events-none');
+            }
+          };
+
+          iframe.onerror = () => {
+            console.warn('[Stream Player] Iframe error encountered, auto-switching mirror...');
+            triggerAutoServerFailover();
+          };
+
           iframe.src = streamUrl;
 
           // Record to Continue Watching history
@@ -4651,11 +4770,51 @@
             state.currentServer
           );
 
-          // Hide loading spinner after short delay
-          setTimeout(() => {
-            loader.classList.add('opacity-0');
-            loader.classList.add('pointer-events-none');
-          }, 800);
+          // Continuous server check until stream plays:
+          // If the server doesn't respond or load within 4.5 seconds, auto-switch to next server!
+          if (state.currentServer !== 'trailer') {
+            state.serverWatchdogTimer = setTimeout(() => {
+              triggerAutoServerFailover();
+            }, 4500);
+          }
+        }
+
+        /**
+         * Smart continuous server failover watchdog
+         * Cycles through servers until working stream plays
+         */
+        function triggerAutoServerFailover() {
+          if (state.serverWatchdogTimer) {
+            clearTimeout(state.serverWatchdogTimer);
+            state.serverWatchdogTimer = null;
+          }
+          const servers = ['vidking', 'autoembed', 'vidlink', 'vidsrc_pm', 'vidsrc_su', 'twoembed'];
+          const currentIdx = servers.indexOf(state.currentServer);
+          if (currentIdx === -1 || (state.autoFailoverAttempt || 0) >= servers.length - 1) {
+            const loader = document.getElementById('playerLoading');
+            if (loader) {
+              loader.classList.add('opacity-0');
+              loader.classList.add('pointer-events-none');
+            }
+            showToast('Checked all servers. If stream is blocked, click External Tab or Switch Mirror.', 'warning');
+            return;
+          }
+
+          state.autoFailoverAttempt = (state.autoFailoverAttempt || 0) + 1;
+          const nextIdx = (currentIdx + 1) % servers.length;
+          const nextServer = servers[nextIdx];
+          const serverLabels = {
+            'vidking': 'Server 1 (VidKing HD)',
+            'autoembed': 'Server 2 (AutoEmbed Multi-Audio)',
+            'vidlink': 'Server 3 (VidLink HD)',
+            'vidsrc_pm': 'Server 4 (VidSrc PM)',
+            'vidsrc_su': 'Server 5 (VidSrc SU)',
+            'twoembed': 'Server 6 (2Embed)'
+          };
+          showToast(`Server busy. Checking ${serverLabels[nextServer] || nextServer}...`, 'info');
+          state.currentServer = nextServer;
+          updateServerButtonsUI();
+          loadStreamPlayer(true);
         }
 
         /**
@@ -4702,7 +4861,7 @@
         }
 
         function tryNextTmdbServer() {
-          const servers = ['vidking', 'vidlink', 'autoembed', 'vidsrc_pm', 'vidsrc_su', 'twoembed'];
+          const servers = ['vidking', 'autoembed', 'vidlink', 'vidsrc_pm', 'vidsrc_su', 'twoembed'];
           const currentIdx = servers.indexOf(state.currentServer);
           const nextIdx = (currentIdx + 1) % servers.length;
           switchServer(servers[nextIdx]);
@@ -5082,7 +5241,10 @@
 
         function playCurrentHero(server = 'autoembed') {
           const movie = state.heroList[state.heroIndex % state.heroList.length];
-          openDetailsModal(movie.id, server);
+          if (movie) {
+            const mType = movie.media_type || (movie.first_air_date ? 'tv' : 'movie');
+            openDetailsModal(movie.id, server, undefined, undefined, false, mType);
+          }
         }
 
         /**
