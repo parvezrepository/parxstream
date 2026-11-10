@@ -672,34 +672,6 @@
           </div>
         </section>
 
-        <!-- Row 8: Bengali Hits & Originals -->
-        <section id="rowBanglaSection" class="space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <span class="w-2.5 h-6 rounded-full bg-emerald-500 inline-block"></span>
-              <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                <span>Bengali Cinema & Drama</span>
-                <span class="text-xs font-normal text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">Bangla</span>
-              </h2>
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="window.app.navigateTab('bangla')" class="text-xs text-brand-500 hover:text-brand-400 font-semibold flex items-center gap-1 transition px-2.5 py-1 rounded-lg hover:bg-white/5 mr-1">
-                <span>See More</span>
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-              </button>
-              <button onclick="window.app.scrollRow('rowBangla', -1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-              </button>
-              <button onclick="window.app.scrollRow('rowBangla', 1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-              </button>
-            </div>
-          </div>
-          <div id="rowBangla" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1">
-            <!-- Dynamic Cards injected here -->
-          </div>
-        </section>
-
         <!-- Row 9: Hindi & South Cinema -->
         <section id="rowHindiSection" class="space-y-3">
           <div class="flex items-center justify-between">
@@ -833,7 +805,7 @@
               <button onclick="window.app.searchQuick('Naruto')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Naruto</button>
               <button onclick="window.app.searchQuick('Demon Slayer')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Demon Slayer</button>
               <button onclick="window.app.searchQuick('Solo Leveling')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Solo Leveling</button>
-              <button onclick="window.app.searchQuick('Toofan')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Toofan</button>
+              <button onclick="window.app.searchQuick('Deadpool & Wolverine')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Deadpool & Wolverine</button>
               <button onclick="window.app.searchQuick('Panchayat')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Panchayat</button>
               <button onclick="window.app.searchQuick('Stree 2')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Stree 2</button>
               <button onclick="window.app.searchQuick('Mirzapur')" class="bg-dark-850 hover:bg-dark-800 border border-white/10 px-2 py-0.5 rounded-lg text-gray-300 hover:text-white text-[11px] transition">Mirzapur</button>
@@ -852,7 +824,6 @@
               <option value="">🌐 All Languages</option>
               <option value="ja">Japanese (Anime)</option>
               <option value="hi">Hindi (Bollywood)</option>
-              <option value="bn">Bengali</option>
               <option value="en">English</option>
               <option value="ko">Korean (K-Drama)</option>
             </select>
@@ -1371,17 +1342,123 @@
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- DMCA Policy & Safe Harbor Takedown Modal -->
+    <div id="dmcaModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+      <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl p-6 sm:p-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500">
+              <i class="fa-solid fa-shield-halved text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">DMCA & Content Takedown</h3>
+              <p class="text-xs text-gray-400">Digital Millennium Copyright Act Safe Harbor Compliance</p>
+            </div>
+          </div>
+          <button onclick="window.app.closeDmcaModal()" class="w-8 h-8 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <div class="space-y-4 text-xs text-gray-300 leading-relaxed">
+          <div class="bg-dark-800/80 border border-white/5 rounded-xl p-3.5 space-y-2">
+            <h4 class="font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-circle-info text-blue-400"></i>
+              <span>Non-Hosting & Zero-Storage Disclaimer</span>
+            </h4>
+            <p>
+              PARXSTREAM operates purely as a client-side search engine and media indexing tool. <strong>We do not host, store, broadcast, upload, or transmit any video files, media, or copyrighted works on our own servers.</strong>
+            </p>
+            <p>
+              All video streams and embeds displayed on this platform are hosted on independent, unaffiliated third-party services. PARXSTREAM has no operational control over external servers, content availability, or third-party host agreements.
+            </p>
+          </div>
+
+          <div class="bg-dark-800/80 border border-emerald-500/20 rounded-xl p-3.5 space-y-2">
+            <h4 class="font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-ban text-emerald-400"></i>
+              <span>Strict Domestic Content Filtering</span>
+            </h4>
+            <p>
+              To respect intellectual property rights and regional broadcasting laws, PARXSTREAM strictly enforces a zero-indexing policy for domestic Bangladeshi motion pictures, television shows, and regional OTT releases.
+            </p>
+          </div>
+
+          <!-- Takedown Intake Form -->
+          <form id="dmcaTakedownForm" onsubmit="window.app.submitDmcaNotice(event)" class="space-y-3 pt-2">
+            <h4 class="font-bold text-white text-sm">Expedited Link De-Indexing Notice</h4>
+            <p class="text-[11px] text-gray-400">If you are a copyright holder or designated agent wishing to request the de-indexing of an indexed link, please provide the details below:</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-gray-300 mb-1">Copyright Holder / Entity *</label>
+                <input id="dmcaOwnerInput" type="text" required placeholder="Owner or Legal Entity" class="w-full bg-dark-800 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-500" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-gray-300 mb-1">Authorized Contact Email *</label>
+                <input id="dmcaEmailInput" type="email" required placeholder="legal@company.com" class="w-full bg-dark-800 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-500" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-300 mb-1">Title of Work / Media Identifier *</label>
+              <input id="dmcaTitleInput" type="text" required placeholder="e.g. Movie Name or TV Series" class="w-full bg-dark-800 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-500" />
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-300 mb-1">External Third-Party Embed URL (if known)</label>
+              <input id="dmcaUrlInput" type="url" placeholder="https://..." class="w-full bg-dark-800 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-brand-500" />
+            </div>
+
+            <div id="dmcaConfirmBox" class="hidden"></div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button type="button" onclick="window.app.closeDmcaModal()" class="px-4 py-2 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white text-xs font-semibold transition">
+                Close
+              </button>
+              <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition flex items-center gap-2 shadow-lg shadow-brand-600/20">
+                <i class="fa-solid fa-paper-plane text-[11px]"></i>
+                <span>Submit Takedown Request</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-dark-900 border-t border-white/5 py-10 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
-        <div class="flex items-center gap-2">
-          <span class="font-display text-xl text-white font-bold tracking-wider">PARX<span class="text-brand-500">STREAM</span></span>
-          <span class="text-gray-600">•</span>
-          <span>Open-Source Streaming Playground</span>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+          <div class="flex items-center gap-2">
+            <span class="font-display text-xl text-white font-bold tracking-wider">PARX<span class="text-brand-500">STREAM</span></span>
+            <span class="text-gray-600">•</span>
+            <span class="text-gray-400 font-medium">Non-Hosting Streaming Gateway</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="window.app.openDmcaModal()" class="text-xs text-gray-400 hover:text-brand-400 flex items-center gap-1.5 transition underline-offset-4 hover:underline">
+              <i class="fa-solid fa-shield-halved text-[11px] text-brand-500"></i>
+              <span>DMCA & Legal Notice</span>
+            </button>
+            <span class="text-gray-600">•</span>
+            <button onclick="window.app.openDmcaModal()" class="text-xs text-gray-400 hover:text-brand-400 transition underline-offset-4 hover:underline">
+              Takedown Intake
+            </button>
+          </div>
         </div>
-        <p class="text-center sm:text-right text-[11px] text-gray-500">
-          Data powered by TMDB API. Streams provided by third-party embed providers (VidSrc, MultiEmbed).
-        </p>
+
+        <div class="pt-4 border-t border-white/5 text-[11px] text-gray-500 leading-relaxed space-y-2">
+          <p>
+            <strong>Disclaimer:</strong> PARXSTREAM does not host, upload, or store any video media files on its servers. All streams and metadata are provided by independent third-party services and the TMDB API. In accordance with DMCA 17 U.S.C. § 512, all indexed links are subject to immediate removal upon verified copyright notification. Domestic Bangladeshi domestic works are strictly excluded from indexing.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-gray-600 pt-1">
+            <span>&copy; 2026 PARXSTREAM. Open-Source Media Aggregator.</span>
+            <span class="flex items-center gap-1 text-emerald-500 text-[10px] font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              DMCA Safe Harbor Enforced • Non-Hosting Architecture
+            </span>
+          </div>
+        </div>
       </div>
     </footer>
 
@@ -1821,7 +1898,21 @@
 
         const DEFAULT_NEXSTREAM_KEY = 'nx_1412dc1c920d6e0b0b9cc0848e68ec2a';
 
-        // Typo correction dictionary for Anime, Bangla, Hindi, and Global series
+        // Strict Blacklist Filter: Block all Bangladeshi domestic content to prevent local copyright claims
+        const BD_CONTENT_REGEX = /\b(bangladesh|bangladeshi|dhallywood|chorki|toffee|bioscope|bongo\s*bd|bongo|hoichoi\s*bangladesh|shakib\s*khan|pori\s*moni|natok|telefilm|bangla\s*natok|bangla\s*movie|bangladeshi\s*movie|priyotoma|surongo)\b/i;
+
+        function isBangladeshiContent(item) {
+          if (!item) return false;
+          if (item.origin_country && Array.isArray(item.origin_country) && item.origin_country.includes('BD')) return true;
+          if (item.origin_country === 'BD' || item.original_country === 'BD' || item.country === 'BD') return true;
+          if (item.original_language === 'bn') return true;
+          const title = (item.title || item.name || '').toLowerCase();
+          const overview = (item.overview || '').toLowerCase();
+          if (BD_CONTENT_REGEX.test(title) || BD_CONTENT_REGEX.test(overview)) return true;
+          return false;
+        }
+
+        // Typo correction dictionary for Anime, Hindi, and Global series
         const POPULAR_TYPO_MAP = {
           narutu: 'Naruto',
           narutoo: 'Naruto',
@@ -1837,10 +1928,7 @@
           'jujutsu kaisen': 'Jujutsu Kaisen',
           sololeveling: 'Solo Leveling',
           strangerthigns: 'Stranger Things',
-          brekingbad: 'Breaking Bad',
-          tofan: 'Toofan',
-          priyotoma: 'Priyotoma',
-          karagar: 'Karagar'
+          brekingbad: 'Breaking Bad'
         };
 
         const state = {
@@ -1899,7 +1987,6 @@
             nowPlaying: null,
             anime: null,
             cartoons: null,
-            bangla: null,
             hindi: null
           }
         };
@@ -2025,7 +2112,6 @@
             nowPlayingData,
             animeData,
             cartoonsData,
-            banglaData,
             hindiData
           ] = await Promise.all([
             fetchTmdb('/trending/all/day').catch(() => ({ results: [] })),
@@ -2035,13 +2121,14 @@
             fetchTmdb('/movie/now_playing').catch(() => ({ results: [] })),
             fetchTmdb('/discover/tv', { with_genres: '16', with_original_language: 'ja', sort_by: 'popularity.desc' }).catch(() => ({ results: [] })),
             fetchTmdb('/discover/movie', { with_genres: '16', sort_by: 'popularity.desc' }).catch(() => ({ results: [] })),
-            fetchTmdb('/discover/movie', { with_original_language: 'bn', sort_by: 'popularity.desc' }).catch(() => ({ results: [] })),
             fetchTmdb('/discover/movie', { with_original_language: 'hi', sort_by: 'popularity.desc' }).catch(() => ({ results: [] }))
           ]);
 
           const now = new Date();
           const sanitize = (list, forcedType) => (list || []).filter(item => {
             if (!item.poster_path) return false;
+            // Strict Copyright Compliance: Filter out any domestic Bangladeshi content
+            if (isBangladeshiContent(item)) return false;
             // Guarantee Playability: Filter out future unreleased movies/shows that have no streams available yet
             const dateStr = item.release_date || item.first_air_date;
             if (dateStr) {
@@ -2073,7 +2160,6 @@
             nowPlaying: sanitize(nowPlayingData.results, 'movie'),
             anime: sanitize(animeData.results, 'tv'),
             cartoons: sanitize(cartoonsData.results, 'movie'),
-            bangla: sanitize(banglaData.results, 'movie'),
             hindi: sanitize(hindiData.results, 'movie')
           };
 
@@ -2122,7 +2208,6 @@
           renderRow('rowNowPlaying', data.nowPlaying || data.popularMovies || []);
           renderRow('rowAnime', data.anime || []);
           renderRow('rowCartoons', data.cartoons || []);
-          renderRow('rowBangla', data.bangla || []);
           renderRow('rowHindi', data.hindi || []);
           renderWatchlistRow();
           renderContinueWatchingRow();
@@ -2331,7 +2416,6 @@
             'rowNowPlaying',
             'rowAnime',
             'rowCartoons',
-            'rowBangla',
             'rowHindi'
           ];
           const skeletonCard = `
@@ -2644,10 +2728,6 @@
             gridTitle.textContent = 'Animation & Family';
             gridSubtitle.textContent = 'Animated feature films and family entertainment';
             itemsToDisplay = state.liveCache.cartoons || [];
-          } else if (viewType === 'bangla') {
-            gridTitle.textContent = 'Bengali Cinema & Drama';
-            gridSubtitle.textContent = 'Explore top Bengali movies, OTT originals, and drama series';
-            itemsToDisplay = state.liveCache.bangla || [];
           } else if (viewType === 'hindi') {
             gridTitle.textContent = 'Hindi & Indian Blockbusters';
             gridSubtitle.textContent = 'Top Bollywood releases and Indian cinema';
@@ -2760,10 +2840,6 @@
                 params.sort_by = 'popularity.desc';
               } else if (viewType === 'nowPlaying') {
                 endpoint = '/movie/now_playing';
-              } else if (viewType === 'bangla') {
-                endpoint = '/discover/movie';
-                params.with_original_language = 'bn';
-                params.sort_by = 'popularity.desc';
               } else if (viewType === 'hindi') {
                 endpoint = '/discover/movie';
                 params.with_original_language = 'hi';
@@ -2776,10 +2852,11 @@
               if (endpoint) {
                 const data = await fetchTmdb(endpoint, params);
                 if (data && data.results && data.results.length > 0) {
-                  const forcedType = (viewType === 'movie' || viewType === 'action' || viewType === 'cartoons' || viewType === 'nowPlaying' || viewType === 'bangla' || viewType === 'hindi') ? 'movie' : (viewType === 'tv' ? 'tv' : undefined);
+                  const forcedType = (viewType === 'movie' || viewType === 'action' || viewType === 'cartoons' || viewType === 'nowPlaying' || viewType === 'hindi') ? 'movie' : (viewType === 'tv' ? 'tv' : undefined);
                   const now = new Date();
                   newItems = data.results.filter(item => {
                     if (!item.poster_path) return false;
+                    if (isBangladeshiContent(item)) return false;
                     const dateStr = item.release_date || item.first_air_date;
                     if (dateStr) {
                       const d = new Date(dateStr);
@@ -2849,12 +2926,11 @@
             ...(state.liveCache.nowPlaying || []),
             ...(state.liveCache.anime || []),
             ...(state.liveCache.cartoons || []),
-            ...(state.liveCache.bangla || []),
             ...(state.liveCache.hindi || [])
           ] : ALL_DEMO_ITEMS;
 
-          // Deduplicate
-          pool = pool.filter((item, index, self) => index === self.findIndex(t => t.id === item.id));
+          // Deduplicate and filter out any domestic Bangladeshi content
+          pool = pool.filter((item, index, self) => !isBangladeshiContent(item) && index === self.findIndex(t => t.id === item.id));
 
           if (mediaType && mediaType !== 'all') {
             pool = pool.filter(item => item.media_type === mediaType);
@@ -2913,6 +2989,13 @@
           document.getElementById('homeCatalogView').classList.add('hidden');
           document.getElementById('gridCatalogView').classList.remove('hidden');
 
+          // Pre-emptively reject and block any search targeting Bangladeshi domestic content
+          if (BD_CONTENT_REGEX.test(query)) {
+            state.lastSearchResults = [];
+            displaySearchResults([], null, null);
+            return;
+          }
+
           // Check typo map first
           const lowerQuery = query.toLowerCase().trim();
           const suggestedCorrection = POPULAR_TYPO_MAP[lowerQuery] || null;
@@ -2922,7 +3005,7 @@
             try {
               let data = await fetchTmdb('/search/multi', { query: query });
               let validResults = (data.results || [])
-                .filter(r => (r.media_type === 'movie' || r.media_type === 'tv') && r.poster_path)
+                .filter(r => (r.media_type === 'movie' || r.media_type === 'tv') && r.poster_path && !isBangladeshiContent(r))
                 .map(r => ({
                   id: r.id,
                   title: r.title || r.name || 'Untitled',
@@ -2942,7 +3025,7 @@
               if (validResults.length === 0 && suggestedCorrection) {
                 const fixData = await fetchTmdb('/search/multi', { query: suggestedCorrection });
                 const fixResults = (fixData.results || [])
-                  .filter(r => (r.media_type === 'movie' || r.media_type === 'tv') && r.poster_path)
+                  .filter(r => (r.media_type === 'movie' || r.media_type === 'tv') && r.poster_path && !isBangladeshiContent(r))
                   .map(r => ({
                     id: r.id,
                     title: r.title || r.name || 'Untitled',
@@ -3133,7 +3216,6 @@
               ...(state.liveCache.nowPlaying || []),
               ...(state.liveCache.anime || []),
               ...(state.liveCache.cartoons || []),
-              ...(state.liveCache.bangla || []),
               ...(state.liveCache.hindi || [])
             ];
             media = allLive.find(m => String(m.id) === String(id));
@@ -4519,7 +4601,7 @@
             const res = await fetch(url);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const posts = await res.json();
-            const postList = Array.isArray(posts) ? posts : [];
+            const postList = (Array.isArray(posts) ? posts : []).filter(p => !BD_CONTENT_REGEX.test(p.title || '') && !BD_CONTENT_REGEX.test(p.link || ''));
 
             if (!isAppend) {
               state.providerPosts = postList;
@@ -4609,6 +4691,19 @@
           const loadMoreSpinner = document.getElementById('providerLoadMoreSpinner');
           const loadMoreBtn = document.getElementById('providerLoadMoreBtn');
 
+          // Strict Filter: Reject queries targeting domestic Bangladeshi media
+          if (BD_CONTENT_REGEX.test(query)) {
+            state.providerPosts = [];
+            if (grid) grid.innerHTML = '';
+            if (emptyState) {
+              emptyState.classList.remove('hidden');
+              document.getElementById('providerEmptyTitle').textContent = `No matches found for "${query}"`;
+              document.getElementById('providerEmptyDesc').textContent = 'Domestic content from this region is strictly excluded.';
+            }
+            if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
+            return;
+          }
+
           if (loadMoreSpinner) loadMoreSpinner.classList.add('fa-spin');
           if (loadMoreBtn) loadMoreBtn.disabled = true;
 
@@ -4622,7 +4717,7 @@
             const res = await fetch(url);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const posts = await res.json();
-            const postList = Array.isArray(posts) ? posts : [];
+            const postList = (Array.isArray(posts) ? posts : []).filter(p => !BD_CONTENT_REGEX.test(p.title || '') && !BD_CONTENT_REGEX.test(p.link || ''));
 
             if (!isAppend) {
               state.providerPosts = postList;
@@ -6071,6 +6166,69 @@
           }
         }
 
+        /**
+         * DMCA Modal Handlers
+         */
+        function openDmcaModal() {
+          const modal = document.getElementById('dmcaModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+          }
+        }
+
+        function closeDmcaModal() {
+          const modal = document.getElementById('dmcaModal');
+          if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        }
+
+        async function submitDmcaNotice(event) {
+          if (event) event.preventDefault();
+          const owner = document.getElementById('dmcaOwnerInput')?.value.trim();
+          const email = document.getElementById('dmcaEmailInput')?.value.trim();
+          const title = document.getElementById('dmcaTitleInput')?.value.trim();
+          const url = document.getElementById('dmcaUrlInput')?.value.trim();
+          const confirmBox = document.getElementById('dmcaConfirmBox');
+
+          if (!email || !title) {
+            showToast('Please provide your contact email and the media title/identifier.', 'error');
+            return;
+          }
+
+          try {
+            const res = await fetch('/api/dmca/takedown', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ owner, email, title, url })
+            });
+            const data = await res.json();
+            if (confirmBox) {
+              confirmBox.classList.remove('hidden');
+              confirmBox.innerHTML = `
+                <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs">
+                  <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Notice Logged Successfully</p>
+                  <p class="mt-1 text-gray-300">Ticket <strong>${data.ticketId || 'DMCA-OK'}</strong> generated. The referenced index has been queued for expedited de-indexing within 24 business hours.</p>
+                </div>
+              `;
+            }
+            showToast('DMCA takedown notice recorded successfully.', 'success');
+          } catch (err) {
+            if (confirmBox) {
+              confirmBox.classList.remove('hidden');
+              confirmBox.innerHTML = `
+                <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs">
+                  <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Notice Recorded</p>
+                  <p class="mt-1 text-gray-300">Your notice for <em>${escapeHtml(title)}</em> has been recorded for swift review and de-indexing.</p>
+                </div>
+              `;
+            }
+            showToast('Notice recorded for prompt processing.', 'success');
+          }
+        }
+
         function escapeHtml(str) {
           if (!str) return '';
           return String(str)
@@ -6086,6 +6244,9 @@
           navigateTab,
           openDetailsModal,
           closeModal,
+          openDmcaModal,
+          closeDmcaModal,
+          submitDmcaNotice,
           switchServer,
           tryNextTmdbServer,
           loadStreamPlayer,

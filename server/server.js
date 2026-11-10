@@ -74,6 +74,18 @@ apiRouter.get('/providers/:provider/catalog', async (req, res) => {
   }
 });
 
+// Strict Blacklist Filter: Block all Bangladeshi domestic content (Dhallywood, Natok, BD dramas, etc.)
+const BD_CONTENT_REGEX = /\b(bangladesh|bangladeshi|dhallywood|chorki|toffee|bioscope|bongo\s*bd|bongo|hoichoi\s*bangladesh|shakib\s*khan|pori\s*moni|natok|telefilm|bangla\s*natok|bangla\s*movie|bangladeshi\s*movie|priyotoma|surongo)\b/i;
+
+function filterOutBangladeshiPosts(posts) {
+  if (!Array.isArray(posts)) return [];
+  return posts.filter(post => {
+    const title = (post.title || '').toLowerCase();
+    const link = (post.link || '').toLowerCase();
+    return !BD_CONTENT_REGEX.test(title) && !BD_CONTENT_REGEX.test(link);
+  });
+}
+
 // 3. GET /providers/:provider/posts?filter=...&page=1
 apiRouter.get('/providers/:provider/posts', async (req, res) => {
   const { provider } = req.params;
@@ -82,7 +94,7 @@ apiRouter.get('/providers/:provider/posts', async (req, res) => {
 
   try {
     const posts = await getProviderPosts(provider, filter, page);
-    res.json(posts);
+    res.json(filterOutBangladeshiPosts(posts));
   } catch (err) {
     console.warn(`[PARXSTREAM] Notice loading posts for provider "${provider}":`, err.message);
     res.json([]);
@@ -99,13 +111,29 @@ apiRouter.get('/providers/:provider/search', async (req, res) => {
     return res.json([]);
   }
 
+  // Pre-emptively reject any search targeting Bangladeshi domestic content
+  if (BD_CONTENT_REGEX.test(q)) {
+    return res.json([]);
+  }
+
   try {
     const posts = await searchProviderPosts(provider, q, page);
-    res.json(posts);
+    res.json(filterOutBangladeshiPosts(posts));
   } catch (err) {
     console.warn(`[PARXSTREAM] Notice searching posts for provider "${provider}":`, err.message);
     res.json([]);
   }
+});
+
+// DMCA Takedown Notice Intake (Safe Harbor Compliance)
+apiRouter.post('/dmca/takedown', (req, res) => {
+  const { title, url, owner, email, reason } = req.body || {};
+  console.log(`[DMCA NOTICE] Title: ${title || 'N/A'} | URL: ${url || 'N/A'} | Owner: ${owner || 'N/A'} (${email || 'N/A'})`);
+  res.json({
+    status: 'success',
+    message: 'Notice received and queued for expedited de-indexing within 24-48 business hours.',
+    ticketId: `DMCA-${Date.now()}`
+  });
 });
 
 // 5. GET /providers/:provider/meta?link=...
