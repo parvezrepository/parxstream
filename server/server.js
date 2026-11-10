@@ -317,6 +317,18 @@ apiRouter.all('/proxy', handleProxyRequest);
 app.use('/api', apiRouter);
 app.use('/', apiRouter);
 
+// Serve static frontend build for production / cPanel deployment
+const distPath = path.resolve(__dirname, '..', 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api') || req.url.startsWith('/v1')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 // Start server if executed directly
 if (require.main === module) {
   app.listen(PORT, '0.0.0.0', async () => {

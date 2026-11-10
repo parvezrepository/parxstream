@@ -1096,6 +1096,62 @@
                 </button>
               </div>
             </div>
+
+            <!-- Universal Audio Language & Subtitle Toolbar -->
+            <div id="universalAudioSubToolbar" class="flex items-center justify-between gap-3 flex-wrap pt-2 border-t border-white/5 text-xs">
+              <!-- Audio Track Dubbing Selector -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-amber-400 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-volume-high text-xs"></i> Audio Track:
+                </span>
+                <select
+                  id="universalAudioSelect"
+                  onchange="window.app.onUniversalAudioChange(this.value)"
+                  class="bg-dark-800 border border-white/10 text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-brand-500"
+                >
+                  <option value="auto">🌐 Auto / Original</option>
+                  <option value="hindi">🇮🇳 Hindi Dubbed (हिंदी)</option>
+                  <option value="english">🇺🇸 English</option>
+                  <option value="japanese">🇯🇵 Japanese (Anime)</option>
+                </select>
+                <span id="audioTrackBadge" class="hidden bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30">
+                  Hindi Dubbed
+                </span>
+              </div>
+
+              <!-- Subtitles (CC) Selector & Custom File Load -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-sky-400 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-closed-captioning text-xs"></i> Subtitles:
+                </span>
+                <select
+                  id="universalSubtitleSelect"
+                  onchange="window.app.onUniversalSubtitleChange(this.value)"
+                  class="bg-dark-800 border border-white/10 text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-brand-500"
+                >
+                  <option value="off">Off</option>
+                  <option value="en">English (CC)</option>
+                  <option value="hi">Hindi (हिंदी)</option>
+                  <option value="es">Spanish (Español)</option>
+                  <option value="fr">French (Français)</option>
+                </select>
+                <label
+                  for="customSubtitleInput"
+                  class="cursor-pointer bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-white/10 flex items-center gap-1 transition text-[11px] font-medium"
+                  title="Upload .srt or .vtt subtitle file from your computer"
+                >
+                  <i class="fa-solid fa-file-arrow-up text-sky-400"></i>
+                  <span>Add Subtitle</span>
+                </label>
+                <input
+                  type="file"
+                  id="customSubtitleInput"
+                  accept=".srt,.vtt,.txt"
+                  onchange="window.app.onCustomSubtitleUpload(event)"
+                  class="hidden"
+                />
+              </div>
+            </div>
           </div>
 
           <!-- Dedicated Vega Provider Video Controls Toolbar -->
@@ -3615,7 +3671,7 @@
         /**
          * Sets up the Season and Episode dropdowns for TV Series
          */
-        function setupTvSelectors(media, tmdbSeasons) {
+        async function setupTvSelectors(media, tmdbSeasons) {
           const seasonSelect = document.getElementById('seasonSelect');
           const episodeSelect = document.getElementById('episodeSelect');
           if (!seasonSelect || !episodeSelect) return;
@@ -3624,58 +3680,102 @@
             state.modalMedia.tmdbSeasons = tmdbSeasons;
           }
 
-          const validSeasons = (state.modalMedia.tmdbSeasons || []).filter(s => s.season_number > 0);
-          const seasonsCount = validSeasons.length > 0
-            ? validSeasons.length
-            : (media.seasons_count || 1);
-          
-          seasonSelect.innerHTML = '';
-          for (let s = 1; s <= seasonsCount; s++) {
-            const opt = document.createElement('option');
-            opt.value = s;
-            opt.textContent = `Season ${s}`;
-            seasonSelect.appendChild(opt);
+          let validSeasons = (state.modalMedia.tmdbSeasons || []).filter(s => s.season_number > 0);
+          if (validSeasons.length === 0 && (state.modalMedia.tmdbSeasons || []).length > 0) {
+            validSeasons = state.modalMedia.tmdbSeasons;
           }
-          if (state.selectedSeason > seasonsCount) {
-            state.selectedSeason = 1;
+
+          seasonSelect.innerHTML = '';
+          if (validSeasons.length > 0) {
+            validSeasons.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = s.season_number;
+              const epText = s.episode_count ? ` (${s.episode_count} eps)` : '';
+              opt.textContent = `${s.name || 'Season ' + s.season_number}${epText}`;
+              seasonSelect.appendChild(opt);
+            });
+            const seasonExists = validSeasons.some(s => s.season_number === Number(state.selectedSeason));
+            if (!seasonExists) {
+              state.selectedSeason = validSeasons[0].season_number;
+            }
+          } else {
+            const seasonsCount = media.seasons_count || 1;
+            for (let s = 1; s <= seasonsCount; s++) {
+              const opt = document.createElement('option');
+              opt.value = s;
+              opt.textContent = `Season ${s}`;
+              seasonSelect.appendChild(opt);
+            }
           }
           seasonSelect.value = state.selectedSeason;
 
-          populateEpisodesDropdown(state.selectedSeason);
+          await populateEpisodesDropdown(state.selectedSeason);
         }
 
-        function populateEpisodesDropdown(seasonNumber) {
+        async function populateEpisodesDropdown(seasonNumber) {
           const episodeSelect = document.getElementById('episodeSelect');
           if (!episodeSelect) return;
           const media = state.modalMedia;
-          
-          let epCount = 10;
-          if (media && media.tmdbSeasons) {
-            const sObj = media.tmdbSeasons.find(s => s.season_number === Number(seasonNumber));
-            if (sObj && sObj.episode_count) {
-              epCount = sObj.episode_count;
+          if (!media) return;
+
+          episodeSelect.innerHTML = '<option value="">Loading episodes...</option>';
+
+          // Fetch real episodes from TMDB if credentials are available
+          let realEpisodes = [];
+          if ((state.apiKey || state.readToken) && media.id) {
+            try {
+              const seasonData = await fetchTmdb(`/tv/${media.id}/season/${seasonNumber}`).catch(() => null);
+              if (seasonData && Array.isArray(seasonData.episodes) && seasonData.episodes.length > 0) {
+                realEpisodes = seasonData.episodes;
+              }
+            } catch (e) {
+              console.warn('[TMDB Season Episodes Warning]', e);
             }
-          } else if (media && media.episodes_per_season && media.episodes_per_season[seasonNumber - 1]) {
-            epCount = media.episodes_per_season[seasonNumber - 1];
           }
 
           episodeSelect.innerHTML = '';
-          for (let e = 1; e <= epCount; e++) {
-            const opt = document.createElement('option');
-            opt.value = e;
-            opt.textContent = `Episode ${e}`;
-            episodeSelect.appendChild(opt);
+
+          if (realEpisodes.length > 0) {
+            realEpisodes.forEach(ep => {
+              const opt = document.createElement('option');
+              opt.value = ep.episode_number;
+              const epTitle = ep.name && !ep.name.toLowerCase().startsWith('episode') ? ` - ${ep.name}` : '';
+              opt.textContent = `E${ep.episode_number}${epTitle}`;
+              episodeSelect.appendChild(opt);
+            });
+            const epExists = realEpisodes.some(ep => ep.episode_number === Number(state.selectedEpisode));
+            if (!epExists) {
+              state.selectedEpisode = realEpisodes[0].episode_number;
+            }
+          } else {
+            let epCount = 10;
+            if (media.tmdbSeasons) {
+              const sObj = media.tmdbSeasons.find(s => s.season_number === Number(seasonNumber));
+              if (sObj && sObj.episode_count) {
+                epCount = sObj.episode_count;
+              }
+            } else if (media.episodes_per_season && media.episodes_per_season[seasonNumber - 1]) {
+              epCount = media.episodes_per_season[seasonNumber - 1];
+            }
+
+            for (let e = 1; e <= epCount; e++) {
+              const opt = document.createElement('option');
+              opt.value = e;
+              opt.textContent = `Episode ${e}`;
+              episodeSelect.appendChild(opt);
+            }
+            if (state.selectedEpisode > epCount) {
+              state.selectedEpisode = 1;
+            }
           }
-          if (state.selectedEpisode > epCount) {
-            state.selectedEpisode = 1;
-          }
+
           episodeSelect.value = state.selectedEpisode;
         }
 
-        function onSeasonChange(newSeason) {
+        async function onSeasonChange(newSeason) {
           state.selectedSeason = parseInt(newSeason, 10);
           state.selectedEpisode = 1;
-          populateEpisodesDropdown(state.selectedSeason);
+          await populateEpisodesDropdown(state.selectedSeason);
           loadStreamPlayer();
           showToast(`Switched to Season ${state.selectedSeason}`, 'info');
           if (state.modalMedia) {
@@ -5233,7 +5333,7 @@
             try {
               const epRes = await fetch(`/api/providers/${encodeURIComponent(state.selectedProvider)}/episodes?url=${encodeURIComponent(seasonItem.episodesLink)}`);
               const episodes = await epRes.json();
-              const epList = Array.isArray(episodes) ? episodes : [];
+              const epList = (Array.isArray(episodes) ? episodes : []).filter(ep => ep && (ep.link || ep.url) && String(ep.link || ep.url).trim().length > 0);
 
               state.activeProviderMedia.episodes = epList;
               if (pLinksCount) pLinksCount.textContent = `${epList.length} Episodes`;
@@ -5251,42 +5351,43 @@
                   `).join('');
                 }
                 state.activeProviderEpisodeIndex = 0;
-                await fetchAndPlayProviderStream(epList[0].link, 'series');
+                await fetchAndPlayProviderStream(epList[0].link || epList[0].url, 'series');
               } else {
-                if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-gray-500 py-2">No direct episodes found. Loading mirror player...</span>`;
+                if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-gray-400 py-2">Loading high-speed backup player...</span>`;
                 await fetchAndPlayProviderStream(seasonItem.link || state.activeProviderMedia.link || '', 'series');
               }
             } catch (err) {
               console.error('[Provider Episodes Error]', err);
-              if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-rose-400 py-2">Episodes feed unavailable. Loading mirror player...</span>`;
+              if (pLinksList) pLinksList.innerHTML = `<span class="text-xs text-amber-400 py-2">Playing via backup mirror...</span>`;
               await fetchAndPlayProviderStream(seasonItem.link || state.activeProviderMedia.link || '', 'series');
             }
             return;
           }
 
-          // Case B: directLinks present
-          if (Array.isArray(seasonItem.directLinks) && seasonItem.directLinks.length > 0) {
+          // Case B: directLinks present (filtered for valid, clickable streams)
+          const validDirectLinks = (seasonItem.directLinks || []).filter(dl => dl && (dl.link || dl.url) && String(dl.link || dl.url).trim().length > 0);
+          if (validDirectLinks.length > 0) {
             if (pLinks) pLinks.classList.remove('hidden');
             const isTv = state.activeProviderMedia.type === 'series' || state.activeProviderMedia.type === 'tv' || (seasonItem.title && seasonItem.title.toLowerCase().includes('season'));
             if (pLinksTitle) pLinksTitle.innerHTML = isTv ? '<i class="fa-solid fa-tv text-xs text-brand-400"></i> Select Episode:' : '<i class="fa-solid fa-film text-xs text-brand-400"></i> Select Option:';
-            if (pLinksCount) pLinksCount.textContent = `${seasonItem.directLinks.length} ${isTv ? 'Episodes' : 'Options'}`;
+            if (pLinksCount) pLinksCount.textContent = `${validDirectLinks.length} ${isTv ? 'Episodes' : 'Options'}`;
 
-            state.activeProviderMedia.directLinks = seasonItem.directLinks;
+            state.activeProviderMedia.directLinks = validDirectLinks;
 
             if (pLinksList) {
-              pLinksList.innerHTML = seasonItem.directLinks.map((dl, idx) => `
+              pLinksList.innerHTML = validDirectLinks.map((dl, idx) => `
                 <button
                   type="button"
                   onclick="window.app.selectProviderDirectLink(${idx})"
                   class="provider-link-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-brand-600 transition border border-white/5 ${idx === 0 ? 'bg-brand-600 text-white border-brand-500 shadow-sm' : ''}"
                 >
-                  <i class="fa-solid ${isTv ? 'fa-play' : 'fa-film'} text-[9px] mr-1"></i> ${escapeHtml(dl.title || `Episode ${idx + 1}`)}
+                  <i class="fa-solid ${isTv ? 'fa-play' : 'fa-film'} text-[9px] mr-1"></i> ${escapeHtml(dl.title || `Option ${idx + 1}`)}
                 </button>
               `).join('');
             }
 
             state.activeProviderEpisodeIndex = 0;
-            await fetchAndPlayProviderStream(seasonItem.directLinks[0].link, seasonItem.directLinks[0].type || state.activeProviderMedia.type || 'movie');
+            await fetchAndPlayProviderStream(validDirectLinks[0].link || validDirectLinks[0].url, validDirectLinks[0].type || state.activeProviderMedia.type || 'movie');
             return;
           }
 
@@ -5859,6 +5960,157 @@
         }
 
         /**
+         * Universal Toolbar Audio Change (TMDB + Providers)
+         */
+        function onUniversalAudioChange(lang) {
+          state.preferredAudioLanguage = lang;
+          const badge = document.getElementById('audioTrackBadge');
+          if (badge) {
+            if (lang === 'hindi') {
+              badge.textContent = 'Hindi Dubbed';
+              badge.className = 'bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30';
+              badge.classList.remove('hidden');
+            } else if (lang === 'japanese') {
+              badge.textContent = 'Japanese Audio';
+              badge.className = 'bg-rose-500/20 text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-500/30';
+              badge.classList.remove('hidden');
+            } else if (lang === 'english') {
+              badge.textContent = 'English Audio';
+              badge.className = 'bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-500/30';
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+
+          // If in Provider mode, delegate to selectAudioLanguage
+          if (state.activeProviderMedia) {
+            selectAudioLanguage(lang);
+            return;
+          }
+
+          // If in TMDB / CinePro mode:
+          if (lang === 'hindi') {
+            showToast('Switching to Multi-Audio / Hindi Dubbed player...', 'info');
+            const hindiCineproIdx = (state.currentCineproSources || []).findIndex(s => (s.server || '').toLowerCase().includes('hindi'));
+            if (hindiCineproIdx !== -1) {
+              playCineproStream(hindiCineproIdx);
+              return;
+            }
+            if (state.currentServer !== 'autoembed') {
+              switchServer('autoembed');
+              return;
+            }
+          } else if (lang === 'english') {
+            if (state.currentServer !== 'vidlink') {
+              switchServer('vidlink');
+              return;
+            }
+          }
+
+          loadStreamPlayer();
+        }
+
+        /**
+         * Universal Subtitle Track Switcher
+         */
+        function onUniversalSubtitleChange(lang) {
+          state.activeSubtitleLang = lang;
+          const video = document.getElementById('streamVideoPlayer');
+          
+          if (video && video.textTracks && video.textTracks.length > 0) {
+            for (let i = 0; i < video.textTracks.length; i++) {
+              const trk = video.textTracks[i];
+              const trkLang = (trk.language || trk.label || '').toLowerCase();
+              if (lang === 'off') {
+                trk.mode = 'disabled';
+              } else if (trkLang.includes(lang) || trk.srclang === lang) {
+                trk.mode = 'showing';
+              } else {
+                trk.mode = 'disabled';
+              }
+            }
+          }
+
+          if (state.hlsInstance && Array.isArray(state.hlsInstance.subtitleTracks)) {
+            if (lang === 'off') {
+              state.hlsInstance.subtitleTrack = -1;
+            } else {
+              const subIdx = state.hlsInstance.subtitleTracks.findIndex(t => 
+                (t.lang || '').toLowerCase().includes(lang) || (t.name || '').toLowerCase().includes(lang)
+              );
+              if (subIdx !== -1) {
+                state.hlsInstance.subtitleTrack = subIdx;
+              }
+            }
+          }
+
+          showToast(lang === 'off' ? 'Subtitles turned off' : `Subtitles set to ${lang.toUpperCase()}`, 'info');
+        }
+
+        /**
+         * Custom Subtitle Upload (.srt / .vtt)
+         */
+        function onCustomSubtitleUpload(event) {
+          const file = event.target.files && event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            let content = e.target.result;
+            // Auto-convert SRT to WebVTT format
+            if (file.name.endsWith('.srt') || !content.startsWith('WEBVTT')) {
+              content = 'WEBVTT\n\n' + content
+                .replace(/\r\n/g, '\n')
+                .replace(/\r/g, '\n')
+                .replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
+            }
+
+            const blob = new Blob([content], { type: 'text/vtt' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            const video = document.getElementById('streamVideoPlayer');
+            if (video) {
+              const oldTracks = video.querySelectorAll('track[data-custom="true"]');
+              oldTracks.forEach(t => t.remove());
+
+              const track = document.createElement('track');
+              track.kind = 'subtitles';
+              track.label = file.name.replace(/\.[^/.]+$/, '');
+              track.srclang = 'custom';
+              track.src = blobUrl;
+              track.default = true;
+              track.dataset.custom = 'true';
+              video.appendChild(track);
+
+              setTimeout(() => {
+                if (video.textTracks) {
+                  for (let i = 0; i < video.textTracks.length; i++) {
+                    if (video.textTracks[i].label === track.label) {
+                      video.textTracks[i].mode = 'showing';
+                    }
+                  }
+                }
+              }, 200);
+
+              const subSelect = document.getElementById('universalSubtitleSelect');
+              if (subSelect) {
+                const opt = document.createElement('option');
+                opt.value = 'custom';
+                opt.textContent = `📁 ${file.name.substring(0, 15)}...`;
+                opt.selected = true;
+                subSelect.appendChild(opt);
+              }
+
+              showToast(`Custom Subtitle "${file.name}" loaded successfully!`, 'success');
+            } else {
+              showToast('Subtitle loaded. Switch to direct video player to display.', 'info');
+            }
+          };
+          reader.readAsText(file);
+        }
+
+        /**
          * Dynamic Resolution and Audio UI generator for HLS streams
          */
         function populateResolutionAndAudioUI(hls) {
@@ -6316,6 +6568,9 @@
           setAudioTrack,
           selectAudioLanguage,
           renderUniversalAudioUI,
+          onUniversalAudioChange,
+          onUniversalSubtitleChange,
+          onCustomSubtitleUpload,
           tryNextWorkingStream,
           retryCurrentStream
         };
