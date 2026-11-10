@@ -1,0 +1,71 @@
+# ==============================================================================
+# PARXSTREAM - cPanel / Apache / LiteSpeed Production Configuration
+# ==============================================================================
+
+# 1. Enable Rewrite Engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Enforce HTTPS (Secure SSL)
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # If backend proxy is configured on cPanel (e.g., port 5001), proxy /api requests
+    # Uncomment the following lines if running Node.js with Apache Reverse Proxy:
+    # RewriteRule ^api/(.*)$ http://127.0.0.1:5001/api/$1 [P,L]
+    # RewriteRule ^v1/(.*)$ http://127.0.0.1:5001/v1/$1 [P,L]
+
+    # If requested file or directory exists in dist/ or root, serve it directly
+    RewriteCond %{DOCUMENT_ROOT}/dist%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ /dist/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # SPA Fallback: Send all other routes to index.html (or dist/index.html if available)
+    RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
+    RewriteRule ^.*$ /dist/index.html [L]
+
+    RewriteRule ^.*$ /index.html [L]
+</IfModule>
+
+# 2. Prevent Directory Browsing
+Options -Indexes
+
+# 3. GZIP / DEFLATE Compression for Superfast Page Loads
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# 4. Leverage Browser Caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+
+    # HTML: Cache for 5 minutes (always fresh)
+    ExpiresByType text/html "access plus 300 seconds"
+
+    # Static Assets: Cache for 1 year
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+</IfModule>
+
+# 5. Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header unset X-Powered-By
+</IfModule>
