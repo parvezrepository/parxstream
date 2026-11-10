@@ -7469,9 +7469,9 @@
           const listEl = document.getElementById('downloadOptionsList');
           if (!modal || !listEl) return;
 
-          const isTv = (media.media_type === 'tv');
+          const isTv = (media.media_type === 'tv' || media.type === 'series' || media.type === 'tv');
           const title = media.title || media.name || 'Selected Title';
-          const tmdbId = media.id;
+          const tmdbId = media.id || media.tmdbId;
           const s = state.selectedSeason || 1;
           const ep = state.selectedEpisode || 1;
 
@@ -7481,12 +7481,66 @@
 
           const options = [];
 
-          // 1. CinePro high speed HLS sources if available
+          // Helper to trigger direct local browser download to Downloads folder
+          function triggerBrowserDownload(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.setAttribute('download', filename || `${title}.mkv`);
+            a.setAttribute('target', '_blank');
+            a.rel = 'noopener noreferrer';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              if (a.parentNode) a.parentNode.removeChild(a);
+            }, 500);
+            showToast('Starting download to your local Downloads folder...', 'success');
+          }
+
+          // 1. Vega Provider Direct File Downloads (CF Storage, Pixeldrain, HubCloud, GDrive, MKV, MP4)
+          if (state.currentStreamList && state.currentStreamList.length > 0) {
+            state.currentStreamList.forEach((st, idx) => {
+              const serverName = st.server || ('Mirror ' + (idx + 1));
+              const isDirectLocker = /download|pixeldrain|storage|drive.google|hubcloud|worker|.mkv|.mp4/i.test(serverName + ' ' + (st.link || ''));
+              
+              if (isDirectLocker && st.link && !st.link.startsWith('javascript:')) {
+                options.push({
+                  label: `${serverName} (Direct File Download)`,
+                  sublabel: 'Saves directly to your PC/Phone Downloads folder',
+                  badge: 'Direct Download',
+                  color: 'emerald',
+                  isDirect: true,
+                  action: () => {
+                    triggerBrowserDownload(st.link, `${title} - ${serverName}.mkv`);
+                  }
+                });
+              }
+            });
+          }
+
+          // 2. Vega Provider Quality Packages (from linkList)
+          if (state.activeProviderMedia && Array.isArray(state.activeProviderMedia.linkList) && state.activeProviderMedia.linkList.length > 0) {
+            state.activeProviderMedia.linkList.slice(0, 3).forEach((item, idx) => {
+              if (item.link) {
+                options.push({
+                  label: `${item.title || ('Quality Option ' + (idx + 1))}`,
+                  sublabel: 'High-speed provider mirror / multi-quality pack',
+                  badge: 'Host Mirror',
+                  color: 'amber',
+                  action: () => {
+                    window.open(item.link, '_blank');
+                  }
+                });
+              }
+            });
+          }
+
+          // 3. CinePro High Speed HLS Sources
           if (state.currentCineproSources && state.currentCineproSources.length > 0) {
             state.currentCineproSources.forEach((src, idx) => {
               options.push({
-                label: `${src.server || 'Direct Server ' + (idx + 1)} (High Speed Direct)`,
-                badge: 'Direct Stream',
+                label: `${src.server || ('CinePro Server ' + (idx + 1))} (1080p Multi-Audio)`,
+                sublabel: 'High-speed direct stream (IDM & 1DM compatible)',
+                badge: 'HLS Direct',
                 color: 'emerald',
                 action: () => {
                   window.open(src.link, '_blank');
@@ -7495,70 +7549,77 @@
             });
           }
 
-          // 2. 1080p Ultra HD (VidKing Fast Embed / Stream)
+          // 4. TMDB 1080p Ultra HD (VidKing Fast Embed / Stream - IDM Enabled)
+          if (tmdbId) {
+            options.push({
+              label: '1080p Ultra HD Video (VidKing Fast Stream / IDM)',
+              sublabel: 'Stream with IDM / 1DM floating button to download directly to local storage',
+              badge: '1080p Ultra',
+              color: 'amber',
+              action: () => {
+                const url = isTv
+                  ? `https://vidking.net/embed/tv/${tmdbId}/${s}/${ep}?autoplay=1`
+                  : `https://vidking.net/embed/movie/${tmdbId}?autoplay=1`;
+                window.open(url, '_blank');
+              }
+            });
+
+            // 5. TMDB 720p HD Stream (VidSrc)
+            options.push({
+              label: '720p HD Video (VidSrc Global Stream)',
+              sublabel: 'High-speed CDN stream for fast playback & downloading',
+              badge: '720p HD',
+              color: 'sky',
+              action: () => {
+                const url = isTv
+                  ? `https://vidsrc.su/embed/tv/${tmdbId}/${s}/${ep}`
+                  : `https://vidsrc.su/embed/movie/${tmdbId}`;
+                window.open(url, '_blank');
+              }
+            });
+
+            // 6. Multi-Audio / Dubbed Stream (AutoEmbed)
+            options.push({
+              label: 'AutoEmbed Multi-Audio (Hindi Dubbed / English)',
+              sublabel: 'Multi-language audio stream with subtitles',
+              badge: 'Multi-Audio',
+              color: 'purple',
+              action: () => {
+                const url = isTv
+                  ? `https://autoembed.me/tv/tmdb/${tmdbId}-${s}-${ep}`
+                  : `https://autoembed.me/movie/tmdb/${tmdbId}`;
+                window.open(url, '_blank');
+              }
+            });
+          }
+
+          // 7. 1-Click Copy Stream Link for IDM / 1DM / VLC (Direct Local Download)
           options.push({
-            label: '1080p Ultra HD (Fast Stream / Direct Video)',
-            badge: '1080p Ultra',
-            color: 'amber',
+            label: 'Copy Video Stream Link (Paste in IDM / 1DM / VLC)',
+            sublabel: 'IDM -> Add URL -> Downloads directly to C:\\Users\\...\\Downloads',
+            badge: 'IDM Downloader',
+            color: 'emerald',
             action: () => {
-              const url = isTv
-                ? `https://vidking.net/embed/tv/${tmdbId}/${s}/${ep}`
-                : `https://vidking.net/embed/movie/${tmdbId}`;
-              window.open(url, '_blank');
+              const link = state.currentStreamUrl || (tmdbId ? (isTv ? `https://vidking.net/embed/tv/${tmdbId}/${s}/${ep}` : `https://vidking.net/embed/movie/${tmdbId}`) : window.location.href);
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(link).then(() => {
+                  showToast('Stream link copied! Open IDM -> Add URL to download directly to your PC.', 'success');
+                });
+              } else {
+                prompt('Copy stream URL to paste into IDM / 1DM / VLC:', link);
+              }
             }
           });
 
-          // 3. 720p HD Stream / CDN Mirror
-          options.push({
-            label: '720p HD (High Speed CDN Stream)',
-            badge: '720p HD',
-            color: 'sky',
-            action: () => {
-              const url = isTv
-                ? `https://vidsrc.su/embed/tv/${tmdbId}/${s}/${ep}`
-                : `https://vidsrc.su/embed/movie/${tmdbId}`;
-              window.open(url, '_blank');
-            }
-          });
-
-          // 4. Multi-Audio / Subtitles Stream (AutoEmbed)
-          options.push({
-            label: 'AutoEmbed Multi-Audio (Hindi Dubbed / English)',
-            badge: 'Multi-Audio',
-            color: 'purple',
-            action: () => {
-              const url = isTv
-                ? `https://autoembed.me/tv/tmdb/${tmdbId}-${s}-${ep}`
-                : `https://autoembed.me/movie/tmdb/${tmdbId}`;
-              window.open(url, '_blank');
-            }
-          });
-
-          // 5. Download Subtitles (.SRT / .VTT)
+          // 8. Download Subtitles (.SRT / .VTT)
           options.push({
             label: 'Download Subtitles (.SRT / .VTT for VLC / MX Player)',
+            sublabel: 'Multiple languages: English, Hindi, Bengali, Spanish',
             badge: 'Subtitles',
             color: 'blue',
             action: () => {
               const query = encodeURIComponent((media.title || media.name || '') + (isTv ? ` S${s}E${ep}` : ''));
               window.open(`https://www.opensubtitles.org/en/search/sublanguageid-all/moviename-${query}`, '_blank');
-            }
-          });
-
-          // 6. Copy Direct Stream Link
-          options.push({
-            label: 'Copy Active Stream Link (For IDM / VLC / Downloader)',
-            badge: 'Clipboard',
-            color: 'gray',
-            action: () => {
-              const link = state.currentStreamUrl || (isTv ? `https://vidking.net/embed/tv/${tmdbId}/${s}/${ep}` : `https://vidking.net/embed/movie/${tmdbId}`);
-              if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(link).then(() => {
-                  showToast('Stream link copied to clipboard!', 'success');
-                });
-              } else {
-                prompt('Copy stream URL for your download manager:', link);
-              }
             }
           });
 
