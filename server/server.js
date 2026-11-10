@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const axios = require('axios');
 const {
   getEnabledProviders,
@@ -125,15 +126,55 @@ apiRouter.get('/providers/:provider/search', async (req, res) => {
   }
 });
 
+const DMCA_FILE_PATH = path.join(__dirname, 'dmca_notices.json');
+
 // DMCA Takedown Notice Intake (Safe Harbor Compliance)
 apiRouter.post('/dmca/takedown', (req, res) => {
-  const { title, url, owner, email, reason } = req.body || {};
-  console.log(`[DMCA NOTICE] Title: ${title || 'N/A'} | URL: ${url || 'N/A'} | Owner: ${owner || 'N/A'} (${email || 'N/A'})`);
+  const { title, url, owner, email } = req.body || {};
+  const ticketId = `DMCA-${Date.now()}`;
+  const noticeEntry = {
+    ticketId,
+    timestamp: new Date().toISOString(),
+    owner: owner || 'N/A',
+    email: email || 'N/A',
+    title: title || 'N/A',
+    url: url || 'N/A',
+    ip: req.ip || req.connection?.remoteAddress || 'N/A',
+    status: 'pending_review'
+  };
+
+  console.log(`[DMCA NOTICE RECEIVED] Ticket: ${ticketId} | Title: "${title}" | By: ${owner} (${email})`);
+
+  try {
+    let notices = [];
+    if (fs.existsSync(DMCA_FILE_PATH)) {
+      const fileData = fs.readFileSync(DMCA_FILE_PATH, 'utf8');
+      notices = JSON.parse(fileData || '[]');
+    }
+    notices.unshift(noticeEntry);
+    fs.writeFileSync(DMCA_FILE_PATH, JSON.stringify(notices, null, 2), 'utf8');
+  } catch (err) {
+    console.error('[DMCA STORAGE ERROR]', err.message);
+  }
+
   res.json({
     status: 'success',
     message: 'Notice received and queued for expedited de-indexing within 24-48 business hours.',
-    ticketId: `DMCA-${Date.now()}`
+    ticketId
   });
+});
+
+// GET /api/dmca/notices - View all submitted DMCA requests
+apiRouter.get('/dmca/notices', (req, res) => {
+  try {
+    if (fs.existsSync(DMCA_FILE_PATH)) {
+      const notices = JSON.parse(fs.readFileSync(DMCA_FILE_PATH, 'utf8') || '[]');
+      return res.json({ total: notices.length, notices });
+    }
+    res.json({ total: 0, notices: [] });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to read DMCA records' });
+  }
 });
 
 // 5. GET /providers/:provider/meta?link=...
