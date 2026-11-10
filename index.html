@@ -975,27 +975,8 @@
           </div>
         </div>
 
-        <!-- Collapsible Video Player Section (Hidden initially, slides open when Play Now or Episode is clicked) -->
-        <div id="playerSectionWrapper" style="display: none;" class="hidden border-b border-white/10 p-3 sm:p-5 space-y-4 bg-dark-950/80 transition-all duration-500 animate-fade-in">
-          
-          <!-- Player Collapse Control Sub-bar -->
-          <div class="flex items-center justify-between gap-3 pb-2 border-b border-white/5">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="playerLiveBadge" class="text-xs font-bold text-white flex items-center gap-1.5">
-                <i class="fa-solid fa-circle-play text-brand-500"></i> Video Streaming Player
-              </span>
-            </div>
-            <button
-              type="button"
-              onclick="window.app.collapsePlayer()"
-              class="text-xs text-gray-300 hover:text-white bg-dark-800 hover:bg-dark-700 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition cursor-pointer shadow"
-              title="Collapse Player and return to Details"
-            >
-              <i class="fa-solid fa-chevron-up text-[10px]"></i>
-              <span>Back to Details</span>
-            </button>
-          </div>
+        <!-- Direct Video Streaming Player Section (Instant Play, No Extra Clicks) -->
+        <div id="playerSectionWrapper" class="border-b border-white/10 p-3 sm:p-5 space-y-4 bg-dark-950/40">
           
           <!-- TMDB Multi-Server Switcher Toolbar (Exclusively for TMDB Titles) -->
           <div id="tmdbServerToolbar" class="flex flex-col gap-3 bg-dark-950 p-3.5 rounded-xl border border-white/10">
@@ -1431,30 +1412,8 @@
                   <!-- Dynamically generated genre pills -->
                 </div>
 
-                <!-- Action Buttons Row -->
-                <div class="flex items-center gap-3 flex-wrap pt-3">
-                  <!-- TV Primary Action: View Episodes -->
-                  <button
-                    id="btnViewEpisodes"
-                    type="button"
-                    onclick="window.app.scrollToEpisodes()"
-                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
-                  >
-                    <i class="fa-solid fa-play"></i>
-                    <span>View Episodes</span>
-                  </button>
-
-                  <!-- Movie Primary Action: Play Now -->
-                  <button
-                    id="btnPlayNow"
-                    type="button"
-                    onclick="window.app.revealPlayerAndPlay()"
-                    class="hidden px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-blue-600/30 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
-                  >
-                    <i class="fa-solid fa-play"></i>
-                    <span>Play Now</span>
-                  </button>
-
+                <!-- Action Buttons Row (Direct Actions, Zero Unnecessary Clicks) -->
+                <div class="flex items-center gap-3 flex-wrap pt-2">
                   <!-- YouTube Trailer Button -->
                   <button
                     id="btnTrailerAction"
@@ -3863,24 +3822,14 @@
           }
           document.body.style.overflow = 'hidden';
 
-          // By default, start with Details View (Player is collapsed until Play Now / Episode click)
+          // Instant streaming on open (Zero unnecessary clicks, buttery smooth)
           const playerWrapper = document.getElementById('playerSectionWrapper');
-          if (autoPlay) {
-            if (playerWrapper) {
-              playerWrapper.style.display = 'block';
-              playerWrapper.classList.remove('hidden');
-            }
-            updateServerButtonsUI();
-            loadStreamPlayer();
-          } else {
-            if (playerWrapper) {
-              playerWrapper.style.display = 'none';
-              playerWrapper.classList.add('hidden');
-            }
-            const iframe = document.getElementById('streamIframe');
-            if (iframe) iframe.src = 'about:blank';
-            updateServerButtonsUI();
+          if (playerWrapper) {
+            playerWrapper.style.display = 'block';
+            playerWrapper.classList.remove('hidden');
           }
+          updateServerButtonsUI();
+          loadStreamPlayer();
 
           // Render initial fallback suggested items from live cache
           renderModalSuggested(media);
@@ -5989,6 +5938,58 @@
         /**
          * Open media modal for a Vega provider title, fetch metadata & resolve links
          */
+        
+        /**
+         * Renders all episodes/qualities for Vega Provider series directly into the rich episode container
+         */
+        function renderProviderEpisodeCards(meta) {
+          const container = document.getElementById('richEpisodesContainer');
+          const section = document.getElementById('detailsSeasonSection');
+          if (!container || !section) return;
+
+          const linkList = Array.isArray(meta?.linkList) ? meta.linkList : [];
+          if (linkList.length === 0) return;
+
+          section.classList.remove('hidden');
+
+          container.innerHTML = linkList.map((item, idx) => {
+            const title = item.title || `Episode ${idx + 1}`;
+            const isSelected = (state.activeProviderSeasonIndex === idx);
+            const poster = meta.poster || meta.image || FALLBACK_POSTER;
+
+            return `
+              <div
+                onclick="window.app.selectProviderSeason(${idx})"
+                class="group relative rounded-2xl ${isSelected ? 'bg-amber-500/10 border-amber-500/40 ring-1 ring-amber-500/30' : 'bg-dark-850/80 hover:bg-dark-800 border-white/10 hover:border-white/20'} border p-3 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 transition duration-200 cursor-pointer shadow-md"
+              >
+                <div class="relative shrink-0 w-full sm:w-44 aspect-video rounded-xl overflow-hidden bg-dark-900 border border-white/10">
+                  <img src="${poster}" alt="${escapeHtml(title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+                  <span class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-xs text-amber-400 font-extrabold text-xs px-2 py-0.5 rounded-md">
+                    ${idx + 1}
+                  </span>
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 text-black flex items-center justify-center shadow-lg font-bold">
+                      <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0 space-y-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <h4 class="text-xs sm:text-sm font-bold ${isSelected ? 'text-amber-400' : 'text-white group-hover:text-amber-300'} truncate transition">
+                      ${escapeHtml(title)}
+                    </h4>
+                    ${isSelected ? '<span class="bg-amber-500 text-black text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded shrink-0">Playing</span>' : ''}
+                  </div>
+                  <p class="text-[11px] text-gray-400 font-medium">Stream Quality / Episode Option</p>
+                  <p class="text-[11px] text-gray-300 line-clamp-2 leading-relaxed">
+                    Click to stream this episode / version directly in high definition with multi-audio.
+                  </p>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
         async function openProviderMedia(encodedPostPayload) {
           let post;
           try {
@@ -6057,13 +6058,13 @@
             backdropEl.style.backgroundImage = providerBg ? `url('${providerBg}')` : 'none';
           }
 
-          // Open Details modal and keep Player collapsed until Play Now / Episode click
+          // Open Modal & ensure player is active immediately
           modal.style.display = 'flex';
           modal.classList.remove('hidden');
           const playerWrapper = document.getElementById('playerSectionWrapper');
           if (playerWrapper) {
-            playerWrapper.style.display = 'none';
-            playerWrapper.classList.add('hidden');
+            playerWrapper.style.display = 'block';
+            playerWrapper.classList.remove('hidden');
           }
           document.body.style.overflow = 'hidden';
 
@@ -6137,22 +6138,19 @@
               }
             }
 
-            // Button visibility
-            const btnViewEpisodes = document.getElementById('btnViewEpisodes');
-            const btnPlayNow = document.getElementById('btnPlayNow');
             const detailsSeasonSection = document.getElementById('detailsSeasonSection');
+            const detailsYouMayLikeSection = document.getElementById('detailsYouMayLikeSection');
             const storylineBar = document.getElementById('storylineBar');
 
             if (isTv) {
-              if (btnViewEpisodes) btnViewEpisodes.classList.remove('hidden');
-              if (btnPlayNow) btnPlayNow.classList.add('hidden');
               if (detailsSeasonSection) detailsSeasonSection.classList.remove('hidden');
+              if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.add('hidden');
               if (storylineBar) storylineBar.className = 'w-1.5 h-4.5 rounded-full bg-amber-500';
               setupProviderTvControls(meta);
+              renderProviderEpisodeCards(meta);
             } else {
-              if (btnViewEpisodes) btnViewEpisodes.classList.add('hidden');
-              if (btnPlayNow) btnPlayNow.classList.remove('hidden');
               if (detailsSeasonSection) detailsSeasonSection.classList.add('hidden');
+              if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.remove('hidden');
               if (storylineBar) storylineBar.className = 'w-1.5 h-4.5 rounded-full bg-sky-500';
             }
 
@@ -7827,6 +7825,7 @@
           refreshProviderCatalog,
           openProviderMedia,
           selectProviderSeason,
+          renderProviderEpisodeCards,
           selectProviderEpisode,
           selectProviderDirectLink,
           selectProviderStream,
