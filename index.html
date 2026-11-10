@@ -299,7 +299,8 @@
     <!-- Global Provider Modal (Responsive for Desktop & Mobile) -->
     <div
       id="providerDropdownMenu"
-      class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+      style="display: none;"
+      class="hidden fixed inset-0 z-50 items-center justify-center p-3 sm:p-4"
     >
       <!-- Dark Frosted Backdrop -->
       <div onclick="window.app.toggleProviderDropdown(false)" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
@@ -924,7 +925,7 @@
     </main>
 
     <!-- Sleek Streaming & Details Modal -->
-    <div id="detailsModal" class="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-xl flex items-center justify-center p-2 sm:p-4 md:p-6 hidden transition-all duration-300">
+    <div id="detailsModal" style="display: none;" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/90 backdrop-blur-xl items-center justify-center p-2 sm:p-4 md:p-6 transition-all duration-300">
       <div id="modalDialog" class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl relative my-auto">
         
         <!-- Modal Top Bar -->
@@ -974,8 +975,27 @@
           </div>
         </div>
 
-        <!-- Video Player Area -->
-        <div class="p-3 sm:p-5 space-y-4">
+        <!-- Collapsible Video Player Section (Hidden initially, slides open when Play Now or Episode is clicked) -->
+        <div id="playerSectionWrapper" style="display: none;" class="hidden border-b border-white/10 p-3 sm:p-5 space-y-4 bg-dark-950/80 transition-all duration-500 animate-fade-in">
+          
+          <!-- Player Collapse Control Sub-bar -->
+          <div class="flex items-center justify-between gap-3 pb-2 border-b border-white/5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="playerLiveBadge" class="text-xs font-bold text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-play text-brand-500"></i> Video Streaming Player
+              </span>
+            </div>
+            <button
+              type="button"
+              onclick="window.app.collapsePlayer()"
+              class="text-xs text-gray-300 hover:text-white bg-dark-800 hover:bg-dark-700 border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition cursor-pointer shadow"
+              title="Collapse Player and return to Details"
+            >
+              <i class="fa-solid fa-chevron-up text-[10px]"></i>
+              <span>Back to Details</span>
+            </button>
+          </div>
           
           <!-- TMDB Multi-Server Switcher Toolbar (Exclusively for TMDB Titles) -->
           <div id="tmdbServerToolbar" class="flex flex-col gap-3 bg-dark-950 p-3.5 rounded-xl border border-white/10">
@@ -1293,7 +1313,24 @@
           </div>
 
           <!-- Responsive 16:9 Video Player Container -->
-          <div id="videoPlayerContainer" class="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+          <div id="videoPlayerContainer" class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/15 shadow-2xl">
+            <!-- Authentic IDM Floating Download Badge (Matching User Requirement) -->
+            <div
+              id="idmPlayerBadge"
+              onclick="window.app.openDownloadModal()"
+              class="absolute top-3 left-3 z-30 flex items-center gap-2.5 bg-dark-950/90 hover:bg-dark-900 text-white border border-emerald-500/50 hover:border-emerald-400 rounded-xl px-3 py-1.5 shadow-2xl backdrop-blur-md cursor-pointer transition transform hover:scale-105 group select-none"
+              title="Download Video with IDM or Direct High-Speed Download"
+            >
+              <div class="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center text-white text-xs font-bold shadow-md group-hover:bg-emerald-400 transition">
+                <i class="fa-solid fa-download"></i>
+              </div>
+              <div class="flex flex-col text-left leading-tight">
+                <span class="text-[11px] font-extrabold text-white flex items-center gap-1.5">
+                  Download Video <span class="bg-amber-400 text-black text-[9px] font-black px-1 rounded shadow-sm">IDM</span>
+                </span>
+                <span class="text-[9px] text-emerald-400 font-semibold tracking-wide">1080p Ultra HD • Multi-Audio</span>
+              </div>
+            </div>
             <!-- Fullscreen Overlay Toggle Button (Direct on player) -->
             <button
               onclick="window.app.togglePlayerFullscreen()"
@@ -1348,109 +1385,121 @@
             </div>
           </div>
 
+        </div>
+        <!-- End of #playerSectionWrapper -->
+
+        <!-- Modern Media Details Section (Visible by default matching MobLand & Resident Evil design) -->
+        <div id="detailsSectionWrapper" class="p-4 sm:p-6 space-y-6">
+          
           <!-- Modern Media Header Card (Matching MobLand & Resident Evil Design) -->
-          <div class="pt-4 border-t border-white/10 flex flex-col md:flex-row items-start gap-5">
-            <!-- Poster Thumbnail -->
-            <div class="relative shrink-0 w-28 sm:w-36 md:w-44 aspect-poster rounded-2xl overflow-hidden shadow-2xl border border-white/15 bg-dark-900 group">
-              <img
-                id="modalPosterImg"
-                src=""
-                alt="Poster"
-                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-              />
-              <div id="modalPosterGlow" class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
-            </div>
+          <div class="relative rounded-3xl overflow-hidden p-5 sm:p-7 border border-white/10 shadow-2xl bg-dark-950/70 backdrop-blur-xl">
+            <!-- Dynamic Backdrop Image with Dark Blur & Gradient Fade -->
+            <div id="modalBackdropGlow" class="absolute inset-0 bg-cover bg-center opacity-25 filter blur-lg pointer-events-none transition-all duration-700"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/80 to-transparent pointer-events-none"></div>
 
-            <!-- Header Info & Actions -->
-            <div class="flex-1 space-y-3 min-w-0">
-              <!-- Type Badge -->
-              <span id="newModalTypeBadge" class="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                TV
-              </span>
-
-              <!-- Title -->
-              <h2 id="newModalTitle" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-                Title
-              </h2>
-
-              <!-- Metadata Row: (Seasons, Episodes, Year, Rating) or (Runtime, Year, Rating) -->
-              <div id="newModalInfoRow" class="flex items-center gap-2 text-xs sm:text-sm text-gray-300 font-medium flex-wrap">
-                <!-- Dynamically generated info pills -->
+            <div class="relative z-10 flex flex-col md:flex-row items-start gap-6">
+              <!-- Poster Thumbnail -->
+              <div class="relative shrink-0 w-32 sm:w-40 md:w-48 aspect-poster rounded-2xl overflow-hidden shadow-2xl border border-white/20 bg-dark-900 group">
+                <img
+                  id="modalPosterImg"
+                  src=""
+                  alt="Poster"
+                  class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                />
+                <div id="modalPosterGlow" class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
               </div>
 
-              <!-- Genres -->
-              <div id="modalGenresList" class="flex items-center gap-1.5 flex-wrap pt-1">
-                <!-- Dynamically generated genre pills -->
-              </div>
+              <!-- Header Info & Actions -->
+              <div class="flex-1 space-y-3 min-w-0">
+                <!-- Type Badge -->
+                <span id="newModalTypeBadge" class="inline-block px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  TV
+                </span>
 
-              <!-- Action Buttons Row -->
-              <div class="flex items-center gap-2.5 flex-wrap pt-2">
-                <!-- TV Primary Action: View Episodes -->
-                <button
-                  id="btnViewEpisodes"
-                  type="button"
-                  onclick="window.app.scrollToSection('detailsSeasonSection')"
-                  class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-lg shadow-amber-500/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
-                >
-                  <i class="fa-solid fa-play"></i>
-                  <span>View Episodes</span>
-                </button>
+                <!-- Title -->
+                <h2 id="newModalTitle" class="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
+                  Title
+                </h2>
 
-                <!-- Movie Primary Action: Play Now -->
-                <button
-                  id="btnPlayNow"
-                  type="button"
-                  onclick="window.app.scrollToSection('videoPlayerContainer')"
-                  class="hidden px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
-                >
-                  <i class="fa-solid fa-play"></i>
-                  <span>Play Now</span>
-                </button>
+                <!-- Metadata Row: (Seasons, Episodes, Year, Rating) or (Runtime, Year, Rating) -->
+                <div id="newModalInfoRow" class="flex items-center gap-2 text-xs sm:text-sm text-gray-300 font-medium flex-wrap">
+                  <!-- Dynamically generated info pills -->
+                </div>
 
-                <!-- YouTube Trailer Button -->
-                <button
-                  id="btnTrailerAction"
-                  type="button"
-                  onclick="window.app.switchServer('trailer')"
-                  class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
-                  title="Watch Official YouTube Trailer"
-                >
-                  <i class="fa-brands fa-youtube"></i>
-                  <span>Trailer</span>
-                </button>
+                <!-- Genres -->
+                <div id="modalGenresList" class="flex items-center gap-1.5 flex-wrap pt-1">
+                  <!-- Dynamically generated genre pills -->
+                </div>
 
-                <!-- Download Button -->
-                <button
-                  id="btnDownloadAction"
-                  type="button"
-                  onclick="window.app.openDownloadModal()"
-                  class="px-4 py-2.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
-                  title="Download Movie or Episode"
-                >
-                  <i class="fa-solid fa-arrow-down-to-bracket"></i>
-                  <span>Download</span>
-                </button>
+                <!-- Action Buttons Row -->
+                <div class="flex items-center gap-3 flex-wrap pt-3">
+                  <!-- TV Primary Action: View Episodes -->
+                  <button
+                    id="btnViewEpisodes"
+                    type="button"
+                    onclick="window.app.scrollToEpisodes()"
+                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                  >
+                    <i class="fa-solid fa-play"></i>
+                    <span>View Episodes</span>
+                  </button>
 
-                <!-- Share Button -->
-                <button
-                  type="button"
-                  onclick="window.app.shareCurrentMedia()"
-                  class="w-10 h-10 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white border border-white/10 flex items-center justify-center transition shadow cursor-pointer"
-                  title="Share"
-                >
-                  <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i>
-                </button>
+                  <!-- Movie Primary Action: Play Now -->
+                  <button
+                    id="btnPlayNow"
+                    type="button"
+                    onclick="window.app.revealPlayerAndPlay()"
+                    class="hidden px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-blue-600/30 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                  >
+                    <i class="fa-solid fa-play"></i>
+                    <span>Play Now</span>
+                  </button>
 
-                <!-- Bookmark Button -->
-                <button
-                  id="headerWatchlistBtn"
-                  type="button"
-                  onclick="window.app.toggleModalWatchlist()"
-                  class="w-10 h-10 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white border border-white/10 flex items-center justify-center transition shadow cursor-pointer"
-                  title="Add to Watchlist"
-                >
-                  <i id="headerWatchlistIcon" class="fa-solid fa-bookmark text-xs"></i>
-                </button>
+                  <!-- YouTube Trailer Button -->
+                  <button
+                    id="btnTrailerAction"
+                    type="button"
+                    onclick="window.app.playTrailer()"
+                    class="px-5 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-600/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                    title="Watch Official YouTube Trailer"
+                  >
+                    <i class="fa-brands fa-youtube text-sm"></i>
+                    <span>Trailer</span>
+                  </button>
+
+                  <!-- Download Button -->
+                  <button
+                    id="btnDownloadAction"
+                    type="button"
+                    onclick="window.app.openDownloadModal()"
+                    class="px-5 py-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                    title="Download Movie or Episode with IDM / High-Speed"
+                  >
+                    <i class="fa-solid fa-arrow-down-to-bracket text-xs"></i>
+                    <span>Download</span>
+                  </button>
+
+                  <!-- Share Button -->
+                  <button
+                    type="button"
+                    onclick="window.app.shareCurrentMedia()"
+                    class="w-11 h-11 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white border border-white/10 flex items-center justify-center transition shadow cursor-pointer"
+                    title="Share"
+                  >
+                    <i class="fa-solid fa-arrow-up-from-bracket text-sm"></i>
+                  </button>
+
+                  <!-- Bookmark Button -->
+                  <button
+                    id="headerWatchlistBtn"
+                    type="button"
+                    onclick="window.app.toggleModalWatchlist()"
+                    class="w-11 h-11 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white border border-white/10 flex items-center justify-center transition shadow cursor-pointer"
+                    title="Add to Watchlist"
+                  >
+                    <i id="headerWatchlistIcon" class="fa-solid fa-bookmark text-sm"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1623,7 +1672,7 @@
     <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Animated Entry Disclaimer Modal (First Visit) -->
-    <div id="entryDisclaimerModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl hidden flex items-center justify-center p-4 transition-all duration-500">
+    <div id="entryDisclaimerModal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl items-center justify-center p-4 transition-all duration-500">
       <div class="relative bg-dark-900 border border-white/15 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 transform transition-all duration-500 scale-95 opacity-0 animate-scale-up" id="disclaimerModalCard">
         <!-- Ambient Glowing Aura -->
         <div class="absolute -top-24 -left-24 w-48 h-48 bg-brand-600/30 rounded-full blur-3xl pointer-events-none"></div>
@@ -1684,7 +1733,7 @@
     </div>
 
     <!-- Dedicated Movie & Series Download Modal -->
-    <div id="downloadModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div id="downloadModal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md items-center justify-center p-4">
       <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl p-6 sm:p-7 space-y-5">
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <div class="flex items-center gap-2.5">
@@ -1713,7 +1762,7 @@
     </div>
 
     <!-- DMCA Policy & Safe Harbor Takedown Modal -->
-    <div id="dmcaModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div id="dmcaModal" style="display: none;" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md items-center justify-center p-4">
       <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl p-6 sm:p-8 space-y-6">
         <div class="flex items-center justify-between border-b border-white/10 pb-4">
           <div class="flex items-center gap-3">
@@ -2661,7 +2710,7 @@
           return `
             <div
               class="group relative shrink-0 w-64 sm:w-72 aspect-video rounded-xl overflow-hidden bg-dark-900 border border-white/10 hover:border-rose-500/60 hover:shadow-xl hover:shadow-rose-600/15 transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer"
-              onclick="window.app.resumeMedia(${item.id}, ${season}, ${episode}, '${item.server || 'autoembed'}')"
+              onclick="window.app.resumeMedia('${item.id}', ${season}, ${episode}, '${item.server || 'autoembed'}')"
             >
               <!-- Background Backdrop / Poster -->
               <img
@@ -2684,7 +2733,7 @@
 
                 <button
                   type="button"
-                  onclick="window.app.removeFromContinueWatchingList(${item.id}, event)"
+                  onclick="window.app.removeFromContinueWatchingList('${item.id}', event)"
                   class="pointer-events-auto w-7 h-7 rounded-full bg-black/75 hover:bg-rose-600 text-gray-300 hover:text-white flex items-center justify-center transition border border-white/15 shadow opacity-80 sm:opacity-0 group-hover:opacity-100"
                   title="Remove from Continue Watching"
                 >
@@ -2927,7 +2976,7 @@
           return `
             <div
               class="group relative shrink-0 w-36 sm:w-44 md:w-48 aspect-poster rounded-xl overflow-hidden bg-dark-900 border border-white/10 hover:border-brand-500/50 hover:shadow-xl hover:shadow-brand-600/10 transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer"
-              onclick="window.app.openDetailsModal(${item.id})"
+              onclick="window.app.openDetailsModal('${item.id}')"
             >
               <!-- Poster Image with Fallback -->
               <img
@@ -2960,14 +3009,14 @@
                 <!-- Hover Buttons -->
                 <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/15" onclick="event.stopPropagation()">
                   <button
-                    onclick="window.app.openDetailsModal(${item.id}, 'vidlink')"
+                    onclick="window.app.openDetailsModal('${item.id}', 'vidlink')"
                     class="flex-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 transition shadow-md"
                     title="Play Movie / Series"
                   >
                     <i class="fa-solid fa-play text-[10px]"></i> Play
                   </button>
                   <button
-                    onclick="window.app.toggleCardWatchlist(${item.id})"
+                    onclick="window.app.toggleCardWatchlist('${item.id}')"
                     class="w-7 h-7 rounded-lg bg-dark-800 hover:bg-dark-700 border border-white/15 flex items-center justify-center text-xs ${inWatchlist ? 'text-emerald-400' : 'text-gray-300 hover:text-white'} transition"
                     title="${inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}"
                   >
@@ -3562,7 +3611,7 @@
         /**
          * Details & Streaming Modal Management
          */
-        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason, initialEpisode) {
+        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason, initialEpisode, autoPlay = false) {
           // Ensure TMDB server toolbar is visible and Provider controls toolbar is hidden
           const tmdbToolbar = document.getElementById('tmdbServerToolbar');
           const providerToolbar = document.getElementById('providerControlsToolbar');
@@ -3797,13 +3846,41 @@
           // Watchlist button in modal
           updateModalWatchlistBtn();
 
-          // Open modal dialog
-          document.getElementById('detailsModal').classList.remove('hidden');
+          // Dynamic Backdrop Banner Glow
+          const backdropEl = document.getElementById('modalBackdropGlow');
+          if (backdropEl) {
+            const bgUrl = media.backdrop_path
+              ? (media.backdrop_path.startsWith('http') ? media.backdrop_path : `${TMDB_IMAGE_ORIGINAL}${media.backdrop_path}`)
+              : (media.poster_path ? (media.poster_path.startsWith('http') ? media.poster_path : `${TMDB_IMAGE_POSTER}${media.poster_path}`) : '');
+            backdropEl.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : 'none';
+          }
+
+          // Open modal dialog in Details View
+          const modalEl = document.getElementById('detailsModal');
+          if (modalEl) {
+            modalEl.style.display = 'flex';
+            modalEl.classList.remove('hidden');
+          }
           document.body.style.overflow = 'hidden';
 
-          // Load stream iframe
-          updateServerButtonsUI();
-          loadStreamPlayer();
+          // By default, start with Details View (Player is collapsed until Play Now / Episode click)
+          const playerWrapper = document.getElementById('playerSectionWrapper');
+          if (autoPlay) {
+            if (playerWrapper) {
+              playerWrapper.style.display = 'block';
+              playerWrapper.classList.remove('hidden');
+            }
+            updateServerButtonsUI();
+            loadStreamPlayer();
+          } else {
+            if (playerWrapper) {
+              playerWrapper.style.display = 'none';
+              playerWrapper.classList.add('hidden');
+            }
+            const iframe = document.getElementById('streamIframe');
+            if (iframe) iframe.src = 'about:blank';
+            updateServerButtonsUI();
+          }
 
           // Render initial fallback suggested items from live cache
           renderModalSuggested(media);
@@ -4098,7 +4175,7 @@
             return `
               <div
                 class="group relative shrink-0 w-28 sm:w-32 aspect-poster rounded-xl overflow-hidden bg-dark-900 border border-white/10 hover:border-brand-500/60 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                onclick="window.app.openDetailsModal(${item.id})"
+                onclick="window.app.openDetailsModal('${item.id}')"
                 title="${title}"
               >
                 <img
@@ -4413,9 +4490,7 @@
           if (episodeSelect) episodeSelect.value = state.selectedEpisode;
           if (richSeasonSelect) richSeasonSelect.value = state.selectedSeason;
 
-          loadStreamPlayer();
-          scrollToSection('videoPlayerContainer');
-          showToast(`Playing Season ${season} Episode ${episode}`, 'info');
+          revealPlayerAndPlay(state.currentServer || 'vidking', season, episode);
 
           if (state.currentSeasonEpisodes) {
             renderRichEpisodeCards(state.currentSeasonEpisodes, season);
@@ -4746,11 +4821,78 @@
           showToast('Refreshing stream player...', 'info');
         }
 
+        
+        /**
+         * Reveal Video Player and begin streaming smoothly
+         */
+        function revealPlayerAndPlay(server, season, episode) {
+          if (server) state.currentServer = server;
+          if (season) state.selectedSeason = Number(season);
+          if (episode) state.selectedEpisode = Number(episode);
+
+          const playerWrapper = document.getElementById('playerSectionWrapper');
+          if (playerWrapper) {
+            playerWrapper.style.display = 'block';
+            playerWrapper.classList.remove('hidden');
+          }
+
+          updateServerButtonsUI();
+          loadStreamPlayer();
+
+          if (playerWrapper) {
+            playerWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+
+          const media = state.modalMedia || state.activeProviderMedia;
+          const title = media?.title || media?.name || 'Title';
+          showToast(`Streaming ${title}...`, 'info');
+        }
+
+        /**
+         * Collapse Video Player and return smoothly to Details View
+         */
+        function collapsePlayer() {
+          const playerWrapper = document.getElementById('playerSectionWrapper');
+          if (playerWrapper) {
+            playerWrapper.style.display = 'none';
+            playerWrapper.classList.add('hidden');
+          }
+          const iframe = document.getElementById('streamIframe');
+          if (iframe) iframe.src = 'about:blank';
+          const video = document.getElementById('streamVideoPlayer');
+          if (video) {
+            try { video.pause(); } catch (e) {}
+          }
+          document.getElementById('modalDialog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        /**
+         * Smoothly scroll down to TV Series Season & Episode section
+         */
+        function scrollToEpisodes() {
+          const section = document.getElementById('detailsSeasonSection');
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+
+        /**
+         * Play official YouTube trailer in stream player
+         */
+        function playTrailer() {
+          revealPlayerAndPlay('trailer');
+        }
+
         function closeModal() {
           const modal = document.getElementById('detailsModal');
           const iframe = document.getElementById('streamIframe');
           const video = document.getElementById('streamVideoPlayer');
-          modal.classList.add('hidden');
+          if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+          }
+          collapsePlayer();
+          document.body.style.overflow = '';
           iframe.src = 'about:blank';
           iframe.classList.remove('hidden');
 
@@ -5180,10 +5322,11 @@
         function toggleProviderDropdown(force) {
           const menu = document.getElementById('providerDropdownMenu');
           if (!menu) return;
-          const isHidden = menu.classList.contains('hidden');
+          const isHidden = menu.classList.contains('hidden') || menu.style.display === 'none';
           const shouldShow = force !== undefined ? force : isHidden;
 
           if (shouldShow) {
+            menu.style.display = 'flex';
             menu.classList.remove('hidden');
             const searchInput = document.getElementById('providerSearchInput');
             if (searchInput) {
@@ -5192,6 +5335,7 @@
               setTimeout(() => searchInput.focus(), 50);
             }
           } else {
+            menu.style.display = 'none';
             menu.classList.add('hidden');
           }
         }
@@ -5906,7 +6050,21 @@
             loader.classList.remove('pointer-events-none');
           }
 
+          // Dynamic Backdrop Banner Glow
+          const providerBg = post.image || '';
+          const backdropEl = document.getElementById('modalBackdropGlow');
+          if (backdropEl) {
+            backdropEl.style.backgroundImage = providerBg ? `url('${providerBg}')` : 'none';
+          }
+
+          // Open Details modal and keep Player collapsed until Play Now / Episode click
+          modal.style.display = 'flex';
           modal.classList.remove('hidden');
+          const playerWrapper = document.getElementById('playerSectionWrapper');
+          if (playerWrapper) {
+            playerWrapper.style.display = 'none';
+            playerWrapper.classList.add('hidden');
+          }
           document.body.style.overflow = 'hidden';
 
           try {
@@ -5926,6 +6084,9 @@
             }
 
             if (titleEl && meta.title) titleEl.textContent = meta.title;
+            const newTitleEl = document.getElementById('newModalTitle');
+            if (newTitleEl && meta.title) newTitleEl.textContent = meta.title;
+
             if (posterEl && (meta.poster || meta.image)) posterEl.src = meta.poster || meta.image;
             if (overviewEl) overviewEl.textContent = meta.synopsis || meta.overview || 'Streaming title ready for playback.';
             
@@ -5942,11 +6103,57 @@
                 ? 'bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded'
                 : 'bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded';
             }
+
+            const newTypeBadge = document.getElementById('newModalTypeBadge');
+            if (newTypeBadge) {
+              newTypeBadge.textContent = isTv ? 'TV' : 'Movie';
+              newTypeBadge.className = isTv
+                ? 'inline-block px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                : 'inline-block px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30';
+            }
+
             if (meta.rating && ratingEl) ratingEl.textContent = String(meta.rating);
 
-            // Setup unified TV season/episode controls for series
+            // Render modern info row
+            const infoRowEl = document.getElementById('newModalInfoRow');
+            if (infoRowEl) {
+              if (isTv) {
+                const seasonsCount = linkList.length > 0 ? `${linkList.length} Options` : 'Full Series';
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-users text-amber-400 text-xs"></i> ${seasonsCount}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${post.tag || '2025'}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-amber-400 font-bold">⭐ ${meta.rating || '8.5'} (HD)</span>
+                `;
+              } else {
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-sky-400 text-xs"></i> Full Feature</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${post.tag || '2025'}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-sky-400 font-bold">⭐ ${meta.rating || '8.0'}</span>
+                `;
+              }
+            }
+
+            // Button visibility
+            const btnViewEpisodes = document.getElementById('btnViewEpisodes');
+            const btnPlayNow = document.getElementById('btnPlayNow');
+            const detailsSeasonSection = document.getElementById('detailsSeasonSection');
+            const storylineBar = document.getElementById('storylineBar');
+
             if (isTv) {
+              if (btnViewEpisodes) btnViewEpisodes.classList.remove('hidden');
+              if (btnPlayNow) btnPlayNow.classList.add('hidden');
+              if (detailsSeasonSection) detailsSeasonSection.classList.remove('hidden');
+              if (storylineBar) storylineBar.className = 'w-1.5 h-4.5 rounded-full bg-amber-500';
               setupProviderTvControls(meta);
+            } else {
+              if (btnViewEpisodes) btnViewEpisodes.classList.add('hidden');
+              if (btnPlayNow) btnPlayNow.classList.remove('hidden');
+              if (detailsSeasonSection) detailsSeasonSection.classList.add('hidden');
+              if (storylineBar) storylineBar.className = 'w-1.5 h-4.5 rounded-full bg-sky-500';
             }
 
             if (linkList.length === 0) {
@@ -7178,6 +7385,7 @@
         function openDmcaModal() {
           const modal = document.getElementById('dmcaModal');
           if (modal) {
+            modal.style.display = 'flex';
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
           }
@@ -7186,6 +7394,7 @@
         function closeDmcaModal() {
           const modal = document.getElementById('dmcaModal');
           if (modal) {
+            modal.style.display = 'none';
             modal.classList.add('hidden');
             document.body.style.overflow = '';
           }
@@ -7249,7 +7458,7 @@
          * Download Modal Handler with multi-quality and direct stream downloads
          */
         function openDownloadModal() {
-          const media = state.modalMedia;
+          const media = state.modalMedia || state.activeProviderMedia;
           if (!media) {
             showToast('Please select a movie or TV show first.', 'warning');
             return;
@@ -7371,12 +7580,16 @@
           `).join('');
 
           state.downloadOptions = options;
+          modal.style.display = 'flex';
           modal.classList.remove('hidden');
         }
 
         function closeDownloadModal() {
           const modal = document.getElementById('downloadModal');
-          if (modal) modal.classList.add('hidden');
+          if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+          }
         }
 
         function triggerDownloadOption(index) {
@@ -7395,8 +7608,10 @@
           if (!modal) return;
 
           if (agreed === 'true') {
+            modal.style.display = 'none';
             modal.classList.add('hidden');
           } else {
+            modal.style.display = 'flex';
             modal.classList.remove('hidden');
             setTimeout(() => {
               if (card) {
@@ -7415,7 +7630,10 @@
             card.classList.add('scale-95', 'opacity-0');
           }
           setTimeout(() => {
-            if (modal) modal.classList.add('hidden');
+            if (modal) {
+              modal.style.display = 'none';
+              modal.classList.add('hidden');
+            }
             showToast('Welcome to PARXSTREAM! Enjoy unlimited streaming.', 'success');
           }, 300);
         }
@@ -7575,6 +7793,10 @@
           installPwaApp,
           // Redesign Section Helpers
           scrollToSection,
+          revealPlayerAndPlay,
+          collapsePlayer,
+          scrollToEpisodes,
+          playTrailer,
           onRichSeasonChange,
           filterRichEpisodes,
           setRichEpisodeLayout,
