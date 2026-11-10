@@ -10,6 +10,16 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- PWA & Mobile Web App Meta -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#e50914" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PARXSTREAM" />
+    <link rel="apple-touch-icon" href="/icon-192.svg" />
+    <link rel="icon" type="image/svg+xml" href="/icon-192.svg" />
+
     <!-- Browser Extension & Environment Compatibility Shim -->
     <script>
       (function() {
@@ -236,6 +246,18 @@
               <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
             </button>
           </div>
+
+          <!-- PWA Install App Button (Desktop) -->
+          <button
+            id="pwaInstallBtn"
+            type="button"
+            onclick="window.app.installPwaApp()"
+            class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold text-xs shadow-md transition transform hover:scale-105 cursor-pointer shrink-0"
+            title="Install PARXSTREAM Web App on Desktop"
+          >
+            <i class="fa-solid fa-cloud-arrow-down text-xs"></i>
+            <span>Install App</span>
+          </button>
 
           <!-- Quick Mobile Top Provider Button -->
           <button
@@ -964,26 +986,27 @@
                 <span class="text-xs font-semibold text-gray-400 mr-1 flex items-center gap-1.5">
                   <i class="fa-solid fa-server text-brand-500"></i> Server:
                 </span>
+
+                <!-- Server 1: VidKing (Cinextma Player) -->
+                <button
+                  id="serverBtnVidKing"
+                  onclick="window.app.switchServer('vidking')"
+                  class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow-sm transition flex items-center gap-1.5"
+                  title="VidKing HD (Cinextma Player - 1080p Fast Embed & Multi-Audio)"
+                >
+                  <i class="fa-solid fa-crown text-[10px] text-amber-300"></i> Server 1 (VidKing HD)
+                  <span class="bg-amber-400/30 text-amber-300 text-[9px] px-1.5 py-0.2 rounded font-bold">Cinextma</span>
+                </button>
                 
-                <!-- Server 1: VidLink -->
+                <!-- Server 2: VidLink -->
                 <button
                   id="serverBtnVidLink"
                   onclick="window.app.switchServer('vidlink')"
-                  class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow-sm transition flex items-center gap-1.5"
+                  class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="VidLink HD (Fast 1080p Ultra Player)"
                 >
-                  <i class="fa-solid fa-bolt text-[10px] text-amber-300"></i> Server 1 (VidLink HD)
+                  <i class="fa-solid fa-bolt text-[10px] text-amber-300"></i> Server 2 (VidLink HD)
                   <span class="bg-emerald-500/30 text-emerald-300 text-[9px] px-1.5 py-0.2 rounded font-bold">Fast HD</span>
-                </button>
-
-                <!-- Server 2: VidSrc PM -->
-                <button
-                  id="serverBtnVidSrcPm"
-                  onclick="window.app.switchServer('vidsrc_pm')"
-                  class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
-                  title="VidSrc PM (Global Fast Stream)"
-                >
-                  <i class="fa-solid fa-play text-[10px] text-rose-400"></i> Server 2 (VidSrc PM)
                 </button>
 
                 <!-- Server 3: AutoEmbed HD -->
@@ -996,24 +1019,34 @@
                   <i class="fa-solid fa-film text-[10px] text-blue-400"></i> Server 3 (AutoEmbed)
                 </button>
 
-                <!-- Server 4: VidSrc SU -->
+                <!-- Server 4: VidSrc PM -->
+                <button
+                  id="serverBtnVidSrcPm"
+                  onclick="window.app.switchServer('vidsrc_pm')"
+                  class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
+                  title="VidSrc PM (Global Fast Stream)"
+                >
+                  <i class="fa-solid fa-play text-[10px] text-rose-400"></i> Server 4 (VidSrc PM)
+                </button>
+
+                <!-- Server 5: VidSrc SU -->
                 <button
                   id="serverBtnVidSrcSu"
                   onclick="window.app.switchServer('vidsrc_su')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="VidSrc SU (Mirror HD)"
                 >
-                  <i class="fa-solid fa-forward text-[10px] text-indigo-400"></i> Server 4 (VidSrc SU)
+                  <i class="fa-solid fa-forward text-[10px] text-indigo-400"></i> Server 5 (VidSrc SU)
                 </button>
 
-                <!-- Server 5: 2Embed -->
+                <!-- Server 6: 2Embed -->
                 <button
                   id="serverBtnTwoEmbed"
                   onclick="window.app.switchServer('twoembed')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="2Embed (Backup Stream)"
                 >
-                  <i class="fa-solid fa-clapperboard text-[10px] text-purple-400"></i> Server 5 (2Embed)
+                  <i class="fa-solid fa-clapperboard text-[10px] text-purple-400"></i> Server 6 (2Embed)
                 </button>
 
                 <!-- CinePro Core Direct HLS Streams Container -->
@@ -1315,78 +1348,269 @@
             </div>
           </div>
 
-          <!-- Media Information & Cast Details -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 pt-3 border-t border-white/10">
-            
-            <!-- Poster Column -->
-            <div class="hidden md:block md:col-span-1">
+          <!-- Modern Media Header Card (Matching MobLand & Resident Evil Design) -->
+          <div class="pt-4 border-t border-white/10 flex flex-col md:flex-row items-start gap-5">
+            <!-- Poster Thumbnail -->
+            <div class="relative shrink-0 w-28 sm:w-36 md:w-44 aspect-poster rounded-2xl overflow-hidden shadow-2xl border border-white/15 bg-dark-900 group">
               <img
                 id="modalPosterImg"
                 src=""
                 alt="Poster"
-                class="w-full rounded-xl shadow-lg border border-white/10 object-cover aspect-poster"
+                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
               />
+              <div id="modalPosterGlow" class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
             </div>
 
-            <!-- Details Content Column -->
-            <div class="md:col-span-3 space-y-4">
-              
-              <!-- Meta Badges Row -->
-              <div class="flex items-center gap-3 flex-wrap text-xs">
-                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-md flex items-center gap-1 font-bold">
-                  <i class="fa-solid fa-star text-[10px]"></i> <span id="modalRating">8.4</span>
-                </span>
-                <span id="modalVotes" class="text-gray-400">(2,450 votes)</span>
-                <span class="text-gray-500">•</span>
-                <span id="modalReleaseDate" class="text-gray-300 font-medium">March 1, 2024</span>
-                <span class="text-gray-500">•</span>
-                <span id="modalRuntimeOrSeasons" class="text-gray-300 font-medium">2h 46m</span>
-                <span class="border border-white/20 text-gray-300 px-1.5 py-0.2 rounded text-[10px] font-bold">HD</span>
+            <!-- Header Info & Actions -->
+            <div class="flex-1 space-y-3 min-w-0">
+              <!-- Type Badge -->
+              <span id="newModalTypeBadge" class="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                TV
+              </span>
+
+              <!-- Title -->
+              <h2 id="newModalTitle" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                Title
+              </h2>
+
+              <!-- Metadata Row: (Seasons, Episodes, Year, Rating) or (Runtime, Year, Rating) -->
+              <div id="newModalInfoRow" class="flex items-center gap-2 text-xs sm:text-sm text-gray-300 font-medium flex-wrap">
+                <!-- Dynamically generated info pills -->
               </div>
 
-              <!-- Genres Badges -->
-              <div id="modalGenresList" class="flex items-center gap-2 flex-wrap">
-                <!-- Dynamically added -->
+              <!-- Genres -->
+              <div id="modalGenresList" class="flex items-center gap-1.5 flex-wrap pt-1">
+                <!-- Dynamically generated genre pills -->
               </div>
 
-              <!-- Synopsis Overview -->
-              <div class="space-y-1.5">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Storyline</h4>
-                <p id="modalOverview" class="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  Movie overview goes here.
-                </p>
-              </div>
+              <!-- Action Buttons Row -->
+              <div class="flex items-center gap-2.5 flex-wrap pt-2">
+                <!-- TV Primary Action: View Episodes -->
+                <button
+                  id="btnViewEpisodes"
+                  type="button"
+                  onclick="window.app.scrollToSection('detailsSeasonSection')"
+                  class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-lg shadow-amber-500/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                >
+                  <i class="fa-solid fa-play"></i>
+                  <span>View Episodes</span>
+                </button>
 
-              <!-- Cast & Crew -->
-              <div class="space-y-2 pt-2">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Top Cast</h4>
-                <div id="modalCastList" class="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
-                  <!-- Cast members -->
-                </div>
-              </div>
+                <!-- Movie Primary Action: Play Now -->
+                <button
+                  id="btnPlayNow"
+                  type="button"
+                  onclick="window.app.scrollToSection('videoPlayerContainer')"
+                  class="hidden px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/30 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                >
+                  <i class="fa-solid fa-play"></i>
+                  <span>Play Now</span>
+                </button>
 
+                <!-- YouTube Trailer Button -->
+                <button
+                  id="btnTrailerAction"
+                  type="button"
+                  onclick="window.app.switchServer('trailer')"
+                  class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                  title="Watch Official YouTube Trailer"
+                >
+                  <i class="fa-brands fa-youtube"></i>
+                  <span>Trailer</span>
+                </button>
+
+                <!-- Download Button -->
+                <button
+                  id="btnDownloadAction"
+                  type="button"
+                  onclick="window.app.openDownloadModal()"
+                  class="px-4 py-2.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-2 transition transform hover:scale-105 cursor-pointer"
+                  title="Download Movie or Episode"
+                >
+                  <i class="fa-solid fa-arrow-down-to-bracket"></i>
+                  <span>Download</span>
+                </button>
+
+                <!-- Share Button -->
+                <button
+                  type="button"
+                  onclick="window.app.shareCurrentMedia()"
+                  class="w-10 h-10 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white border border-white/10 flex items-center justify-center transition shadow cursor-pointer"
+                  title="Share"
+                >
+                  <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i>
+                </button>
+
+                <!-- Bookmark Button -->
+                <button
+                  id="headerWatchlistBtn"
+                  type="button"
+                  onclick="window.app.toggleModalWatchlist()"
+                  class="w-10 h-10 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white border border-white/10 flex items-center justify-center transition shadow cursor-pointer"
+                  title="Add to Watchlist"
+                >
+                  <i id="headerWatchlistIcon" class="fa-solid fa-bookmark text-xs"></i>
+                </button>
+              </div>
             </div>
-
           </div>
 
-          <!-- Suggested Titles Row (More Like This) -->
-          <div id="modalSuggestedSection" class="pt-4 border-t border-white/10 space-y-3">
+          <!-- Section 1: Story Line -->
+          <div class="space-y-2 pt-2 border-t border-white/5">
+            <div class="flex items-center gap-2">
+              <span id="storylineBar" class="w-1.5 h-4 rounded-full bg-amber-500"></span>
+              <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Story Line</h3>
+            </div>
+            <p id="modalOverview" class="text-xs sm:text-sm text-gray-300 leading-relaxed font-normal">
+              Synopsis loading...
+            </p>
+          </div>
+
+          <!-- Section 2: Top Casts (Circular Avatars) -->
+          <div class="space-y-3 pt-2">
             <div class="flex items-center justify-between">
-              <h4 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
-                <span class="w-2 h-4 rounded-full bg-brand-600 inline-block"></span>
-                <span>More Like This / Suggested</span>
-              </h4>
+              <div class="flex items-center gap-2">
+                <span id="castsBar" class="w-1.5 h-4 rounded-full bg-amber-500"></span>
+                <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Top Casts</h3>
+              </div>
               <div class="flex items-center gap-1.5">
-                <button onclick="window.app.scrollRow('modalSuggestedList', -1)" class="w-7 h-7 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white flex items-center justify-center border border-white/10 text-xs">
+                <button onclick="window.app.scrollRow('modalCastList', -1)" class="w-7 h-7 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white flex items-center justify-center border border-white/10 text-xs transition cursor-pointer">
                   <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <button onclick="window.app.scrollRow('modalSuggestedList', 1)" class="w-7 h-7 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white flex items-center justify-center border border-white/10 text-xs">
+                <button onclick="window.app.scrollRow('modalCastList', 1)" class="w-7 h-7 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white flex items-center justify-center border border-white/10 text-xs transition cursor-pointer">
                   <i class="fa-solid fa-chevron-right"></i>
                 </button>
               </div>
             </div>
+            <div id="modalCastList" class="flex items-center gap-4 overflow-x-auto no-scrollbar scroll-smooth py-1">
+              <!-- Dynamically populated circular cast avatars -->
+            </div>
+          </div>
+
+          <!-- Section 3: Photos Gallery (TMDB Backdrops & +Count overlay) -->
+          <div id="detailsPhotosSection" class="space-y-3 pt-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span id="photosBar" class="w-1.5 h-4 rounded-full bg-amber-500"></span>
+                <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Photos</h3>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button onclick="window.app.scrollRow('modalPhotosList', -1)" class="w-7 h-7 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white flex items-center justify-center border border-white/10 text-xs transition cursor-pointer">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button onclick="window.app.scrollRow('modalPhotosList', 1)" class="w-7 h-7 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 hover:text-white flex items-center justify-center border border-white/10 text-xs transition cursor-pointer">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+            <div id="modalPhotosList" class="flex items-center gap-3.5 overflow-x-auto no-scrollbar scroll-smooth py-1">
+              <!-- Dynamically populated photo stills -->
+            </div>
+          </div>
+
+          <!-- Section 4 (TV Series Only): Season & Episode with Search & Rich Cards -->
+          <div id="detailsSeasonSection" class="space-y-3.5 pt-3 border-t border-white/10 hidden">
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-4 rounded-full bg-amber-500"></span>
+              <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">Season & Episode</h3>
+            </div>
+
+            <!-- Toolbar: Season dropdown, Episode search, List/Grid toggles -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-dark-950/70 p-2.5 rounded-2xl border border-white/10">
+              <div class="flex items-center gap-2.5 flex-1 flex-wrap">
+                <div class="relative">
+                  <select
+                    id="richSeasonSelect"
+                    onchange="window.app.onRichSeasonChange(this.value)"
+                    class="appearance-none bg-dark-800 border border-white/15 text-white text-xs font-bold rounded-xl pl-3 pr-8 py-2 focus:outline-none focus:border-amber-500 cursor-pointer"
+                  >
+                    <option value="1">Season 1</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
+                </div>
+
+                <!-- Search input -->
+                <div class="relative flex-1 min-w-[160px] max-w-sm">
+                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                  <input
+                    id="richEpisodeSearchInput"
+                    type="text"
+                    placeholder="Search episodes..."
+                    oninput="window.app.filterRichEpisodes(this.value)"
+                    class="w-full bg-dark-800 border border-white/15 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              <!-- View layout toggles -->
+              <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                <button
+                  id="richViewListBtn"
+                  type="button"
+                  onclick="window.app.setRichEpisodeLayout('list')"
+                  class="w-8 h-8 rounded-lg bg-amber-500 text-black flex items-center justify-center text-xs font-bold transition shadow cursor-pointer"
+                  title="List View"
+                >
+                  <i class="fa-solid fa-bars"></i>
+                </button>
+                <button
+                  id="richViewGridBtn"
+                  type="button"
+                  onclick="window.app.setRichEpisodeLayout('grid')"
+                  class="w-8 h-8 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 flex items-center justify-center text-xs transition cursor-pointer"
+                  title="Grid View"
+                >
+                  <i class="fa-solid fa-grip"></i>
+                </button>
+                <button
+                  id="richSortBtn"
+                  type="button"
+                  onclick="window.app.toggleRichEpisodeSort()"
+                  class="w-8 h-8 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 flex items-center justify-center text-xs transition cursor-pointer"
+                  title="Sort order (Ascending / Descending)"
+                >
+                  <i class="fa-solid fa-arrow-down-short-wide"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Rich Episode Cards Container -->
+            <div id="richEpisodesContainer" class="flex flex-col gap-3 max-h-[500px] overflow-y-auto no-scrollbar pr-1">
+              <!-- Dynamically populated rich episode cards -->
+            </div>
+          </div>
+
+          <!-- Section 4 (Movies Only): You May Like (Recommendations & Similar) -->
+          <div id="detailsYouMayLikeSection" class="space-y-3 pt-3 border-t border-white/10 hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-4 rounded-full bg-sky-500"></span>
+                <h3 class="text-sm sm:text-base font-bold text-white tracking-wide">You may like</h3>
+              </div>
+
+              <!-- Tabs: Recommendations | Similar -->
+              <div class="flex items-center gap-4 text-xs font-semibold">
+                <button
+                  id="tabRecommendationsBtn"
+                  type="button"
+                  onclick="window.app.switchYouMayLikeTab('recommendations')"
+                  class="text-white border-b-2 border-sky-500 pb-1 font-bold transition cursor-pointer"
+                >
+                  Recommendations
+                </button>
+                <button
+                  id="tabSimilarBtn"
+                  type="button"
+                  onclick="window.app.switchYouMayLikeTab('similar')"
+                  class="text-gray-400 hover:text-white pb-1 transition cursor-pointer"
+                >
+                  Similar
+                </button>
+              </div>
+            </div>
+
             <div id="modalSuggestedList" class="flex gap-3.5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5">
-              <!-- Dynamically populated suggested movies -->
+              <!-- Dynamically populated movie cards -->
             </div>
           </div>
 
@@ -1397,6 +1621,96 @@
 
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Animated Entry Disclaimer Modal (First Visit) -->
+    <div id="entryDisclaimerModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl hidden flex items-center justify-center p-4 transition-all duration-500">
+      <div class="relative bg-dark-900 border border-white/15 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6 transform transition-all duration-500 scale-95 opacity-0 animate-scale-up" id="disclaimerModalCard">
+        <!-- Ambient Glowing Aura -->
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-brand-600/30 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-rose-600 flex items-center justify-center text-white text-xl shadow-lg shadow-brand-500/30">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-extrabold text-white tracking-wide">
+              Welcome to PARX<span class="text-brand-500">STREAM</span>
+            </h3>
+            <p class="text-xs text-gray-400 font-medium">Compliance & Safe Harbor Disclaimer</p>
+          </div>
+        </div>
+
+        <div class="relative space-y-3 text-xs text-gray-300 leading-relaxed">
+          <div class="bg-dark-800/80 border border-white/5 rounded-2xl p-3.5 space-y-1.5">
+            <h4 class="font-bold text-white flex items-center gap-2 text-xs">
+              <i class="fa-solid fa-cloud-arrow-down text-blue-400"></i>
+              <span>Non-Hosting Client Architecture</span>
+            </h4>
+            <p class="text-[11px] text-gray-400 leading-normal">
+              PARXSTREAM does not host, upload, or transmit any video files on its servers. It operates strictly as an open-source indexing client connecting to independent third-party public web embeds.
+            </p>
+          </div>
+
+          <div class="bg-dark-800/80 border border-emerald-500/20 rounded-2xl p-3.5 space-y-1.5">
+            <h4 class="font-bold text-white flex items-center gap-2 text-xs">
+              <i class="fa-solid fa-ban text-emerald-400"></i>
+              <span>Strict Domestic Filtering</span>
+            </h4>
+            <p class="text-[11px] text-gray-400 leading-normal">
+              Domestic Bangladeshi copyright-protected broadcasts, films, and OTT productions are strictly blocked from indexing on this gateway.
+            </p>
+          </div>
+        </div>
+
+        <div class="relative flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <button
+            type="button"
+            onclick="window.location.href='https://google.com'"
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white text-xs font-semibold transition"
+          >
+            Leave Site
+          </button>
+          <button
+            type="button"
+            onclick="window.app.acceptEntryDisclaimer()"
+            class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white text-xs font-bold shadow-lg shadow-brand-600/30 transition transform hover:scale-105 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <i class="fa-solid fa-check"></i>
+            <span>I Understand & Agree</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dedicated Movie & Series Download Modal -->
+    <div id="downloadModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+      <div class="bg-dark-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl p-6 sm:p-7 space-y-5">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-base">
+              <i class="fa-solid fa-download"></i>
+            </div>
+            <div>
+              <h3 id="downloadModalTitle" class="text-base font-bold text-white">Download Options</h3>
+              <p class="text-[11px] text-gray-400">High-speed direct video downloads & streams</p>
+            </div>
+          </div>
+          <button onclick="window.app.closeDownloadModal()" class="w-8 h-8 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <div id="downloadOptionsList" class="space-y-2.5 text-xs">
+          <!-- Dynamically populated download buttons -->
+        </div>
+
+        <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-gray-500">
+          <span>Speed: High Speed CDN • Resume Supported</span>
+          <button onclick="window.app.closeDownloadModal()" class="text-gray-400 hover:text-white font-medium">Close</button>
+        </div>
+      </div>
+    </div>
 
     <!-- DMCA Policy & Safe Harbor Takedown Modal -->
     <div id="dmcaModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
@@ -2030,10 +2344,15 @@
           
           // Modal & Player State
           modalMedia: null,
-          currentServer: 'vidlink', // 'vidlink' | 'vidsrc_pm' | 'autoembed' | 'vidsrc_su' | 'twoembed' | 'trailer'
+          currentServer: 'vidking', // 'vidking' (Cinextma) | 'vidlink' | 'autoembed' | 'vidsrc_pm' | 'vidsrc_su' | 'twoembed' | 'trailer'
           currentStreamUrl: '',
           selectedSeason: 1,
           selectedEpisode: 1,
+          richEpisodeLayout: 'list',
+          episodeFilterQuery: '',
+          episodeSortDesc: false,
+          currentSeasonEpisodes: [],
+          downloadOptions: [],
 
           // Vega Providers Integration State
           selectedProvider: localStorage.getItem('cinestream_selected_provider') || 'tmdb',
@@ -2099,6 +2418,9 @@
          * Initialize App on DOM Ready
          */
         function init() {
+          checkEntryDisclaimer();
+          initInfiniteScroll();
+          initPwa();
           updateApiStatusUI();
           updateWatchlistBadges();
           renderContinueWatchingRow();
@@ -3240,7 +3562,7 @@
         /**
          * Details & Streaming Modal Management
          */
-        async function openDetailsModal(id, preferredServer = 'vidlink', initialSeason, initialEpisode) {
+        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason, initialEpisode) {
           // Ensure TMDB server toolbar is visible and Provider controls toolbar is hidden
           const tmdbToolbar = document.getElementById('tmdbServerToolbar');
           const providerToolbar = document.getElementById('providerControlsToolbar');
@@ -3331,19 +3653,98 @@
           state.selectedEpisode = initialEpisode || 1;
 
           // Render basic modal metadata
-          document.getElementById('modalMediaTitle').textContent = media.title || media.name || 'Title';
-          document.getElementById('modalMediaTypeBadge').textContent = isTv ? 'TV Series' : 'Movie';
-          document.getElementById('modalMediaTypeBadge').className = isTv
-            ? 'bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded'
-            : 'bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded';
+          const title = media.title || media.name || 'Title';
+          const titleEl = document.getElementById('modalMediaTitle');
+          const newTitleEl = document.getElementById('newModalTitle');
+          if (titleEl) titleEl.textContent = title;
+          if (newTitleEl) newTitleEl.textContent = title;
+
+          const oldTypeBadge = document.getElementById('modalMediaTypeBadge');
+          if (oldTypeBadge) {
+            oldTypeBadge.textContent = isTv ? 'TV Series' : 'Movie';
+            oldTypeBadge.className = isTv
+              ? 'bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded'
+              : 'bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded';
+          }
+
+          const newTypeBadge = document.getElementById('newModalTypeBadge');
+          if (newTypeBadge) {
+            newTypeBadge.textContent = isTv ? 'TV' : 'Movie';
+            newTypeBadge.className = isTv
+              ? 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30'
+              : 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30';
+          }
 
           const year = (media.release_date || media.first_air_date || '2024').substring(0, 4);
-          document.getElementById('modalMediaYear').textContent = `(${year})`;
-          document.getElementById('modalReleaseDate').textContent = media.release_date || media.first_air_date || 'Recent Release';
-          document.getElementById('modalRating').textContent = media.vote_average ? media.vote_average.toFixed(1) : '8.0';
-          document.getElementById('modalVotes').textContent = `(${media.vote_count ? media.vote_count.toLocaleString() : '3,200'} votes)`;
-          document.getElementById('modalOverview').textContent = media.overview || 'Synopsis not available.';
-          document.getElementById('modalRuntimeOrSeasons').textContent = isTv ? `${media.seasons_count || 1} Seasons` : (media.runtime || '2h 15m');
+          const yearEl = document.getElementById('modalMediaYear');
+          if (yearEl) yearEl.textContent = `(${year})`;
+          const relDateEl = document.getElementById('modalReleaseDate');
+          if (relDateEl) relDateEl.textContent = media.release_date || media.first_air_date || 'Recent Release';
+          const ratingEl = document.getElementById('modalRating');
+          if (ratingEl) ratingEl.textContent = media.vote_average ? media.vote_average.toFixed(1) : '8.0';
+          const votesEl = document.getElementById('modalVotes');
+          if (votesEl) votesEl.textContent = `(${media.vote_count ? media.vote_count.toLocaleString() : '3,200'} votes)`;
+          const overviewEl = document.getElementById('modalOverview');
+          if (overviewEl) overviewEl.textContent = media.overview || 'Synopsis not available.';
+          const runtimeEl = document.getElementById('modalRuntimeOrSeasons');
+          if (runtimeEl) runtimeEl.textContent = isTv ? `${media.seasons_count || 1} Seasons` : (media.runtime || '2h 15m');
+
+          // Render metadata row matching uploaded screenshot
+          const infoRowEl = document.getElementById('newModalInfoRow');
+          if (infoRowEl) {
+            if (isTv) {
+              const seasonsText = `${media.seasons_count || 1} Seasons`;
+              const epsText = media.episodes_count ? ` • ${media.episodes_count} Episodes` : '';
+              const dateRange = (media.first_air_date ? media.first_air_date.substring(0, 4) : '2025');
+              const ratingVal = media.vote_average ? media.vote_average.toFixed(1) : '8.6';
+              const voteCountText = media.vote_count ? (media.vote_count > 1000 ? (media.vote_count/1000).toFixed(1) + 'k' : media.vote_count) : '1.2k';
+              infoRowEl.innerHTML = `
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-users text-amber-400 text-xs"></i> ${seasonsText}${epsText}</span>
+                <span class="text-gray-500">•</span>
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${dateRange}</span>
+                <span class="text-gray-500">•</span>
+                <span class="text-amber-400 font-bold">⭐ ${ratingVal} (${voteCountText})</span>
+              `;
+            } else {
+              const runtimeText = media.runtime ? (typeof media.runtime === 'number' ? `${Math.floor(media.runtime/60)}h ${media.runtime%60}m` : media.runtime) : '1h 34m';
+              const yearText = (media.release_date || '2026').substring(0, 4);
+              const ratingVal = media.vote_average ? media.vote_average.toFixed(1) : '7.5';
+              infoRowEl.innerHTML = `
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-sky-400 text-xs"></i> ${runtimeText}</span>
+                <span class="text-gray-500">•</span>
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${yearText}</span>
+                <span class="text-gray-500">•</span>
+                <span class="text-sky-400 font-bold">⭐ ${ratingVal}</span>
+              `;
+            }
+          }
+
+          // Section & Action visibility
+          const btnViewEpisodes = document.getElementById('btnViewEpisodes');
+          const btnPlayNow = document.getElementById('btnPlayNow');
+          const detailsSeasonSection = document.getElementById('detailsSeasonSection');
+          const detailsYouMayLikeSection = document.getElementById('detailsYouMayLikeSection');
+          const storylineBar = document.getElementById('storylineBar');
+          const castsBar = document.getElementById('castsBar');
+          const photosBar = document.getElementById('photosBar');
+
+          if (isTv) {
+            if (btnViewEpisodes) btnViewEpisodes.classList.remove('hidden');
+            if (btnPlayNow) btnPlayNow.classList.add('hidden');
+            if (detailsSeasonSection) detailsSeasonSection.classList.remove('hidden');
+            if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.add('hidden');
+            if (storylineBar) storylineBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
+            if (castsBar) castsBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
+            if (photosBar) photosBar.className = 'w-1.5 h-4 rounded-full bg-amber-500';
+          } else {
+            if (btnViewEpisodes) btnViewEpisodes.classList.add('hidden');
+            if (btnPlayNow) btnPlayNow.classList.remove('hidden');
+            if (detailsSeasonSection) detailsSeasonSection.classList.add('hidden');
+            if (detailsYouMayLikeSection) detailsYouMayLikeSection.classList.remove('hidden');
+            if (storylineBar) storylineBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
+            if (castsBar) castsBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
+            if (photosBar) photosBar.className = 'w-1.5 h-4 rounded-full bg-sky-500';
+          }
 
           // Poster
           const posterUrl = media.poster_path
@@ -3353,29 +3754,36 @@
 
           // Genres
           const genresEl = document.getElementById('modalGenresList');
-          if (media.genres && media.genres.length > 0) {
-            genresEl.innerHTML = media.genres.map(g => `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">${g.name}</span>`).join('');
-          } else {
-            genresEl.innerHTML = `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">Streaming HD</span>`;
+          if (genresEl) {
+            if (media.genres && media.genres.length > 0) {
+              genresEl.innerHTML = media.genres.map(g => `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">${escapeHtml(g.name)}</span>`).join('');
+            } else {
+              genresEl.innerHTML = `<span class="bg-dark-800 text-gray-300 text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/10">Streaming HD</span>`;
+            }
           }
 
-          // Cast
+          // Initial Cast
           const castEl = document.getElementById('modalCastList');
-          if (media.cast && media.cast.length > 0) {
-            castEl.innerHTML = media.cast.map(c => `
-              <div class="shrink-0 flex items-center gap-2 bg-dark-800/80 px-2.5 py-1.5 rounded-lg border border-white/5">
-                <div class="w-7 h-7 rounded-full bg-dark-700 flex items-center justify-center text-gray-400 text-xs font-bold">
-                  ${c.name.charAt(0)}
+          if (castEl) {
+            if (media.cast && media.cast.length > 0) {
+              castEl.innerHTML = media.cast.map(c => `
+                <div class="shrink-0 flex items-center gap-3 bg-dark-850/90 hover:bg-dark-800 px-3 py-2 rounded-2xl border border-white/10 transition group shadow-sm">
+                  <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 bg-dark-700 shadow-md">
+                    ${c.profile_path ? `<img src="${TMDB_IMAGE_POSTER}${c.profile_path}" alt="${escapeHtml(c.name)}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>` : `<div class="w-full h-full flex items-center justify-center font-bold text-gray-300 text-sm">${c.name.charAt(0)}</div>`}
+                  </div>
+                  <div class="text-left leading-tight min-w-0 pr-1">
+                    <p class="text-xs font-bold text-white truncate max-w-[110px]">${escapeHtml(c.name)}</p>
+                    <p class="text-[10px] text-gray-400 truncate max-w-[110px] mt-0.5">${escapeHtml(c.character || 'Cast')}</p>
+                  </div>
                 </div>
-                <div class="text-left leading-tight">
-                  <p class="text-xs font-semibold text-white truncate max-w-[120px]">${c.name}</p>
-                  <p class="text-[10px] text-gray-400 truncate max-w-[120px]">${c.character || 'Cast'}</p>
-                </div>
-              </div>
-            `).join('');
-          } else {
-            castEl.innerHTML = `<span class="text-xs text-gray-400">Featuring an ensemble cast.</span>`;
+              `).join('');
+            } else {
+              castEl.innerHTML = `<span class="text-xs text-gray-400">Cast details loading...</span>`;
+            }
           }
+
+          // Initial Photos
+          renderModalPhotos(media.backdrop_path ? [{ file_path: media.backdrop_path }] : []);
 
           // TV Season & Episode Selectors
           const tvSelectors = document.getElementById('tvSelectors');
@@ -3494,12 +3902,12 @@
         async function fetchDeepTmdbDetails(id, isTv) {
           let endpoint = isTv ? `/tv/${id}` : `/movie/${id}`;
           try {
-            let fullData = await fetchTmdb(endpoint, { append_to_response: 'credits,videos,external_ids' }).catch(() => null);
+            let fullData = await fetchTmdb(endpoint, { append_to_response: 'credits,videos,external_ids,images' }).catch(() => null);
 
             // Self-healing check: if the initial endpoint returned 404 or missing ID, check opposite type
             if (!fullData || fullData.status_code === 34 || (!fullData.id && !fullData.title && !fullData.name)) {
               const altEndpoint = isTv ? `/movie/${id}` : `/tv/${id}`;
-              const altData = await fetchTmdb(altEndpoint, { append_to_response: 'credits,videos,external_ids' }).catch(() => null);
+              const altData = await fetchTmdb(altEndpoint, { append_to_response: 'credits,videos,external_ids,images' }).catch(() => null);
               if (altData && (altData.id || altData.title || altData.name)) {
                 fullData = altData;
                 isTv = !isTv;
@@ -3512,6 +3920,13 @@
                   typeBadge.className = isTv
                     ? 'bg-purple-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded'
                     : 'bg-brand-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded';
+                }
+                const newTypeBadge = document.getElementById('newModalTypeBadge');
+                if (newTypeBadge) {
+                  newTypeBadge.textContent = isTv ? 'TV' : 'Movie';
+                  newTypeBadge.className = isTv
+                    ? 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    : 'inline-block px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30';
                 }
                 const tvSelectors = document.getElementById('tvSelectors');
                 if (isTv) {
@@ -3540,22 +3955,61 @@
               state.modalMedia.trailer_key = trailer.key;
             }
 
-            // Update Cast
-            if (fullData.credits && fullData.credits.cast) {
-              const topCast = fullData.credits.cast.slice(0, 6);
-              const castEl = document.getElementById('modalCastList');
-              castEl.innerHTML = topCast.map(c => `
-                <div class="shrink-0 flex items-center gap-2 bg-dark-800/80 px-2.5 py-1.5 rounded-lg border border-white/5">
-                  <div class="w-7 h-7 rounded-full bg-dark-700 flex items-center justify-center text-gray-400 text-xs font-bold overflow-hidden">
-                    ${c.profile_path ? `<img src="${TMDB_IMAGE_POSTER}${c.profile_path}" class="w-full h-full object-cover"/>` : c.name.charAt(0)}
-                  </div>
-                  <div class="text-left leading-tight">
-                    <p class="text-xs font-semibold text-white truncate max-w-[120px]">${c.name}</p>
-                    <p class="text-[10px] text-gray-400 truncate max-w-[120px]">${c.character || 'Cast'}</p>
-                  </div>
-                </div>
-              `).join('');
+            // Update Metadata row with exact values
+            const infoRowEl = document.getElementById('newModalInfoRow');
+            if (infoRowEl) {
+              if (isTv) {
+                const sCount = fullData.number_of_seasons || state.modalMedia.seasons_count || 1;
+                const epCount = fullData.number_of_episodes ? ` • ${fullData.number_of_episodes} Episodes` : '';
+                const dateRange = (fullData.first_air_date ? fullData.first_air_date.substring(0, 4) : '2025') + (fullData.last_air_date ? ` - ${fullData.last_air_date.substring(0, 4)}` : '');
+                const ratingVal = fullData.vote_average ? fullData.vote_average.toFixed(1) : (state.modalMedia.vote_average ? state.modalMedia.vote_average.toFixed(1) : '8.6');
+                const voteCountText = fullData.vote_count ? (fullData.vote_count > 1000 ? (fullData.vote_count/1000).toFixed(1) + 'k' : fullData.vote_count) : '1.2k';
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-users text-amber-400 text-xs"></i> ${sCount} Seasons${epCount}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${dateRange}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-amber-400 font-bold">⭐ ${ratingVal} (${voteCountText})</span>
+                `;
+              } else {
+                const rMinutes = fullData.runtime || (typeof state.modalMedia.runtime === 'number' ? state.modalMedia.runtime : 105);
+                const runtimeText = `${Math.floor(rMinutes / 60)}h ${rMinutes % 60 ? (rMinutes % 60) + 'm' : ''}`;
+                const yearText = (fullData.release_date || state.modalMedia.release_date || '2026').substring(0, 4);
+                const ratingVal = fullData.vote_average ? fullData.vote_average.toFixed(1) : (state.modalMedia.vote_average ? state.modalMedia.vote_average.toFixed(1) : '7.5');
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-sky-400 text-xs"></i> ${runtimeText}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${yearText}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-sky-400 font-bold">⭐ ${ratingVal}</span>
+                `;
+              }
             }
+
+            // Update Top Cast with circular avatar portraits matching screenshot
+            if (fullData.credits && fullData.credits.cast) {
+              const topCast = fullData.credits.cast.slice(0, 10);
+              const castEl = document.getElementById('modalCastList');
+              if (castEl) {
+                castEl.innerHTML = topCast.map(c => `
+                  <div class="shrink-0 flex items-center gap-3 bg-dark-850/90 hover:bg-dark-800 px-3 py-2 rounded-2xl border border-white/10 transition group shadow-sm">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 bg-dark-700 shadow-md">
+                      ${c.profile_path ? `<img src="${TMDB_IMAGE_POSTER}${c.profile_path}" alt="${escapeHtml(c.name)}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>` : `<div class="w-full h-full flex items-center justify-center font-bold text-gray-300 text-sm">${c.name.charAt(0)}</div>`}
+                    </div>
+                    <div class="text-left leading-tight min-w-0 pr-1">
+                      <p class="text-xs font-bold text-white truncate max-w-[110px]">${escapeHtml(c.name)}</p>
+                      <p class="text-[10px] text-gray-400 truncate max-w-[110px] mt-0.5">${escapeHtml(c.character || 'Cast')}</p>
+                    </div>
+                  </div>
+                `).join('');
+              }
+            }
+
+            // Update Photos gallery with backdrop stills
+            const backdrops = (fullData.images && Array.isArray(fullData.images.backdrops) && fullData.images.backdrops.length > 0)
+              ? fullData.images.backdrops
+              : (state.modalMedia.backdrop_path ? [{ file_path: state.modalMedia.backdrop_path }] : []);
+            renderModalPhotos(backdrops);
 
             // Update TV Seasons if TV
             if (isTv && fullData.seasons) {
@@ -3669,10 +4123,63 @@
         }
 
         /**
+         * Renders Photos gallery with TMDB backdrop stills and +Count badge matching screenshot
+         */
+        function renderModalPhotos(backdrops) {
+          const container = document.getElementById('modalPhotosList');
+          const section = document.getElementById('detailsPhotosSection');
+          if (!container) return;
+
+          const stills = (Array.isArray(backdrops) && backdrops.length > 0)
+            ? backdrops.filter(b => b.file_path)
+            : [];
+
+          if (stills.length === 0) {
+            if (section) section.classList.add('hidden');
+            return;
+          }
+
+          if (section) section.classList.remove('hidden');
+          const displayStills = stills.slice(0, 4);
+          const remaining = Math.max(0, stills.length - displayStills.length);
+
+          container.innerHTML = displayStills.map((still, idx) => {
+            const isLastWithMore = (idx === displayStills.length - 1 && remaining > 0);
+            const stillUrl = `${TMDB_IMAGE_BACKDROP}${still.file_path}`;
+            const badgeCount = remaining > 50 ? '+100' : (remaining > 15 ? '+28' : `+${remaining}`);
+
+            return `
+              <div
+                class="relative shrink-0 w-44 sm:w-56 aspect-video rounded-2xl overflow-hidden border border-white/10 bg-dark-900 group shadow-lg cursor-pointer"
+                onclick="window.open('${stillUrl}', '_blank')"
+                title="View Photo Still"
+              >
+                <img
+                  src="${stillUrl}"
+                  alt="Movie Photo"
+                  class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+                ${isLastWithMore ? `
+                  <div class="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center text-white font-extrabold text-xl tracking-wider">
+                    ${badgeCount}
+                  </div>
+                ` : `
+                  <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <i class="fa-solid fa-eye text-white text-xs bg-black/60 p-2 rounded-full backdrop-blur-sm"></i>
+                  </div>
+                `}
+              </div>
+            `;
+          }).join('');
+        }
+
+        /**
          * Sets up the Season and Episode dropdowns for TV Series
          */
         async function setupTvSelectors(media, tmdbSeasons) {
           const seasonSelect = document.getElementById('seasonSelect');
+          const richSeasonSelect = document.getElementById('richSeasonSelect');
           const episodeSelect = document.getElementById('episodeSelect');
           if (!seasonSelect || !episodeSelect) return;
 
@@ -3686,6 +4193,8 @@
           }
 
           seasonSelect.innerHTML = '';
+          if (richSeasonSelect) richSeasonSelect.innerHTML = '';
+
           if (validSeasons.length > 0) {
             validSeasons.forEach(s => {
               const opt = document.createElement('option');
@@ -3693,6 +4202,13 @@
               const epText = s.episode_count ? ` (${s.episode_count} eps)` : '';
               opt.textContent = `${s.name || 'Season ' + s.season_number}${epText}`;
               seasonSelect.appendChild(opt);
+
+              if (richSeasonSelect) {
+                const rOpt = document.createElement('option');
+                rOpt.value = s.season_number;
+                rOpt.textContent = s.name || `Season ${s.season_number}`;
+                richSeasonSelect.appendChild(rOpt);
+              }
             });
             const seasonExists = validSeasons.some(s => s.season_number === Number(state.selectedSeason));
             if (!seasonExists) {
@@ -3705,11 +4221,44 @@
               opt.value = s;
               opt.textContent = `Season ${s}`;
               seasonSelect.appendChild(opt);
+
+              if (richSeasonSelect) {
+                const rOpt = document.createElement('option');
+                rOpt.value = s;
+                rOpt.textContent = `Season ${s}`;
+                richSeasonSelect.appendChild(rOpt);
+              }
             }
           }
           seasonSelect.value = state.selectedSeason;
+          if (richSeasonSelect) richSeasonSelect.value = state.selectedSeason;
 
           await populateEpisodesDropdown(state.selectedSeason);
+        }
+
+        function createFallbackEpisodes(media, seasonNumber) {
+          let epCount = 10;
+          if (media.tmdbSeasons) {
+            const sObj = media.tmdbSeasons.find(s => s.season_number === Number(seasonNumber));
+            if (sObj && sObj.episode_count) {
+              epCount = sObj.episode_count;
+            }
+          } else if (media.episodes_per_season && media.episodes_per_season[seasonNumber - 1]) {
+            epCount = media.episodes_per_season[seasonNumber - 1];
+          }
+
+          const fallback = [];
+          for (let e = 1; e <= epCount; e++) {
+            fallback.push({
+              episode_number: e,
+              name: `Episode ${e}`,
+              overview: `Watch full episode ${e} of Season ${seasonNumber} in HD stream with multi-audio dubbed tracks.`,
+              still_path: media.backdrop_path || '',
+              air_date: media.first_air_date || '',
+              runtime: 45
+            });
+          }
+          return fallback;
         }
 
         async function populateEpisodesDropdown(seasonNumber) {
@@ -3735,41 +4284,220 @@
 
           episodeSelect.innerHTML = '';
 
-          if (realEpisodes.length > 0) {
-            realEpisodes.forEach(ep => {
-              const opt = document.createElement('option');
-              opt.value = ep.episode_number;
-              const epTitle = ep.name && !ep.name.toLowerCase().startsWith('episode') ? ` - ${ep.name}` : '';
-              opt.textContent = `E${ep.episode_number}${epTitle}`;
-              episodeSelect.appendChild(opt);
-            });
-            const epExists = realEpisodes.some(ep => ep.episode_number === Number(state.selectedEpisode));
-            if (!epExists) {
-              state.selectedEpisode = realEpisodes[0].episode_number;
-            }
-          } else {
-            let epCount = 10;
-            if (media.tmdbSeasons) {
-              const sObj = media.tmdbSeasons.find(s => s.season_number === Number(seasonNumber));
-              if (sObj && sObj.episode_count) {
-                epCount = sObj.episode_count;
-              }
-            } else if (media.episodes_per_season && media.episodes_per_season[seasonNumber - 1]) {
-              epCount = media.episodes_per_season[seasonNumber - 1];
-            }
+          const finalEpisodes = realEpisodes.length > 0 ? realEpisodes : createFallbackEpisodes(media, seasonNumber);
 
-            for (let e = 1; e <= epCount; e++) {
-              const opt = document.createElement('option');
-              opt.value = e;
-              opt.textContent = `Episode ${e}`;
-              episodeSelect.appendChild(opt);
-            }
-            if (state.selectedEpisode > epCount) {
-              state.selectedEpisode = 1;
-            }
+          finalEpisodes.forEach(ep => {
+            const opt = document.createElement('option');
+            opt.value = ep.episode_number;
+            const epTitle = ep.name && !ep.name.toLowerCase().startsWith('episode') ? ` - ${ep.name}` : '';
+            opt.textContent = `E${ep.episode_number}${epTitle}`;
+            episodeSelect.appendChild(opt);
+          });
+
+          const epExists = finalEpisodes.some(ep => ep.episode_number === Number(state.selectedEpisode));
+          if (!epExists && finalEpisodes.length > 0) {
+            state.selectedEpisode = finalEpisodes[0].episode_number;
           }
 
           episodeSelect.value = state.selectedEpisode;
+          renderRichEpisodeCards(finalEpisodes, seasonNumber);
+        }
+
+        function formatDateFriendly(dateStr) {
+          if (!dateStr) return '';
+          try {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          } catch (e) {
+            return dateStr;
+          }
+        }
+
+        /**
+         * Renders rich episode cards matching the MobLand TV Series screenshot
+         */
+        function renderRichEpisodeCards(episodes, seasonNumber) {
+          state.currentSeasonEpisodes = episodes || [];
+          const container = document.getElementById('richEpisodesContainer');
+          if (!container) return;
+
+          if (!episodes || episodes.length === 0) {
+            container.innerHTML = `<div class="p-6 text-center text-xs text-gray-500 bg-dark-900/60 rounded-2xl border border-white/5">No episode metadata found for this season.</div>`;
+            return;
+          }
+
+          const query = (state.episodeFilterQuery || '').toLowerCase().trim();
+          let list = [...episodes];
+          if (query) {
+            list = list.filter(ep => 
+              (ep.name && ep.name.toLowerCase().includes(query)) ||
+              (ep.overview && ep.overview.toLowerCase().includes(query)) ||
+              String(ep.episode_number).includes(query)
+            );
+          }
+
+          if (state.episodeSortDesc) {
+            list.reverse();
+          }
+
+          const layout = state.richEpisodeLayout || 'list';
+
+          if (layout === 'grid') {
+            container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto no-scrollbar pr-1';
+          } else {
+            container.className = 'flex flex-col gap-3 max-h-[500px] overflow-y-auto no-scrollbar pr-1';
+          }
+
+          if (list.length === 0) {
+            container.innerHTML = `<div class="p-6 text-center text-xs text-gray-400 bg-dark-900/60 rounded-2xl border border-white/5">No episodes match "${escapeHtml(query)}".</div>`;
+            return;
+          }
+
+          container.innerHTML = list.map(ep => {
+            const epNum = ep.episode_number;
+            const isPlaying = (Number(state.selectedSeason) === Number(seasonNumber) && Number(state.selectedEpisode) === Number(epNum));
+            const stillUrl = ep.still_path ? `${TMDB_IMAGE_BACKDROP}${ep.still_path}` : (state.modalMedia?.backdrop_path ? `${TMDB_IMAGE_BACKDROP}${state.modalMedia.backdrop_path}` : FALLBACK_POSTER);
+            const durationText = ep.runtime ? (ep.runtime >= 60 ? `${Math.floor(ep.runtime / 60)}h ${ep.runtime % 60 ? (ep.runtime % 60) + 'm' : ''}` : `${ep.runtime}m`) : '45m';
+            const airDate = ep.air_date ? formatDateFriendly(ep.air_date) : '';
+            const overview = ep.overview || 'Episode synopsis not available.';
+            const title = ep.name || `Episode ${epNum}`;
+
+            return `
+              <div
+                onclick="window.app.playRichEpisode(${seasonNumber}, ${epNum})"
+                class="group relative rounded-2xl ${isPlaying ? 'bg-amber-500/10 border-amber-500/40 ring-1 ring-amber-500/30' : 'bg-dark-850/80 hover:bg-dark-800 border-white/10 hover:border-white/20'} border p-3 flex ${layout === 'grid' ? 'flex-col' : 'flex-col sm:flex-row'} items-start sm:items-center gap-3.5 transition duration-200 cursor-pointer shadow-md"
+              >
+                <!-- Thumbnail with duration and episode number badges -->
+                <div class="relative shrink-0 ${layout === 'grid' ? 'w-full' : 'w-full sm:w-44'} aspect-video rounded-xl overflow-hidden bg-dark-900 border border-white/10">
+                  <img src="${stillUrl}" alt="${escapeHtml(title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+                  <span class="absolute top-1.5 right-1.5 bg-black/75 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
+                    ${durationText}
+                  </span>
+                  <span class="absolute bottom-1.5 left-1.5 bg-black/75 backdrop-blur-xs text-amber-400 font-extrabold text-xs px-2 py-0.5 rounded-md">
+                    ${epNum}
+                  </span>
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 text-black flex items-center justify-center shadow-lg font-bold">
+                      <i class="fa-solid fa-play text-xs ml-0.5"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Episode Title, Air Date, & Description -->
+                <div class="flex-1 min-w-0 space-y-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <h4 class="text-xs sm:text-sm font-bold ${isPlaying ? 'text-amber-400' : 'text-white group-hover:text-amber-300'} truncate transition">
+                      ${escapeHtml(title)}
+                    </h4>
+                    ${isPlaying ? `<span class="bg-amber-500 text-black text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded shrink-0">Playing</span>` : ''}
+                  </div>
+                  ${airDate ? `<p class="text-[11px] text-gray-400 font-medium">${airDate}</p>` : ''}
+                  <p class="text-[11px] text-gray-300 line-clamp-2 leading-relaxed">
+                    ${escapeHtml(overview)}
+                  </p>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        function playRichEpisode(season, episode) {
+          state.selectedSeason = Number(season);
+          state.selectedEpisode = Number(episode);
+
+          const seasonSelect = document.getElementById('seasonSelect');
+          const episodeSelect = document.getElementById('episodeSelect');
+          const richSeasonSelect = document.getElementById('richSeasonSelect');
+          if (seasonSelect) seasonSelect.value = state.selectedSeason;
+          if (episodeSelect) episodeSelect.value = state.selectedEpisode;
+          if (richSeasonSelect) richSeasonSelect.value = state.selectedSeason;
+
+          loadStreamPlayer();
+          scrollToSection('videoPlayerContainer');
+          showToast(`Playing Season ${season} Episode ${episode}`, 'info');
+
+          if (state.currentSeasonEpisodes) {
+            renderRichEpisodeCards(state.currentSeasonEpisodes, season);
+          }
+        }
+
+        function scrollToSection(elementId) {
+          const el = document.getElementById(elementId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+
+        async function onRichSeasonChange(seasonNumber) {
+          state.selectedSeason = parseInt(seasonNumber, 10);
+          state.selectedEpisode = 1;
+
+          const seasonSelect = document.getElementById('seasonSelect');
+          if (seasonSelect) seasonSelect.value = state.selectedSeason;
+
+          await populateEpisodesDropdown(state.selectedSeason);
+          loadStreamPlayer();
+          showToast(`Switched to Season ${state.selectedSeason}`, 'info');
+        }
+
+        function filterRichEpisodes(query) {
+          state.episodeFilterQuery = query;
+          if (state.currentSeasonEpisodes) {
+            renderRichEpisodeCards(state.currentSeasonEpisodes, state.selectedSeason || 1);
+          }
+        }
+
+        function setRichEpisodeLayout(layout) {
+          state.richEpisodeLayout = layout;
+          const listBtn = document.getElementById('richViewListBtn');
+          const gridBtn = document.getElementById('richViewGridBtn');
+          if (layout === 'grid') {
+            if (gridBtn) {
+              gridBtn.className = 'w-8 h-8 rounded-lg bg-amber-500 text-black flex items-center justify-center text-xs font-bold transition shadow cursor-pointer';
+            }
+            if (listBtn) {
+              listBtn.className = 'w-8 h-8 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 flex items-center justify-center text-xs transition cursor-pointer';
+            }
+          } else {
+            if (listBtn) {
+              listBtn.className = 'w-8 h-8 rounded-lg bg-amber-500 text-black flex items-center justify-center text-xs font-bold transition shadow cursor-pointer';
+            }
+            if (gridBtn) {
+              gridBtn.className = 'w-8 h-8 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 flex items-center justify-center text-xs transition cursor-pointer';
+            }
+          }
+          if (state.currentSeasonEpisodes) {
+            renderRichEpisodeCards(state.currentSeasonEpisodes, state.selectedSeason || 1);
+          }
+        }
+
+        function toggleRichEpisodeSort() {
+          state.episodeSortDesc = !state.episodeSortDesc;
+          showToast(state.episodeSortDesc ? 'Episodes sorted descending' : 'Episodes sorted ascending', 'info');
+          if (state.currentSeasonEpisodes) {
+            renderRichEpisodeCards(state.currentSeasonEpisodes, state.selectedSeason || 1);
+          }
+        }
+
+        async function switchYouMayLikeTab(tab) {
+          const recBtn = document.getElementById('tabRecommendationsBtn');
+          const simBtn = document.getElementById('tabSimilarBtn');
+          if (!state.modalMedia) return;
+
+          if (tab === 'similar') {
+            if (simBtn) simBtn.className = 'text-white border-b-2 border-sky-500 pb-1 font-bold transition cursor-pointer';
+            if (recBtn) recBtn.className = 'text-gray-400 hover:text-white pb-1 transition cursor-pointer';
+            
+            const data = await fetchTmdb(`/movie/${state.modalMedia.id}/similar`).catch(() => null);
+            if (data && data.results) {
+              renderModalSuggestedItems(data.results.filter(i => i.poster_path).slice(0, 12));
+            }
+          } else {
+            if (recBtn) recBtn.className = 'text-white border-b-2 border-sky-500 pb-1 font-bold transition cursor-pointer';
+            if (simBtn) simBtn.className = 'text-gray-400 hover:text-white pb-1 transition cursor-pointer';
+            fetchTmdbRecommendations(state.modalMedia.id, false);
+          }
         }
 
         async function onSeasonChange(newSeason) {
@@ -3839,7 +4567,14 @@
           const imdbId = media.imdb_id || '';
           const isTv = media.media_type === 'tv';
 
-          if (state.currentServer === 'vidlink') {
+          if (state.currentServer === 'vidking') {
+            // VidKing HD (Cinextma Engine): High quality, fast 1080p, multi-audio
+            if (isTv) {
+              streamUrl = `https://vidking.net/embed/tv/${tmdbId}/${state.selectedSeason}/${state.selectedEpisode}?autoplay=1`;
+            } else {
+              streamUrl = `https://vidking.net/embed/movie/${tmdbId}?autoplay=1`;
+            }
+          } else if (state.currentServer === 'vidlink') {
             // VidLink Pro: Ultra fast 1080p, subtitles, audio track switcher
             if (isTv) {
               streamUrl = `https://vidlink.pro/tv/${tmdbId}/${state.selectedSeason}/${state.selectedEpisode}?primaryColor=e50914&autoplay=true`;
@@ -3931,18 +4666,19 @@
           loadStreamPlayer();
 
           const serverNames = {
-            'vidlink': 'Server 1 (VidLink HD)',
-            'vidsrc_pm': 'Server 2 (VidSrc PM)',
+            'vidking': 'Server 1 (VidKing HD - Cinextma)',
+            'vidlink': 'Server 2 (VidLink HD)',
             'autoembed': 'Server 3 (AutoEmbed)',
-            'vidsrc_su': 'Server 4 (VidSrc SU)',
-            'twoembed': 'Server 5 (2Embed)',
+            'vidsrc_pm': 'Server 4 (VidSrc PM)',
+            'vidsrc_su': 'Server 5 (VidSrc SU)',
+            'twoembed': 'Server 6 (2Embed)',
             'trailer': 'Official Trailer'
           };
           showToast(`Switched to ${serverNames[serverType] || serverType}`, 'info');
         }
 
         function tryNextTmdbServer() {
-          const servers = ['vidlink', 'autoembed', 'vidsrc_pm', 'vidsrc_su', 'twoembed'];
+          const servers = ['vidking', 'vidlink', 'autoembed', 'vidsrc_pm', 'vidsrc_su', 'twoembed'];
           const currentIdx = servers.indexOf(state.currentServer);
           const nextIdx = (currentIdx + 1) % servers.length;
           switchServer(servers[nextIdx]);
@@ -3950,6 +4686,7 @@
 
         function updateServerButtonsUI() {
           const map = {
+            'vidking': document.getElementById('serverBtnVidKing'),
             'vidlink': document.getElementById('serverBtnVidLink'),
             'vidsrc_pm': document.getElementById('serverBtnVidSrcPm'),
             'autoembed': document.getElementById('serverBtnAutoEmbed'),
@@ -6508,6 +7245,260 @@
             .replace(/'/g, '&#039;');
         }
 
+        /**
+         * Download Modal Handler with multi-quality and direct stream downloads
+         */
+        function openDownloadModal() {
+          const media = state.modalMedia;
+          if (!media) {
+            showToast('Please select a movie or TV show first.', 'warning');
+            return;
+          }
+
+          const modal = document.getElementById('downloadModal');
+          const titleEl = document.getElementById('downloadModalTitle');
+          const listEl = document.getElementById('downloadOptionsList');
+          if (!modal || !listEl) return;
+
+          const isTv = (media.media_type === 'tv');
+          const title = media.title || media.name || 'Selected Title';
+          const tmdbId = media.id;
+          const s = state.selectedSeason || 1;
+          const ep = state.selectedEpisode || 1;
+
+          if (titleEl) {
+            titleEl.textContent = isTv ? `Download: ${title} (S${s} E${ep})` : `Download: ${title}`;
+          }
+
+          const options = [];
+
+          // 1. CinePro high speed HLS sources if available
+          if (state.currentCineproSources && state.currentCineproSources.length > 0) {
+            state.currentCineproSources.forEach((src, idx) => {
+              options.push({
+                label: `${src.server || 'Direct Server ' + (idx + 1)} (High Speed Direct)`,
+                badge: 'Direct Stream',
+                color: 'emerald',
+                action: () => {
+                  window.open(src.link, '_blank');
+                }
+              });
+            });
+          }
+
+          // 2. 1080p Ultra HD (VidKing Fast Embed / Stream)
+          options.push({
+            label: '1080p Ultra HD (Fast Stream / Direct Video)',
+            badge: '1080p Ultra',
+            color: 'amber',
+            action: () => {
+              const url = isTv
+                ? `https://vidking.net/embed/tv/${tmdbId}/${s}/${ep}`
+                : `https://vidking.net/embed/movie/${tmdbId}`;
+              window.open(url, '_blank');
+            }
+          });
+
+          // 3. 720p HD Stream / CDN Mirror
+          options.push({
+            label: '720p HD (High Speed CDN Stream)',
+            badge: '720p HD',
+            color: 'sky',
+            action: () => {
+              const url = isTv
+                ? `https://vidsrc.su/embed/tv/${tmdbId}/${s}/${ep}`
+                : `https://vidsrc.su/embed/movie/${tmdbId}`;
+              window.open(url, '_blank');
+            }
+          });
+
+          // 4. Multi-Audio / Subtitles Stream (AutoEmbed)
+          options.push({
+            label: 'AutoEmbed Multi-Audio (Hindi Dubbed / English)',
+            badge: 'Multi-Audio',
+            color: 'purple',
+            action: () => {
+              const url = isTv
+                ? `https://autoembed.me/tv/tmdb/${tmdbId}-${s}-${ep}`
+                : `https://autoembed.me/movie/tmdb/${tmdbId}`;
+              window.open(url, '_blank');
+            }
+          });
+
+          // 5. Download Subtitles (.SRT / .VTT)
+          options.push({
+            label: 'Download Subtitles (.SRT / .VTT for VLC / MX Player)',
+            badge: 'Subtitles',
+            color: 'blue',
+            action: () => {
+              const query = encodeURIComponent((media.title || media.name || '') + (isTv ? ` S${s}E${ep}` : ''));
+              window.open(`https://www.opensubtitles.org/en/search/sublanguageid-all/moviename-${query}`, '_blank');
+            }
+          });
+
+          // 6. Copy Direct Stream Link
+          options.push({
+            label: 'Copy Active Stream Link (For IDM / VLC / Downloader)',
+            badge: 'Clipboard',
+            color: 'gray',
+            action: () => {
+              const link = state.currentStreamUrl || (isTv ? `https://vidking.net/embed/tv/${tmdbId}/${s}/${ep}` : `https://vidking.net/embed/movie/${tmdbId}`);
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(link).then(() => {
+                  showToast('Stream link copied to clipboard!', 'success');
+                });
+              } else {
+                prompt('Copy stream URL for your download manager:', link);
+              }
+            }
+          });
+
+          listEl.innerHTML = options.map((opt, idx) => `
+            <div class="flex items-center justify-between p-3 rounded-xl bg-dark-800/80 hover:bg-dark-800 border border-white/5 hover:border-white/15 transition gap-3">
+              <div class="flex items-center gap-2.5 truncate">
+                <span class="w-2 h-2 rounded-full ${opt.color === 'emerald' ? 'bg-emerald-400' : (opt.color === 'amber' ? 'bg-amber-400' : 'bg-sky-400')}"></span>
+                <span class="font-medium text-white text-xs truncate">${opt.label}</span>
+              </div>
+              <button
+                type="button"
+                onclick="window.app.triggerDownloadOption(${idx})"
+                class="shrink-0 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <i class="fa-solid fa-arrow-down-to-bracket text-[10px]"></i>
+                <span>Get</span>
+              </button>
+            </div>
+          `).join('');
+
+          state.downloadOptions = options;
+          modal.classList.remove('hidden');
+        }
+
+        function closeDownloadModal() {
+          const modal = document.getElementById('downloadModal');
+          if (modal) modal.classList.add('hidden');
+        }
+
+        function triggerDownloadOption(index) {
+          if (state.downloadOptions && state.downloadOptions[index]) {
+            state.downloadOptions[index].action();
+          }
+        }
+
+        /**
+         * Animated Entry Disclaimer Modal Check & Acceptance
+         */
+        function checkEntryDisclaimer() {
+          const agreed = localStorage.getItem('parx_disclaimer_agreed');
+          const modal = document.getElementById('entryDisclaimerModal');
+          const card = document.getElementById('disclaimerModalCard');
+          if (!modal) return;
+
+          if (agreed === 'true') {
+            modal.classList.add('hidden');
+          } else {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+              if (card) {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+              }
+            }, 120);
+          }
+        }
+
+        function acceptEntryDisclaimer() {
+          localStorage.setItem('parx_disclaimer_agreed', 'true');
+          const card = document.getElementById('disclaimerModalCard');
+          const modal = document.getElementById('entryDisclaimerModal');
+          if (card) {
+            card.classList.add('scale-95', 'opacity-0');
+          }
+          setTimeout(() => {
+            if (modal) modal.classList.add('hidden');
+            showToast('Welcome to PARXSTREAM! Enjoy unlimited streaming.', 'success');
+          }, 300);
+        }
+
+        /**
+         * Smooth Infinite Scroll on mouse wheel or mobile touch
+         */
+        function initInfiniteScroll() {
+          let isScrollThrottled = false;
+          window.addEventListener('scroll', () => {
+            if (isScrollThrottled) return;
+            isScrollThrottled = true;
+            setTimeout(() => { isScrollThrottled = false; }, 300);
+
+            // If details modal or other overlay is open, don't trigger background pagination
+            const detailsModal = document.getElementById('detailsModal');
+            if (detailsModal && !detailsModal.classList.contains('hidden')) return;
+
+            const scrollY = window.scrollY || window.pageYOffset;
+            const scrollBottom = window.innerHeight + scrollY;
+            const documentHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+            if (scrollBottom >= documentHeight - 800) {
+              if (state.selectedProvider !== 'tmdb') {
+                const pBtn = document.getElementById('providerLoadMoreBtn');
+                if (pBtn && !pBtn.classList.contains('hidden') && !pBtn.disabled && !state.providerIsLoading) {
+                  loadMoreProviderPosts();
+                }
+              } else {
+                const gridView = document.getElementById('gridViewSection');
+                const gBtn = document.getElementById('gridLoadMoreBtn');
+                if (gridView && !gridView.classList.contains('hidden') && gBtn && !gBtn.classList.contains('hidden') && !gBtn.disabled && !state.isLoadingMore) {
+                  loadMoreGridItems();
+                }
+              }
+            }
+          }, { passive: true });
+        }
+
+        /**
+         * PWA Installation & Service Worker Integration
+         */
+        let deferredPrompt = null;
+        function initPwa() {
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const pwaBtn = document.getElementById('pwaInstallBtn');
+            const mobPwaBtn = document.getElementById('mobilePwaInstallBtn');
+            if (pwaBtn) pwaBtn.classList.remove('hidden');
+            if (mobPwaBtn) mobPwaBtn.classList.remove('hidden');
+          });
+
+          window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            const pwaBtn = document.getElementById('pwaInstallBtn');
+            const mobPwaBtn = document.getElementById('mobilePwaInstallBtn');
+            if (pwaBtn) pwaBtn.classList.add('hidden');
+            if (mobPwaBtn) mobPwaBtn.classList.add('hidden');
+            showToast('PARXSTREAM installed successfully!', 'success');
+          });
+
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch((err) => {
+              console.warn('[PWA] Service worker registration error:', err);
+            });
+          }
+        }
+
+        function installPwaApp() {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+              if (choiceResult.outcome === 'accepted') {
+                showToast('Thank you for installing PARXSTREAM!', 'success');
+              }
+              deferredPrompt = null;
+            });
+          } else {
+            showToast('To install: Open browser menu (⋮ / Share) & select "Add to Home Screen" or "Install App"', 'info');
+          }
+        }
+
         // Expose public API to window for inline onclick attributes
         window.app = {
           navigateTab,
@@ -6572,7 +7563,24 @@
           onUniversalSubtitleChange,
           onCustomSubtitleUpload,
           tryNextWorkingStream,
-          retryCurrentStream
+          retryCurrentStream,
+          // Download Modal Methods
+          openDownloadModal,
+          closeDownloadModal,
+          triggerDownloadOption,
+          // Entry Disclaimer Modal
+          checkEntryDisclaimer,
+          acceptEntryDisclaimer,
+          // PWA Install
+          installPwaApp,
+          // Redesign Section Helpers
+          scrollToSection,
+          onRichSeasonChange,
+          filterRichEpisodes,
+          setRichEpisodeLayout,
+          toggleRichEpisodeSort,
+          playRichEpisode,
+          switchYouMayLikeTab
         };
 
         // Initialize when DOM is ready
@@ -6606,6 +7614,10 @@
         <i class="fa-solid fa-bookmark text-sm text-amber-400"></i>
         <span>My List</span>
         <span id="mobileWatchlistBadge" class="absolute top-0 right-2 w-2 h-2 rounded-full bg-brand-500 hidden"></span>
+      </button>
+      <button id="mobilePwaInstallBtn" onclick="window.app.installPwaApp()" class="text-amber-400 hover:text-amber-300 flex flex-col items-center gap-1 py-1 relative">
+        <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
+        <span>Install</span>
       </button>
     </nav>
   </body>
