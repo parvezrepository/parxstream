@@ -20,6 +20,18 @@
     <link rel="apple-touch-icon" href="/icon-192.svg" />
     <link rel="icon" type="image/svg+xml" href="/icon-192.svg" />
 
+    <!-- Automatic Production Domain Redirect (Routes all Vercel visitors to parxstream.top) -->
+    <script>
+      (function() {
+        try {
+          var h = window.location.hostname;
+          if (h === 'parxstream.vercel.app' || (h.endsWith('.vercel.app') && !h.includes('localhost'))) {
+            window.location.replace('https://parxstream.top' + window.location.pathname + window.location.search + window.location.hash);
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- Browser Extension & Environment Compatibility Shim -->
     <script>
       (function() {

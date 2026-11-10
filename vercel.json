@@ -19,6 +19,18 @@
       "entrypoint": "server.js"
     }
   },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://parxstream.top/",
+      "permanent": false
+    },
+    {
+      "source": "/index.html",
+      "destination": "https://parxstream.top/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
