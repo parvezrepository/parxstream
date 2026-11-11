@@ -735,6 +735,90 @@
           </div>
         </section>
 
+        <!-- Row 10: 123Movies VIP Cinema Blockbusters -->
+        <section id="rowMovieboxCinemaSection" class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2.5 h-6 rounded-full bg-purple-500 inline-block animate-pulse"></span>
+              <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                <span>123Movies VIP: Latest Cinema</span>
+                <span class="text-xs font-semibold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30">1080p • Zero Ads</span>
+              </h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="window.app.switchProvider('moviebox')" class="text-xs text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-1 transition px-2.5 py-1 rounded-lg hover:bg-white/5 mr-1">
+                <span>VIP Mode</span>
+                <i class="fa-solid fa-crown text-[10px]"></i>
+              </button>
+              <button onclick="window.app.scrollRow('rowMovieboxCinema', -1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <button onclick="window.app.scrollRow('rowMovieboxCinema', 1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+          <div id="rowMovieboxCinema" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1">
+            <!-- Dynamic Cards injected here -->
+          </div>
+        </section>
+
+        <!-- Row 11: 123Movies VIP Top Anime Series (Dual Audio) -->
+        <section id="rowMovieboxAnimeSection" class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2.5 h-6 rounded-full bg-amber-400 inline-block"></span>
+              <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                <span>123Movies VIP: Top Anime Series</span>
+                <span class="text-xs font-semibold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">🔊 Dual Audio / Dub</span>
+              </h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="window.app.navigateTab('anime')" class="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 transition px-2.5 py-1 rounded-lg hover:bg-white/5 mr-1">
+                <span>All Anime</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+              <button onclick="window.app.scrollRow('rowMovieboxAnime', -1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <button onclick="window.app.scrollRow('rowMovieboxAnime', 1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+          <div id="rowMovieboxAnime" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1">
+            <!-- Dynamic Cards injected here -->
+          </div>
+        </section>
+
+        <!-- Row 12: 123Movies VIP Bollywood & South Indian -->
+        <section id="rowMovieboxBollywoodSection" class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2.5 h-6 rounded-full bg-rose-500 inline-block"></span>
+              <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                <span>123Movies VIP: Indian Cinema</span>
+                <span class="text-xs font-semibold text-rose-300 bg-rose-500/20 px-2 py-0.5 rounded-full border border-rose-500/30">Multi-Audio</span>
+              </h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="window.app.navigateTab('hindi')" class="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1 transition px-2.5 py-1 rounded-lg hover:bg-white/5 mr-1">
+                <span>See More</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+              <button onclick="window.app.scrollRow('rowMovieboxBollywood', -1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <button onclick="window.app.scrollRow('rowMovieboxBollywood', 1)" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+          <div id="rowMovieboxBollywood" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1">
+            <!-- Dynamic Cards injected here -->
+          </div>
+        </section>
+
       </div>
 
       <!-- Dedicated Provider Catalog & Browsing View (For Vega Providers) -->
@@ -2397,7 +2481,7 @@
         const DEFAULT_NEXSTREAM_KEY = 'nx_1412dc1c920d6e0b0b9cc0848e68ec2a';
 
         // Strict Blacklist Filter: Block all Bangladeshi domestic content to prevent local copyright claims
-        const BD_CONTENT_REGEX = /\b(bangladesh|bangladeshi|dhallywood|chorki|toffee|bioscope|bongo\s*bd|bongo|hoichoi\s*bangladesh|shakib\s*khan|pori\s*moni|natok|telefilm|bangla\s*natok|bangla\s*movie|bangladeshi\s*movie|priyotoma|surongo)\b/i;
+        const BD_CONTENT_REGEX = /\b(bangladesh|bangladeshi|dhallywood|chorki|toffee|bioscope|bongo\s*bd|bongo|hoichoi\s*bangladesh|shakib\s*khan|pori\s*moni|natok|telefilm|bangla\s*natok|bangla\s*movie|bangladeshi\s*movie|priyotoma|surongo|bengali|bangla)\b/i;
 
         function isBangladeshiContent(item) {
           if (!item) return false;
@@ -2406,7 +2490,9 @@
           if (item.original_language === 'bn') return true;
           const title = (item.title || item.name || '').toLowerCase();
           const overview = (item.overview || '').toLowerCase();
-          if (BD_CONTENT_REGEX.test(title) || BD_CONTENT_REGEX.test(overview)) return true;
+          const genre = (item.genre || '').toLowerCase();
+          if (BD_CONTENT_REGEX.test(title) || BD_CONTENT_REGEX.test(overview) || BD_CONTENT_REGEX.test(genre)) return true;
+          if (title.includes('bengali') || title.includes('bangla') || title.includes('bd ')) return true;
           return false;
         }
 
@@ -2620,7 +2706,8 @@
             nowPlayingData,
             animeData,
             cartoonsData,
-            hindiData
+            hindiData,
+            movieboxHomeData
           ] = await Promise.all([
             fetchTmdb('/trending/all/day').catch(() => ({ results: [] })),
             fetchTmdb('/movie/popular').catch(() => ({ results: [] })),
@@ -2629,7 +2716,8 @@
             fetchTmdb('/movie/now_playing').catch(() => ({ results: [] })),
             fetchTmdb('/discover/tv', { with_genres: '16', with_original_language: 'ja', sort_by: 'popularity.desc' }).catch(() => ({ results: [] })),
             fetchTmdb('/discover/movie', { with_genres: '16', sort_by: 'popularity.desc' }).catch(() => ({ results: [] })),
-            fetchTmdb('/discover/movie', { with_original_language: 'hi', sort_by: 'popularity.desc' }).catch(() => ({ results: [] }))
+            fetchTmdb('/discover/movie', { with_original_language: 'hi', sort_by: 'popularity.desc' }).catch(() => ({ results: [] })),
+            apiFetch('/api/moviebox/home').then(r => r.ok ? r.json() : null).catch(() => null)
           ]);
 
           const now = new Date();
@@ -2668,17 +2756,51 @@
             nowPlaying: sanitize(nowPlayingData.results, 'movie'),
             anime: sanitize(animeData.results, 'tv'),
             cartoons: sanitize(cartoonsData.results, 'movie'),
-            hindi: sanitize(hindiData.results, 'movie')
+            hindi: sanitize(hindiData.results, 'movie'),
+            movieboxCinema: [],
+            movieboxAnime: [],
+            movieboxBollywood: []
           };
 
+          // Integrate MovieBox VIP (123Movies) Curated Feeds & Dual-Audio Anime
+          if (movieboxHomeData && Array.isArray(movieboxHomeData.sections)) {
+            state.movieboxHome = movieboxHomeData;
+            const mbSections = movieboxHomeData.sections;
+            const mbAnime = mbSections.find(s => /anime/i.test(s.title))?.items || [];
+            const mbCinema = mbSections.find(s => /cinema/i.test(s.title))?.items || [];
+            const mbBollywood = mbSections.find(s => /bollywood/i.test(s.title))?.items || [];
+            const mbSouth = mbSections.find(s => /south/i.test(s.title))?.items || [];
+            const mbTrending = mbSections.find(s => /trending/i.test(s.title))?.items || [];
+
+            liveData.movieboxCinema = mbCinema;
+            liveData.movieboxAnime = mbAnime;
+            liveData.movieboxBollywood = [...mbBollywood, ...mbSouth];
+
+            // Blend high-quality dual audio anime and hindi into main rows
+            if (mbAnime.length > 0) {
+              liveData.anime = [...mbAnime, ...liveData.anime];
+            }
+            if (mbBollywood.length > 0 || mbSouth.length > 0) {
+              liveData.hindi = [...mbBollywood, ...mbSouth, ...liveData.hindi];
+            }
+
+            // If in MovieBox VIP mode, hero banners switch to MovieBox featured titles
+            if (state.selectedProvider === 'moviebox' && movieboxHomeData.hero && movieboxHomeData.hero.length > 0) {
+              liveData.trending = mbTrending.length > 0 ? mbTrending : liveData.trending;
+              liveData.popularMovies = mbCinema.length > 0 ? mbCinema : liveData.popularMovies;
+            }
+          }
+
           state.liveCache = liveData;
-          state.heroList = liveData.trending.length > 0 ? liveData.trending : DEMO_CATALOG.trending;
+          state.heroList = (state.selectedProvider === 'moviebox' && state.movieboxHome?.hero?.length > 0)
+            ? state.movieboxHome.hero
+            : (liveData.trending.length > 0 ? liveData.trending : DEMO_CATALOG.trending);
           state.lastSyncedAt = new Date();
 
           renderCatalog(liveData);
 
           if (!options.silent) {
-            showToast('Live TMDB feeds synchronized successfully!', 'success');
+            showToast('Live feeds & 123Movies VIP synchronized successfully!', 'success');
           }
           updateApiStatusUI();
         }
@@ -2706,7 +2828,9 @@
          * Renders all rows in the home catalog view
          */
         function renderCatalog(data) {
-          state.heroList = (data.trending && data.trending.length > 0) ? data.trending : DEMO_CATALOG.trending;
+          state.heroList = (state.selectedProvider === 'moviebox' && state.movieboxHome?.hero?.length > 0)
+            ? state.movieboxHome.hero
+            : ((data.trending && data.trending.length > 0) ? data.trending : DEMO_CATALOG.trending);
           renderHero();
 
           renderRow('rowTrending', data.trending || DEMO_CATALOG.trending);
@@ -2717,6 +2841,9 @@
           renderRow('rowAnime', data.anime || []);
           renderRow('rowCartoons', data.cartoons || []);
           renderRow('rowHindi', data.hindi || []);
+          renderRow('rowMovieboxCinema', data.movieboxCinema || []);
+          renderRow('rowMovieboxAnime', data.movieboxAnime || []);
+          renderRow('rowMovieboxBollywood', data.movieboxBollywood || []);
           renderWatchlistRow();
           renderContinueWatchingRow();
         }
@@ -2926,7 +3053,10 @@
             'rowNowPlaying',
             'rowAnime',
             'rowCartoons',
-            'rowHindi'
+            'rowHindi',
+            'rowMovieboxCinema',
+            'rowMovieboxAnime',
+            'rowMovieboxBollywood'
           ];
           const skeletonCard = `
             <div class="shrink-0 w-36 sm:w-44 md:w-48 aspect-poster rounded-xl skeleton-shimmer border border-white/5"></div>
@@ -3063,9 +3193,12 @@
                 <span class="bg-black/70 backdrop-blur-md text-amber-400 font-bold text-[10px] sm:text-xs px-2 py-0.5 rounded-md flex items-center gap-1 border border-white/10">
                   <i class="fa-solid fa-star text-[9px]"></i> ${rating}
                 </span>
-                <span class="bg-black/70 backdrop-blur-md text-gray-200 text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded border border-white/10">
-                  ${isTv ? 'TV' : 'Movie'}
-                </span>
+                <div class="flex items-center gap-1">
+                  ${(item.isDualAudio || item.hasHindiAudio) ? '<span class="bg-amber-500/90 text-dark-950 font-black text-[9px] px-1.5 py-0.5 rounded shadow flex items-center gap-1 border border-amber-400/40"><i class="fa-solid fa-volume-high text-[8px]"></i> Dual Audio</span>' : ''}
+                  <span class="bg-black/70 backdrop-blur-md text-gray-200 text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded border border-white/10">
+                    ${isTv ? 'TV' : 'Movie'}
+                  </span>
+                </div>
               </div>
 
               <!-- Hover Action Overlay -->
@@ -3136,8 +3269,8 @@
           const gridCatalog = document.getElementById('gridCatalogView');
           const providerCatalog = document.getElementById('providerCatalogView');
 
-          // If in external Vega Provider mode (CinePro uses TMDB dashboard with direct HLS playback)
-          if (state.selectedProvider && state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro') {
+          // If in external Vega Provider mode (CinePro & MovieBox use core dashboard with direct stream playback)
+          if (state.selectedProvider && state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro' && state.selectedProvider !== 'moviebox') {
             if (hero) hero.classList.add('hidden');
             if (homeCatalog) homeCatalog.classList.add('hidden');
 
@@ -3441,7 +3574,10 @@
             ...(state.liveCache.nowPlaying || []),
             ...(state.liveCache.anime || []),
             ...(state.liveCache.cartoons || []),
-            ...(state.liveCache.hindi || [])
+            ...(state.liveCache.hindi || []),
+            ...(state.liveCache.movieboxCinema || []),
+            ...(state.liveCache.movieboxAnime || []),
+            ...(state.liveCache.movieboxBollywood || [])
           ] : ALL_DEMO_ITEMS;
 
           // Deduplicate and filter out any domestic Bangladeshi content
@@ -3482,7 +3618,7 @@
 
             clearTimeout(state.searchDebounceTimer);
             state.searchDebounceTimer = setTimeout(() => {
-              if (state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro') {
+              if (state.selectedProvider !== 'tmdb' && state.selectedProvider !== 'cinepro' && state.selectedProvider !== 'moviebox') {
                 executeProviderSearch(query);
               } else {
                 executeSearch(query);
@@ -3559,6 +3695,35 @@
                   usedSuggestion = suggestedCorrection;
                 }
               }
+
+              // Also query MovieBox 123movies VIP core for anime, dual-audio, and cinema titles
+              try {
+                const mbRes = await apiFetch(`/api/moviebox/search?q=${encodeURIComponent(query)}`);
+                if (mbRes.ok) {
+                  const mbResults = await mbRes.json();
+                  if (Array.isArray(mbResults) && mbResults.length > 0) {
+                    const cleanMb = mbResults.filter(r => !isBangladeshiContent(r) && r.cover).map(r => ({
+                      id: String(r.subjectId),
+                      subjectId: String(r.subjectId),
+                      title: r.title,
+                      name: r.title,
+                      media_type: r.type === 'series' ? 'tv' : 'movie',
+                      overview: 'Watch in 1080p Ultra HD with multi-audio dubbed tracks and zero ads.',
+                      poster_path: r.cover,
+                      backdrop_path: r.cover,
+                      vote_average: parseFloat(r.imdbRating || '8.2'),
+                      release_date: r.releaseDate || '',
+                      isDualAudio: /hindi|dual|dub/i.test(r.title || ''),
+                      hasHindiAudio: /hindi|dual|dub/i.test(r.title || '')
+                    }));
+                    for (const mbItem of cleanMb) {
+                      if (!validResults.some(v => v.id === mbItem.id || v.title.toLowerCase() === mbItem.title.toLowerCase())) {
+                        validResults.push(mbItem);
+                      }
+                    }
+                  }
+                }
+              } catch (mbSearchErr) {}
 
               state.lastSearchResults = validResults;
               displaySearchResults(validResults, usedSuggestion, suggestedCorrection);
@@ -4110,15 +4275,18 @@
           if (!targetMedia) return;
 
           try {
+            const sid = targetMedia.subjectId || '';
             const title = targetMedia.title || targetMedia.name || targetMedia.original_title || '';
-            if (!title) return;
-            const year = targetMedia.release_date ? targetMedia.release_date.split('-')[0] : (targetMedia.first_air_date ? targetMedia.first_air_date.split('-')[0] : '');
+            if (!title && !sid) return;
+            const year = targetMedia.release_date ? targetMedia.release_date.split('-')[0] : (targetMedia.first_air_date ? targetMedia.first_air_date.split('-')[0] : (targetMedia.year || ''));
             const isTv = targetMedia.media_type === 'tv' || targetMedia.type === 'tv' || targetMedia.type === 'series';
             const s = isTv ? (season || state.selectedSeason || 1) : 0;
             const ep = isTv ? (episode || state.selectedEpisode || 1) : 0;
             const pref = state.preferredAudioLanguage || '';
 
-            const url = `/api/moviebox/streams?title=${encodeURIComponent(title)}&year=${encodeURIComponent(year)}&type=${isTv ? 'tv' : 'movie'}&season=${s}&episode=${ep}&preferredAudio=${encodeURIComponent(pref)}`;
+            let url = `/api/moviebox/streams?type=${isTv ? 'tv' : 'movie'}&season=${s}&episode=${ep}&preferredAudio=${encodeURIComponent(pref)}`;
+            if (sid) url += `&subjectId=${encodeURIComponent(sid)}`;
+            if (title) url += `&title=${encodeURIComponent(title)}&year=${encodeURIComponent(year)}`;
             const res = await apiFetch(url);
             if (!res.ok) return;
             const sources = await res.json();
@@ -4487,6 +4655,26 @@
 
           if (tmdbSeasons && Array.isArray(tmdbSeasons)) {
             state.modalMedia.tmdbSeasons = tmdbSeasons;
+          }
+
+          // If no TMDB seasons but subjectId is present (MovieBox Anime or Series), query MovieBox verified season breakdown
+          if ((!state.modalMedia.tmdbSeasons || state.modalMedia.tmdbSeasons.length === 0) && (state.modalMedia.subjectId || state.modalMedia.id)) {
+            const sid = state.modalMedia.subjectId || state.modalMedia.id;
+            try {
+              const mbRes = await apiFetch(`/api/moviebox/episodes/${encodeURIComponent(sid)}`);
+              if (mbRes.ok) {
+                const mbSeasons = await mbRes.json();
+                if (Array.isArray(mbSeasons) && mbSeasons.length > 0) {
+                  state.modalMedia.tmdbSeasons = mbSeasons.map(s => ({
+                    season_number: s.season,
+                    name: `Season ${s.season}`,
+                    episode_count: s.episodeCount || 12
+                  }));
+                }
+              }
+            } catch (mbErr) {
+              console.warn('[setupTvSelectors MovieBox warning]', mbErr);
+            }
           }
 
           let validSeasons = (state.modalMedia.tmdbSeasons || []).filter(s => {
@@ -5588,6 +5776,7 @@
 
           const isTmdbSelected = state.selectedProvider === 'tmdb';
           const isCineproSelected = state.selectedProvider === 'cinepro';
+          const isMovieboxSelected = state.selectedProvider === 'moviebox';
 
           let html = `
             <button
@@ -5607,6 +5796,26 @@
                 </div>
               </div>
               ${isTmdbSelected ? '<i class="fa-solid fa-check text-xs text-brand-500 mr-1"></i>' : ''}
+            </button>
+
+            <!-- MovieBox VIP Option (123moviesfree.club Engine) -->
+            <button
+              type="button"
+              onclick="window.app.switchProvider('moviebox')"
+              class="w-full flex items-center justify-between p-2 rounded-xl text-left transition ${
+                isMovieboxSelected ? 'bg-purple-600/15 border border-purple-500/40 text-purple-300' : 'hover:bg-dark-800 text-gray-200'
+              }"
+            >
+              <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded-lg bg-purple-950/80 flex items-center justify-center p-0.5 border border-purple-500/30 shrink-0">
+                  <i class="fa-solid fa-crown text-xs text-purple-400"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-white">MovieBox VIP (123Movies Core)</p>
+                  <p class="text-[10px] text-purple-400/80">1080p Ultra HD • Dual Audio • Anime & Cinema • Zero Ads</p>
+                </div>
+              </div>
+              ${isMovieboxSelected ? '<i class="fa-solid fa-check text-xs text-purple-400 mr-1"></i>' : ''}
             </button>
 
             <!-- CinePro Core Multi-Engine Option -->
@@ -5714,6 +5923,25 @@
           const mIconEl = document.getElementById('mobileSelectedProviderIcon');
           const mBadgeEl = document.getElementById('mobileProviderBadge');
 
+          if (providerValue === 'moviebox') {
+            const iconSvg = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f451.svg';
+            if (nameEl) nameEl.textContent = 'MovieBox VIP';
+            if (iconEl) iconEl.src = iconSvg;
+            if (badgeEl) {
+              badgeEl.textContent = '1080p VIP';
+              badgeEl.className = 'hidden sm:inline bg-purple-500/20 text-purple-300 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-purple-500/30';
+            }
+            if (mTopNameEl) mTopNameEl.textContent = 'MovieBox';
+            if (mTopIconEl) mTopIconEl.src = iconSvg;
+            if (mNameEl) mNameEl.textContent = 'MovieBox VIP Core';
+            if (mIconEl) mIconEl.src = iconSvg;
+            if (mBadgeEl) {
+              mBadgeEl.textContent = '1080p VIP';
+              mBadgeEl.className = 'bg-purple-500/20 text-purple-300 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-purple-500/30';
+            }
+            return;
+          }
+
           if (providerValue === 'cinepro') {
             const iconSvg = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/26a1.svg';
             if (nameEl) nameEl.textContent = 'CinePro (17 Engines)';
@@ -5786,21 +6014,21 @@
           const gridCatalog = document.getElementById('gridCatalogView');
           const providerCatalog = document.getElementById('providerCatalogView');
 
-          if (providerValue === 'tmdb' || providerValue === 'cinepro') {
-            // Restore default TMDB views (CinePro runs on top of TMDB catalog with 17 direct HLS stream engines)
+          if (providerValue === 'tmdb' || providerValue === 'cinepro' || providerValue === 'moviebox') {
+            // Restore core dashboard views (TMDB, CinePro, MovieBox VIP)
             if (providerCatalog) providerCatalog.classList.add('hidden');
             if (hero) hero.classList.remove('hidden');
             if (homeCatalog) homeCatalog.classList.remove('hidden');
             if (gridCatalog) gridCatalog.classList.add('hidden');
             state.currentTab = 'home';
-            if (!state.liveCache || !state.liveCache.trending || state.liveCache.trending.length === 0) {
-              fetchLiveDashboard({ silent: true });
-            }
+            fetchLiveDashboard({ silent: true });
             if (showNotification) {
               showToast(
-                providerValue === 'cinepro'
-                  ? 'Switched to CinePro Core (17 HLS Engines active)'
-                  : 'Switched to TMDB (Multi-Server) mode',
+                providerValue === 'moviebox'
+                  ? 'Switched to MovieBox VIP (123Movies: 1080p Ultra HD & Dual Audio active)'
+                  : (providerValue === 'cinepro'
+                    ? 'Switched to CinePro Core (17 HLS Engines active)'
+                    : 'Switched to TMDB (Multi-Server) mode'),
                 'info'
               );
             }

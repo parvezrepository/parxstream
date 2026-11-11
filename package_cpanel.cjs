@@ -1,10 +1,18 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const cp = require('child_process');
 
-const tempDir = path.join(__dirname, 'temp_cpanel_pack');
+// Clean up old local tempDir if exists
+const localTemp = path.join(__dirname, 'temp_cpanel_pack');
+if (fs.existsSync(localTemp)) {
+  try { fs.rmSync(localTemp, { recursive: true, force: true }); } catch (e) {}
+}
+
+// Use OS temp directory to avoid OneDrive file locking
+const tempDir = path.join(os.tmpdir(), 'parxstream_cpanel_pack_' + Date.now());
 if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
-fs.mkdirSync(tempDir);
+fs.mkdirSync(tempDir, { recursive: true });
 
 // 1. Copy root files
 const rootFiles = ['app.js', 'app.cjs', 'package.json', '.htaccess', '.npmrc', 'index.html', 'manifest.json', 'sw.js', 'icon-192.svg', 'icon-512.svg'];

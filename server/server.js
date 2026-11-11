@@ -25,7 +25,10 @@ const {
   resolveMovieBoxStreams,
   searchMovieBox,
   getMovieBoxDetails,
-  getMovieBoxSeasons
+  getMovieBoxSeasons,
+  getMovieBoxCaptions,
+  getMovieBoxHome,
+  getMovieBoxCatalog
 } = require('./movieboxManager');
 
 const app = express();
@@ -268,14 +271,36 @@ apiRouter.get('/cinepro/tv/:tmdbId/:season/:episode', async (req, res) => {
   }
 });
 
-// 9. MovieBox VIP Core Routes (1080p Ultra HD / Dual Audio / Multi-Language Dubs)
+// 9. MovieBox VIP Core Routes (1080p Ultra HD / Dual Audio / 123Movies Full Catalog)
+apiRouter.get('/moviebox/home', async (req, res) => {
+  try {
+    const data = await getMovieBoxHome(req.query.refresh === '1');
+    res.json(data);
+  } catch (err) {
+    console.warn('[MovieBox Home Error]:', err.message);
+    res.json({ hero: [], sections: [] });
+  }
+});
+
+apiRouter.get('/moviebox/catalog', async (req, res) => {
+  try {
+    const tab = req.query.tab || 'movies';
+    const items = await getMovieBoxCatalog(tab);
+    res.json(items);
+  } catch (err) {
+    console.warn('[MovieBox Catalog Error]:', err.message);
+    res.json([]);
+  }
+});
+
 apiRouter.get('/moviebox/streams', async (req, res) => {
   try {
-    const { title, year, type, season, episode, preferredAudio } = req.query;
-    if (!title) return res.status(400).json({ error: 'Title is required' });
+    const { subjectId, title, year, type, season, episode, preferredAudio } = req.query;
+    if (!subjectId && !title) return res.status(400).json({ error: 'subjectId or title is required' });
 
     const streams = await resolveMovieBoxStreams({
-      title,
+      subjectId: subjectId || null,
+      title: title || null,
       year: year ? parseInt(year, 10) : undefined,
       type: type || 'movie',
       season: season ? parseInt(season, 10) : 1,
@@ -301,11 +326,32 @@ apiRouter.get('/moviebox/search', async (req, res) => {
   }
 });
 
-apiRouter.get('/moviebox/seasons/:subjectId', async (req, res) => {
+apiRouter.get('/moviebox/detail/:subjectId', async (req, res) => {
+  try {
+    const { subjectId } = req.params;
+    const details = await getMovieBoxDetails(subjectId);
+    res.json(details || {});
+  } catch (err) {
+    res.json({});
+  }
+});
+
+apiRouter.get('/moviebox/episodes/:subjectId', async (req, res) => {
   try {
     const { subjectId } = req.params;
     const seasons = await getMovieBoxSeasons(subjectId);
     res.json(seasons);
+  } catch (err) {
+    res.json([]);
+  }
+});
+
+apiRouter.get('/moviebox/captions', async (req, res) => {
+  try {
+    const { subjectId, season, episode } = req.query;
+    if (!subjectId) return res.json([]);
+    const captions = await getMovieBoxCaptions(subjectId, season, episode);
+    res.json(captions);
   } catch (err) {
     res.json([]);
   }
