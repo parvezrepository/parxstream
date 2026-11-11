@@ -17,7 +17,7 @@ if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true })
 fs.mkdirSync(tempDir, { recursive: true });
 
 // 1. Copy root entry files
-const rootFiles = ['app.js', 'app.cjs', '.npmrc', 'index.html', 'manifest.json', 'sw.js', 'icon-192.svg', 'icon-512.svg'];
+const rootFiles = ['app.js', 'app.cjs', '.htaccess', '.npmrc', 'index.html', 'manifest.json', 'sw.js', 'icon-192.svg', 'icon-512.svg'];
 rootFiles.forEach(f => {
   if (fs.existsSync(f)) {
     fs.copyFileSync(f, path.join(tempDir, f));
