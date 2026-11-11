@@ -1062,6 +1062,9 @@
                   <i class="fa-solid fa-clapperboard text-[10px] text-purple-400"></i> Server 6 (2Embed)
                 </button>
 
+                <!-- MovieBox VIP Core Streams Container -->
+                <div id="movieboxServerButtons" class="contents"></div>
+
                 <!-- CinePro Core Direct HLS Streams Container -->
                 <div id="cineproServerButtons" class="contents"></div>
 
@@ -2474,6 +2477,8 @@
           providerSearchActive: false,
           currentStreamList: [],
           currentStreamIndex: 0,
+          currentMovieboxSources: [],
+          currentCineproSources: [],
           hlsInstance: null,
           activeProviderMedia: null,
           activeEpisodeLink: null,
@@ -3993,6 +3998,8 @@
 
             // Fetch high-speed CinePro HLS direct streams in background
             fetchCineproSourcesForModal(media.id, isTv, state.selectedSeason || 1, state.selectedEpisode || 1);
+            // Fetch MovieBox VIP Core 1080p Ultra HD and Multi-Audio streams
+            fetchMovieboxSourcesForModal(media, state.selectedSeason || 1, state.selectedEpisode || 1);
           } catch (topModalError) {
             console.error('[openDetailsModal Top Level Catch]', topModalError);
             // Ensure modal and player always open regardless of any metadata parse issues
@@ -4092,6 +4099,90 @@
         }
 
         /**
+         * Query MovieBox VIP Core for 1080p Ultra HD and Multi-Audio / Hindi Dubbed streams
+         */
+        async function fetchMovieboxSourcesForModal(media, season = 1, episode = 1) {
+          const container = document.getElementById('movieboxServerButtons');
+          if (!container) return;
+          container.innerHTML = '';
+
+          const targetMedia = media || state.modalMedia;
+          if (!targetMedia) return;
+
+          try {
+            const title = targetMedia.title || targetMedia.name || targetMedia.original_title || '';
+            if (!title) return;
+            const year = targetMedia.release_date ? targetMedia.release_date.split('-')[0] : (targetMedia.first_air_date ? targetMedia.first_air_date.split('-')[0] : '');
+            const isTv = targetMedia.media_type === 'tv' || targetMedia.type === 'tv' || targetMedia.type === 'series';
+            const s = isTv ? (season || state.selectedSeason || 1) : 0;
+            const ep = isTv ? (episode || state.selectedEpisode || 1) : 0;
+            const pref = state.preferredAudioLanguage || '';
+
+            const url = `/api/moviebox/streams?title=${encodeURIComponent(title)}&year=${encodeURIComponent(year)}&type=${isTv ? 'tv' : 'movie'}&season=${s}&episode=${ep}&preferredAudio=${encodeURIComponent(pref)}`;
+            const res = await apiFetch(url);
+            if (!res.ok) return;
+            const sources = await res.json();
+            if (!Array.isArray(sources) || sources.length === 0) return;
+
+            state.currentMovieboxSources = sources;
+
+            container.innerHTML = sources.map((stream, idx) => {
+              const isHindi = stream.hasHindiAudio || (stream.server && stream.server.toLowerCase().includes('hindi'));
+              const badgeClass = isHindi
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                : 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+              const badgeText = isHindi ? 'Hindi Dub' : '1080p Ultra';
+              const icon = isHindi ? 'fa-solid fa-volume-high text-amber-400' : 'fa-solid fa-crown text-purple-400';
+
+              return `
+                <button
+                  type="button"
+                  onclick="window.app.playMovieboxStream(${idx})"
+                  class="server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-purple-500/30 transition flex items-center gap-1.5"
+                  title="${escapeHtml(stream.server || `MovieBox Core ${idx + 1}`)}"
+                >
+                  <i class="${icon} text-[10px]"></i>
+                  <span>${escapeHtml(stream.server || `MovieBox ${idx + 1}`)}</span>
+                  <span class="${badgeClass} text-[9px] px-1.5 py-0.2 rounded font-bold border">${badgeText}</span>
+                </button>
+              `;
+            }).join('');
+          } catch (e) {
+            console.warn('[PARXSTREAM] MovieBox streams fetch error:', e);
+          }
+        }
+
+        /**
+         * Plays a MovieBox stream directly in HTML5 video player with multi-audio & subtitles
+         */
+        function playMovieboxStream(index) {
+          const sources = state.currentMovieboxSources || [];
+          const stream = sources[index];
+          if (!stream || !stream.link) return;
+
+          const isTvMedia = state.modalMedia?.media_type === 'tv' || state.modalMedia?.type === 'tv' || state.modalMedia?.type === 'series';
+          state.currentStreamList = [
+            ...sources,
+            ...(state.currentCineproSources || []),
+            ...getEmbedFallbackStreams(state.modalMedia, isTvMedia ? 'series' : 'movie')
+          ];
+          state.currentStreamIndex = index;
+
+          // Highlight active pill
+          const pills = document.querySelectorAll('.server-pill');
+          pills.forEach(p => {
+            p.className = 'server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5';
+          });
+          const activePill = document.querySelectorAll('.moviebox-pill')[index];
+          if (activePill) {
+            activePill.className = 'server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 text-white shadow-sm ring-1 ring-purple-400 border border-purple-400 transition flex items-center gap-1.5';
+          }
+
+          showToast(`Playing via ${stream.server || 'MovieBox VIP Core'} (1080p Ultra HD)`, 'success');
+          playStream(stream);
+        }
+
+        /**
          * Fetches full TMDB details (cast, official trailer, seasons) when API credentials are provided
          */
         async function fetchDeepTmdbDetails(id, isTv) {
@@ -4148,6 +4239,7 @@
 
                 loadStreamPlayer();
                 fetchCineproSourcesForModal(id, isTv, 1, 1);
+                fetchMovieboxSourcesForModal(state.modalMedia, 1, 1);
               }
             }
 
@@ -4397,9 +4489,14 @@
             state.modalMedia.tmdbSeasons = tmdbSeasons;
           }
 
-          let validSeasons = (state.modalMedia.tmdbSeasons || []).filter(s => s.season_number > 0);
+          let validSeasons = (state.modalMedia.tmdbSeasons || []).filter(s => {
+            if (!s || typeof s.season_number !== 'number' || s.season_number <= 0) return false;
+            // Exclude empty future announced seasons with 0 episodes
+            if (s.episode_count === 0 && s.air_date && new Date(s.air_date) > new Date()) return false;
+            return true;
+          });
           if (validSeasons.length === 0 && (state.modalMedia.tmdbSeasons || []).length > 0) {
-            validSeasons = state.modalMedia.tmdbSeasons;
+            validSeasons = (state.modalMedia.tmdbSeasons || []).filter(s => s && s.season_number > 0);
           }
 
           seasonSelect.innerHTML = '';
@@ -4625,6 +4722,11 @@
 
           revealPlayerAndPlay(state.currentServer || 'vidking', season, episode);
 
+          if (state.modalMedia) {
+            fetchCineproSourcesForModal(state.modalMedia.id, true, season, episode);
+            fetchMovieboxSourcesForModal(state.modalMedia, season, episode);
+          }
+
           if (state.currentSeasonEpisodes) {
             renderRichEpisodeCards(state.currentSeasonEpisodes, season);
           }
@@ -4716,6 +4818,7 @@
           showToast(`Switched to Season ${state.selectedSeason}`, 'info');
           if (state.modalMedia) {
             fetchCineproSourcesForModal(state.modalMedia.id, true, state.selectedSeason, 1);
+            fetchMovieboxSourcesForModal(state.modalMedia, state.selectedSeason, 1);
           }
         }
 
@@ -4725,6 +4828,7 @@
           showToast(`Playing Episode ${state.selectedEpisode}`, 'info');
           if (state.modalMedia) {
             fetchCineproSourcesForModal(state.modalMedia.id, true, state.selectedSeason, state.selectedEpisode);
+            fetchMovieboxSourcesForModal(state.modalMedia, state.selectedSeason, state.selectedEpisode);
           }
         }
 
@@ -6238,7 +6342,13 @@
           const section = document.getElementById('detailsSeasonSection');
           if (!container || !section) return;
 
-          const linkList = Array.isArray(meta?.linkList) ? meta.linkList : [];
+          const rawList = Array.isArray(meta?.linkList) ? meta.linkList : [];
+          const linkList = rawList.filter(item => {
+            if (!item) return false;
+            const t = String(item.title || '').trim();
+            const hasLink = Boolean(item.episodesLink || (Array.isArray(item.directLinks) && item.directLinks.length > 0) || item.link || item.url);
+            return t.length > 0 && hasLink;
+          });
           if (linkList.length === 0) return;
 
           section.classList.remove('hidden');
@@ -6858,6 +6968,31 @@
               } catch (cpErr) {
                 console.warn('[PARXSTREAM] CinePro stream resolution notice:', cpErr);
               }
+            }
+
+            // Query MovieBox VIP Core for 1080p Ultra HD and Multi-Audio / Hindi Dubbed direct streams
+            try {
+              const mTitle = state.activeProviderMedia?.title || state.activeProviderMedia?.name || '';
+              const mYear = state.activeProviderMedia?.year || '';
+              const isTv = type === 'series' || type === 'tv';
+              const s = state.providerActiveSeason || 1;
+              const ep = state.providerActiveEpisode || 1;
+              if (mTitle) {
+                const mbUrl = `/api/moviebox/streams?title=${encodeURIComponent(mTitle)}&year=${encodeURIComponent(mYear)}&type=${isTv ? 'tv' : 'movie'}&season=${s}&episode=${ep}&preferredAudio=${encodeURIComponent(state.preferredAudioLanguage || '')}`;
+                const mbRes = await apiFetch(mbUrl);
+                if (mbRes.ok) {
+                  const mbSources = await mbRes.json();
+                  if (Array.isArray(mbSources) && mbSources.length > 0) {
+                    if (hasHindiRelease && webStreams.length > 0) {
+                      webStreams.push(...mbSources);
+                    } else {
+                      webStreams.unshift(...mbSources);
+                    }
+                  }
+                }
+              }
+            } catch (mbErr) {
+              console.warn('[PARXSTREAM] MovieBox provider stream resolution notice:', mbErr);
             }
 
             const fallbackStreams = getEmbedFallbackStreams(state.activeProviderMedia, type);
@@ -7553,9 +7688,9 @@
           }
 
           // Construct stream proxy URL
+          const customHeaders = stream.headers || {};
           let proxiedUrl = stream.link;
           if (stream.link.startsWith('http://') || stream.link.startsWith('https://')) {
-            const customHeaders = stream.headers || {};
             proxiedUrl = resolveApiUrl(`/api/proxy?url=${encodeURIComponent(stream.link)}&headers=${encodeURIComponent(JSON.stringify(customHeaders))}`);
           }
           state.currentStreamUrl = proxiedUrl;
@@ -8089,6 +8224,8 @@
           toggleModalWatchlist,
           playCineproStream,
           fetchCineproSourcesForModal,
+          playMovieboxStream,
+          fetchMovieboxSourcesForModal,
           shareCurrentMedia,
           clearSearch,
           setTypeFilter,

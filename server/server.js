@@ -21,6 +21,12 @@ const {
   getCineProStatus,
   cineproPort
 } = require('./cineproManager');
+const {
+  resolveMovieBoxStreams,
+  searchMovieBox,
+  getMovieBoxDetails,
+  getMovieBoxSeasons
+} = require('./movieboxManager');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -262,6 +268,49 @@ apiRouter.get('/cinepro/tv/:tmdbId/:season/:episode', async (req, res) => {
   }
 });
 
+// 9. MovieBox VIP Core Routes (1080p Ultra HD / Dual Audio / Multi-Language Dubs)
+apiRouter.get('/moviebox/streams', async (req, res) => {
+  try {
+    const { title, year, type, season, episode, preferredAudio } = req.query;
+    if (!title) return res.status(400).json({ error: 'Title is required' });
+
+    const streams = await resolveMovieBoxStreams({
+      title,
+      year: year ? parseInt(year, 10) : undefined,
+      type: type || 'movie',
+      season: season ? parseInt(season, 10) : 1,
+      episode: episode ? parseInt(episode, 10) : 1,
+      preferredAudio: preferredAudio || null
+    });
+
+    res.json(streams);
+  } catch (err) {
+    console.warn('[MovieBox Route Warning]:', err.message);
+    res.json([]);
+  }
+});
+
+apiRouter.get('/moviebox/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.json([]);
+    const results = await searchMovieBox(q);
+    res.json(results);
+  } catch (err) {
+    res.json([]);
+  }
+});
+
+apiRouter.get('/moviebox/seasons/:subjectId', async (req, res) => {
+  try {
+    const { subjectId } = req.params;
+    const seasons = await getMovieBoxSeasons(subjectId);
+    res.json(seasons);
+  } catch (err) {
+    res.json([]);
+  }
+});
+
 const handleCineproProxy = async (req, res) => {
   const data = req.query.data;
   if (!data) {
@@ -340,6 +389,7 @@ if (require.main === module) {
     console.log(`\n🎬 PARXSTREAM Provider Backend API running on http://localhost:${PORT}`);
     console.log(`   - Providers: http://localhost:${PORT}/api/providers`);
     console.log(`   - CinePro:   http://localhost:${PORT}/api/cinepro/status`);
+    console.log(`   - MovieBox:  http://localhost:${PORT}/api/moviebox/streams?title=...`);
     console.log(`   - Proxy:     http://localhost:${PORT}/api/proxy?url=...`);
     // Initialize CinePro Core engine in background
     initCinePro().catch(e => console.warn('[CinePro] Engine start error:', e.message));
