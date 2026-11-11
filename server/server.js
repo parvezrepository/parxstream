@@ -319,13 +319,18 @@ app.use('/', apiRouter);
 
 // Serve static frontend build for production / cPanel deployment
 const distPath = path.resolve(__dirname, '..', 'dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
+const rootPath = path.resolve(__dirname, '..');
+const staticPath = (fs.existsSync(distPath) && fs.existsSync(path.join(distPath, 'index.html')))
+  ? distPath
+  : (fs.existsSync(path.join(rootPath, 'index.html')) ? rootPath : null);
+
+if (staticPath) {
+  app.use(express.static(staticPath));
   app.get('*', (req, res, next) => {
     if (req.url.startsWith('/api') || req.url.startsWith('/v1')) {
       return next();
     }
-    res.sendFile(path.join(distPath, 'index.html'));
+    res.sendFile(path.join(staticPath, 'index.html'));
   });
 }
 

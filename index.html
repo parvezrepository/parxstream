@@ -1933,13 +1933,10 @@
         ];
 
         // Universal Cloud & Local API Bridge (cPanel & Vercel Dual-Mode)
-        // Automatically connects to high-speed cloud backend if running statically on cPanel
+        // Defaults to local cPanel/server API first. If local API is not available (static hosting),
+        // it automatically fails over to the high-speed cloud backup (https://parxstream.vercel.app).
         const CLOUD_API_BASE = 'https://parxstream.vercel.app';
-        let _isCloudApiActive = (
-          window.location.hostname.includes('parxstream.top') ||
-          window.location.hostname.endsWith('.top') ||
-          window.location.protocol === 'file:'
-        );
+        let _isCloudApiActive = (window.location.protocol === 'file:');
 
         function resolveApiUrl(endpoint) {
           if (!endpoint) return '';
