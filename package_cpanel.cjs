@@ -7,7 +7,7 @@ if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true })
 fs.mkdirSync(tempDir);
 
 // 1. Copy root files
-const rootFiles = ['app.js', 'app.cjs', 'package.json', '.htaccess', 'index.html', 'manifest.json', 'sw.js', 'icon-192.svg', 'icon-512.svg'];
+const rootFiles = ['app.js', 'app.cjs', 'package.json', '.htaccess', '.npmrc', 'index.html', 'manifest.json', 'sw.js', 'icon-192.svg', 'icon-512.svg'];
 rootFiles.forEach(f => {
   if (fs.existsSync(f)) {
     fs.copyFileSync(f, path.join(tempDir, f));
@@ -47,3 +47,4 @@ fs.rmSync(tempDir, { recursive: true, force: true });
 
 const stats = fs.statSync(zipPath);
 console.log(`SUCCESS: Created cpanel_full_app.zip (${(stats.size / 1024 / 1024).toFixed(2)} MB)`);
+
