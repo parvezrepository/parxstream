@@ -188,17 +188,18 @@ async function nativeApiRequest(method, pathOrUrl, bodyDict = null, retry = true
 }
 
 /**
- * Search MovieBox titles with clean sanitization
+ * Search MovieBox titles with clean sanitization and comprehensive pagination
  */
-async function searchMovieBox(query) {
+async function searchMovieBox(query, page = 1, perPage = 24) {
   if (!query || typeof query !== 'string') return [];
   const cleanQ = query.trim().toLowerCase();
-  if (searchCache.has(cleanQ)) {
-    return searchCache.get(cleanQ);
+  const cacheKey = `${cleanQ}_p${page}`;
+  if (searchCache.has(cacheKey)) {
+    return searchCache.get(cacheKey);
   }
 
   try {
-    const payload = { keyword: query.trim(), page: 1, perPage: 12 };
+    const payload = { keyword: query.trim(), page: page || 1, perPage: perPage || 24 };
     const res = await nativeApiRequest('POST', '/wefeed-mobile-bff/subject-api/search', payload);
     const data = res.data || {};
     const rawItems = data.items || data.list || [];
@@ -218,9 +219,9 @@ async function searchMovieBox(query) {
         detailPath: sub.detailPath || '',
         language: sub.language || 'en'
       };
-    }).filter(r => r.subjectId && r.title);
+    }).filter(r => r.subjectId && r.title && isCleanNonBangla(r.title, r.genre));
 
-    searchCache.set(cleanQ, results);
+    searchCache.set(cacheKey, results);
     return results;
   } catch (err) {
     console.warn('[MovieBox] Search error for query:', query, err.message);
@@ -327,8 +328,8 @@ async function extractStreamsForSubject(subjectId, season = 0, episode = 0, dubL
 
       const isHindi = dubLabel && (dubLabel.toLowerCase().includes('hindi') || dubLabel.toLowerCase().includes('dub'));
       const serverTitle = isHindi
-        ? `MovieBox Core (Hindi Dubbed ${quality})`
-        : `MovieBox VIP Core (${quality} Fast CDN)`;
+        ? `PARXSTREAM VIP (Hindi Dubbed ${quality})`
+        : `PARXSTREAM VIP (${quality} Fast CDN)`;
 
       streams.push({
         server: serverTitle,

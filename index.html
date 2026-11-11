@@ -252,9 +252,9 @@
               title="Switch Content Provider (Vega & MultiStream)"
               aria-label="Switch Provider"
             >
-              <img id="selectedProviderIcon" src="https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png" onerror="this.src='https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg'" class="w-4 h-4 rounded object-contain shrink-0" />
-              <span id="selectedProviderName" class="max-w-[65px] xs:max-w-[85px] sm:max-w-[110px] truncate text-[11px] sm:text-xs">TMDB (Default)</span>
-              <span id="providerBadge" class="hidden sm:inline bg-brand-600/30 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30">Live</span>
+              <img id="selectedProviderIcon" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f451.svg" class="w-4 h-4 rounded object-contain shrink-0" />
+              <span id="selectedProviderName" class="max-w-[65px] xs:max-w-[85px] sm:max-w-[110px] truncate text-[11px] sm:text-xs">PARXSTREAM (Default)</span>
+              <span id="providerBadge" class="hidden sm:inline bg-purple-500/20 text-purple-300 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-purple-500/30">1080p VIP</span>
               <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
             </button>
           </div>
@@ -276,11 +276,11 @@
             id="mobileTopProviderBtn"
             type="button"
             onclick="window.app.toggleProviderDropdown()"
-            class="md:hidden flex items-center gap-1 bg-dark-850 hover:bg-dark-800 border border-brand-500/40 px-2 py-1.5 rounded-xl text-xs font-semibold text-gray-200 transition shadow-sm shrink-0"
+            class="md:hidden flex items-center gap-1 bg-dark-850 hover:bg-dark-800 border border-purple-500/40 px-2 py-1.5 rounded-xl text-xs font-semibold text-gray-200 transition shadow-sm shrink-0"
             title="Switch Provider"
           >
-            <img id="mobileTopProviderIcon" src="https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png" onerror="this.src='https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg'" class="w-3.5 h-3.5 rounded-full object-contain shrink-0" />
-            <span id="mobileTopProviderName" class="max-w-[55px] xs:max-w-[70px] truncate text-[11px] text-brand-300 font-bold">TMDB</span>
+            <img id="mobileTopProviderIcon" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f451.svg" class="w-3.5 h-3.5 rounded-full object-contain shrink-0" />
+            <span id="mobileTopProviderName" class="max-w-[55px] xs:max-w-[70px] truncate text-[11px] text-purple-300 font-bold">PARXSTREAM</span>
             <i class="fa-solid fa-chevron-down text-[8px] text-gray-400"></i>
           </button>
         </div>
@@ -292,15 +292,15 @@
           id="mobileProviderSelectorBtn"
           type="button"
           onclick="window.app.toggleProviderDropdown()"
-          class="flex-1 flex items-center justify-between bg-dark-850 hover:bg-dark-800 active:bg-dark-750 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-200 shadow-sm transition"
+          class="flex-1 flex items-center justify-between bg-dark-850 hover:bg-dark-800 active:bg-dark-750 border border-purple-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-200 shadow-sm transition"
         >
           <div class="flex items-center gap-2 truncate">
-            <img id="mobileSelectedProviderIcon" src="https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png" onerror="this.src='https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f3ac.svg'" class="w-4 h-4 rounded-full object-contain shrink-0" />
+            <img id="mobileSelectedProviderIcon" src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f451.svg" class="w-4 h-4 rounded-full object-contain shrink-0" />
             <span class="text-gray-400 font-normal text-[11px]">Provider:</span>
-            <span id="mobileSelectedProviderName" class="text-brand-300 font-bold truncate">TMDB (Default)</span>
+            <span id="mobileSelectedProviderName" class="text-purple-300 font-bold truncate">PARXSTREAM (Default)</span>
           </div>
           <div class="flex items-center gap-1.5 shrink-0 ml-2">
-            <span id="mobileProviderBadge" class="bg-brand-600/30 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30">Live</span>
+            <span id="mobileProviderBadge" class="bg-purple-500/20 text-purple-300 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-purple-500/30">1080p VIP</span>
             <span class="text-[10px] text-gray-400 font-normal">Switch</span>
             <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
           </div>
@@ -1084,14 +1084,17 @@
                   <i class="fa-solid fa-server text-brand-500"></i> Server:
                 </span>
 
+                <!-- PARXSTREAM VIP (MovieBox) Streams Container (Priority #1) -->
+                <div id="movieboxServerButtons" class="contents"></div>
+
                 <!-- Server 1: VidKing (Cinextma Player) -->
                 <button
                   id="serverBtnVidKing"
                   onclick="window.app.switchServer('vidking')"
-                  class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow-sm transition flex items-center gap-1.5"
+                  class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="VidKing HD (Cinextma Player - 1080p Fast Embed & Multi-Audio)"
                 >
-                  <i class="fa-solid fa-crown text-[10px] text-amber-300"></i> Server 1 (VidKing HD)
+                  <i class="fa-solid fa-play text-[10px] text-amber-300"></i> Server 1 (VidKing HD)
                   <span class="bg-amber-400/30 text-amber-300 text-[9px] px-1.5 py-0.2 rounded font-bold">Cinextma</span>
                 </button>
                 
@@ -1145,9 +1148,6 @@
                 >
                   <i class="fa-solid fa-clapperboard text-[10px] text-purple-400"></i> Server 6 (2Embed)
                 </button>
-
-                <!-- MovieBox VIP Core Streams Container -->
-                <div id="movieboxServerButtons" class="contents"></div>
 
                 <!-- CinePro Core Direct HLS Streams Container -->
                 <div id="cineproServerButtons" class="contents"></div>
@@ -2551,8 +2551,10 @@
           currentSeasonEpisodes: [],
           downloadOptions: [],
 
-          // Vega Providers Integration State
-          selectedProvider: localStorage.getItem('cinestream_selected_provider') || 'tmdb',
+          // Vega Providers Integration State (Defaults to PARXSTREAM VIP Core)
+          selectedProvider: (localStorage.getItem('cinestream_selected_provider') && localStorage.getItem('cinestream_selected_provider') !== 'tmdb')
+            ? localStorage.getItem('cinestream_selected_provider')
+            : 'moviebox',
           availableProviders: [...FALLBACK_PROVIDERS],
           providerCatalog: [],
           providerCatalogIndex: 0,
@@ -3647,15 +3649,60 @@
             return;
           }
 
-          // Check typo map first
           const lowerQuery = query.toLowerCase().trim();
           const suggestedCorrection = POPULAR_TYPO_MAP[lowerQuery] || null;
 
-          // If TMDB API credentials are available, fetch live search results
+          const combinedResults = [];
+          const seenKeys = new Set();
+
+          // 1. Concurrently query PARXSTREAM (MovieBox Core) API and TMDB
+          const promises = [];
+
+          // PARXSTREAM VIP search query
+          const mbPromise = apiFetch(`/api/moviebox/search?q=${encodeURIComponent(query)}&page=1`)
+            .then(res => res.ok ? res.json() : [])
+            .catch(() => []);
+          promises.push(mbPromise);
+
+          // TMDB search query (if credentials present)
+          let tmdbPromise = Promise.resolve(null);
           if (state.apiKey || state.readToken) {
-            try {
-              let data = await fetchTmdb('/search/multi', { query: query });
-              let validResults = (data.results || [])
+            tmdbPromise = fetchTmdb('/search/multi', { query: query }).catch(() => null);
+          }
+          promises.push(tmdbPromise);
+
+          try {
+            const [mbData, tmdbData] = await Promise.all(promises);
+
+            // Process PARXSTREAM (MovieBox) results first (Priority #1)
+            if (Array.isArray(mbData) && mbData.length > 0) {
+              const cleanMb = mbData.filter(r => !isBangladeshiContent(r) && r.cover).map(r => ({
+                id: String(r.subjectId),
+                subjectId: String(r.subjectId),
+                title: r.title,
+                name: r.title,
+                media_type: r.type === 'series' ? 'tv' : 'movie',
+                overview: 'Watch in 1080p Ultra HD with multi-audio dubbed tracks and zero ads.',
+                poster_path: r.cover,
+                backdrop_path: r.cover,
+                vote_average: parseFloat(r.imdbRating || '8.2'),
+                release_date: r.releaseDate || '',
+                isDualAudio: /hindi|dual|dub/i.test(r.title || ''),
+                hasHindiAudio: /hindi|dual|dub/i.test(r.title || '')
+              }));
+
+              for (const item of cleanMb) {
+                const key = `${item.title.toLowerCase()}_${item.media_type}`;
+                if (!seenKeys.has(key)) {
+                  seenKeys.add(key);
+                  combinedResults.push(item);
+                }
+              }
+            }
+
+            // Process TMDB results
+            if (tmdbData && Array.isArray(tmdbData.results)) {
+              let tmdbValid = tmdbData.results
                 .filter(r => (r.media_type === 'movie' || r.media_type === 'tv') && r.poster_path && !isBangladeshiContent(r))
                 .map(r => ({
                   id: r.id,
@@ -3671,67 +3718,51 @@
                   original_language: r.original_language
                 }));
 
-              // If 0 results and we have a typo suggestion (e.g. narutu -> Naruto), automatically query suggested term
-              let usedSuggestion = null;
-              if (validResults.length === 0 && suggestedCorrection) {
-                const fixData = await fetchTmdb('/search/multi', { query: suggestedCorrection });
-                const fixResults = (fixData.results || [])
-                  .filter(r => (r.media_type === 'movie' || r.media_type === 'tv') && r.poster_path && !isBangladeshiContent(r))
-                  .map(r => ({
-                    id: r.id,
-                    title: r.title || r.name || 'Untitled',
-                    name: r.name,
-                    media_type: r.media_type,
-                    overview: r.overview || '',
-                    poster_path: r.poster_path,
-                    backdrop_path: r.backdrop_path || r.poster_path,
-                    vote_average: r.vote_average ? Math.round(r.vote_average * 10) / 10 : 7.0,
-                    release_date: r.release_date || r.first_air_date || '',
-                    genre_ids: r.genre_ids || [],
-                    original_language: r.original_language
-                  }));
-                if (fixResults.length > 0) {
-                  validResults = fixResults;
-                  usedSuggestion = suggestedCorrection;
+              for (const item of tmdbValid) {
+                const key = `${item.title.toLowerCase()}_${item.media_type}`;
+                if (!seenKeys.has(key)) {
+                  seenKeys.add(key);
+                  combinedResults.push(item);
                 }
               }
-
-              // Also query MovieBox 123movies VIP core for anime, dual-audio, and cinema titles
-              try {
-                const mbRes = await apiFetch(`/api/moviebox/search?q=${encodeURIComponent(query)}`);
-                if (mbRes.ok) {
-                  const mbResults = await mbRes.json();
-                  if (Array.isArray(mbResults) && mbResults.length > 0) {
-                    const cleanMb = mbResults.filter(r => !isBangladeshiContent(r) && r.cover).map(r => ({
-                      id: String(r.subjectId),
-                      subjectId: String(r.subjectId),
-                      title: r.title,
-                      name: r.title,
-                      media_type: r.type === 'series' ? 'tv' : 'movie',
-                      overview: 'Watch in 1080p Ultra HD with multi-audio dubbed tracks and zero ads.',
-                      poster_path: r.cover,
-                      backdrop_path: r.cover,
-                      vote_average: parseFloat(r.imdbRating || '8.2'),
-                      release_date: r.releaseDate || '',
-                      isDualAudio: /hindi|dual|dub/i.test(r.title || ''),
-                      hasHindiAudio: /hindi|dual|dub/i.test(r.title || '')
-                    }));
-                    for (const mbItem of cleanMb) {
-                      if (!validResults.some(v => v.id === mbItem.id || v.title.toLowerCase() === mbItem.title.toLowerCase())) {
-                        validResults.push(mbItem);
-                      }
-                    }
-                  }
-                }
-              } catch (mbSearchErr) {}
-
-              state.lastSearchResults = validResults;
-              displaySearchResults(validResults, usedSuggestion, suggestedCorrection);
-              return;
-            } catch (err) {
-              console.warn('Live search failed, searching local demo catalog:', err);
             }
+
+            // If 0 results, try typo suggestion if available
+            let usedSuggestion = null;
+            if (combinedResults.length === 0 && suggestedCorrection) {
+              const fixMbRes = await apiFetch(`/api/moviebox/search?q=${encodeURIComponent(suggestedCorrection)}&page=1`).then(r => r.ok ? r.json() : []).catch(() => []);
+              if (Array.isArray(fixMbRes) && fixMbRes.length > 0) {
+                const cleanFix = fixMbRes.filter(r => !isBangladeshiContent(r) && r.cover).map(r => ({
+                  id: String(r.subjectId),
+                  subjectId: String(r.subjectId),
+                  title: r.title,
+                  name: r.title,
+                  media_type: r.type === 'series' ? 'tv' : 'movie',
+                  overview: 'Watch in 1080p Ultra HD with multi-audio dubbed tracks and zero ads.',
+                  poster_path: r.cover,
+                  backdrop_path: r.cover,
+                  vote_average: parseFloat(r.imdbRating || '8.2'),
+                  release_date: r.releaseDate || '',
+                  isDualAudio: /hindi|dual|dub/i.test(r.title || ''),
+                  hasHindiAudio: /hindi|dual|dub/i.test(r.title || '')
+                }));
+                combinedResults.push(...cleanFix);
+                usedSuggestion = suggestedCorrection;
+              }
+            }
+
+            if (combinedResults.length > 0) {
+              state.lastSearchResults = combinedResults;
+              displaySearchResults(combinedResults, usedSuggestion, suggestedCorrection);
+              return;
+            }
+          } catch (err) {
+            console.warn('[executeSearch error]', err);
           }
+
+          // Fallback local search
+          populateGridView('search');
+        }
 
           // Fallback local search
           populateGridView('search');
@@ -4161,10 +4192,15 @@
               fetchDeepTmdbDetails(media.id, isTv);
             }
 
+            // Fetch deep details from PARXSTREAM (MovieBox) API if subjectId is present
+            if (media.subjectId) {
+              fetchMovieboxDeepDetails(media.subjectId, isTv);
+            }
+
+            // Fetch PARXSTREAM VIP (MovieBox) 1080p Ultra HD and Multi-Audio streams (Priority #1)
+            fetchMovieboxSourcesForModal(media, state.selectedSeason || 1, state.selectedEpisode || 1);
             // Fetch high-speed CinePro HLS direct streams in background
             fetchCineproSourcesForModal(media.id, isTv, state.selectedSeason || 1, state.selectedEpisode || 1);
-            // Fetch MovieBox VIP Core 1080p Ultra HD and Multi-Audio streams
-            fetchMovieboxSourcesForModal(media, state.selectedSeason || 1, state.selectedEpisode || 1);
           } catch (topModalError) {
             console.error('[openDetailsModal Top Level Catch]', topModalError);
             // Ensure modal and player always open regardless of any metadata parse issues
@@ -4264,6 +4300,58 @@
         }
 
         /**
+         * Fetches rich metadata and dubbing information from PARXSTREAM (MovieBox) API
+         */
+        async function fetchMovieboxDeepDetails(subjectId, isTv) {
+          if (!subjectId) return;
+          try {
+            const res = await apiFetch(`/api/moviebox/detail/${encodeURIComponent(subjectId)}`);
+            if (!res.ok) return;
+            const details = await res.json();
+            if (!details || !details.title) return;
+
+            // Overview / Storyline
+            const overviewEl = document.getElementById('modalOverview');
+            if (overviewEl && details.description && (!overviewEl.textContent || overviewEl.textContent.includes('not available'))) {
+              overviewEl.textContent = details.description;
+            }
+
+            // Metadata Info Row (Rating, Runtime, Dubs)
+            const infoRowEl = document.getElementById('newModalInfoRow');
+            if (infoRowEl) {
+              const ratingVal = details.imdbRating || '8.2';
+              const yr = details.releaseDate ? details.releaseDate.split('-')[0] : '2025';
+              const dubsCount = Array.isArray(details.dubs) ? details.dubs.length : 0;
+              const dubText = dubsCount > 0 ? ` • <span class="text-amber-400 font-semibold"><i class="fa-solid fa-volume-high text-[10px]"></i> ${dubsCount} Audio Tracks (Dual/Hindi)</span>` : '';
+
+              if (isTv) {
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-tv text-purple-400 text-xs"></i> TV Series</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${yr}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-amber-400 font-bold">⭐ ${ratingVal}</span>
+                  ${dubText}
+                `;
+              } else {
+                const rMinutes = details.duration ? Math.floor(details.duration / 60) : 110;
+                const runtimeText = `${Math.floor(rMinutes / 60)}h ${rMinutes % 60 ? (rMinutes % 60) + 'm' : ''}`;
+                infoRowEl.innerHTML = `
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-sky-400 text-xs"></i> ${runtimeText}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-gray-400 text-xs"></i> ${yr}</span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-sky-400 font-bold">⭐ ${ratingVal}</span>
+                  ${dubText}
+                `;
+              }
+            }
+          } catch (e) {
+            console.warn('[fetchMovieboxDeepDetails warning]', e);
+          }
+        }
+
+        /**
          * Query MovieBox VIP Core for 1080p Ultra HD and Multi-Audio / Hindi Dubbed streams
          */
         async function fetchMovieboxSourcesForModal(media, season = 1, episode = 1) {
@@ -4302,19 +4390,25 @@
               const badgeText = isHindi ? 'Hindi Dub' : '1080p Ultra';
               const icon = isHindi ? 'fa-solid fa-volume-high text-amber-400' : 'fa-solid fa-crown text-purple-400';
 
+              const cleanServerName = (stream.server || `PARXSTREAM VIP ${idx + 1}`).replace(/moviebox\s*(vip)?\s*(core)?/gi, 'PARXSTREAM VIP');
               return `
                 <button
                   type="button"
                   onclick="window.app.playMovieboxStream(${idx})"
                   class="server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-purple-500/30 transition flex items-center gap-1.5"
-                  title="${escapeHtml(stream.server || `MovieBox Core ${idx + 1}`)}"
+                  title="${escapeHtml(cleanServerName)}"
                 >
                   <i class="${icon} text-[10px]"></i>
-                  <span>${escapeHtml(stream.server || `MovieBox ${idx + 1}`)}</span>
+                  <span>${escapeHtml(cleanServerName)}</span>
                   <span class="${badgeClass} text-[9px] px-1.5 py-0.2 rounded font-bold border">${badgeText}</span>
                 </button>
               `;
             }).join('');
+
+            // Priority #1 Auto-play: Always start with PARXSTREAM VIP (MovieBox) stream!
+            if (sources.length > 0 && (state.selectedProvider === 'moviebox' || state.selectedProvider === 'tmdb')) {
+              playMovieboxStream(0);
+            }
           } catch (e) {
             console.warn('[PARXSTREAM] MovieBox streams fetch error:', e);
           }
@@ -4346,7 +4440,8 @@
             activePill.className = 'server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 text-white shadow-sm ring-1 ring-purple-400 border border-purple-400 transition flex items-center gap-1.5';
           }
 
-          showToast(`Playing via ${stream.server || 'MovieBox VIP Core'} (1080p Ultra HD)`, 'success');
+          const sName = (stream.server || 'PARXSTREAM VIP Core').replace(/moviebox\s*(vip)?\s*(core)?/gi, 'PARXSTREAM VIP');
+          showToast(`Playing via ${sName} (1080p Ultra HD)`, 'success');
           playStream(stream);
         }
 
@@ -5086,7 +5181,9 @@
                 'vidsrc_su': 'VidSrc SU',
                 'twoembed': '2Embed Multi-Server'
               };
-              loaderText.textContent = `Connecting to ${serverNames[state.currentServer] || state.currentServer}...`;
+              loaderText.textContent = (state.selectedProvider === 'moviebox')
+                ? 'Connecting to PARXSTREAM VIP Core (1080p Ultra HD)...'
+                : `Connecting to ${serverNames[state.currentServer] || state.currentServer}...`;
             }
           }
 
@@ -5774,11 +5871,32 @@
           const container = document.getElementById('providerListContainer');
           if (!container) return;
 
+          const isMovieboxSelected = state.selectedProvider === 'moviebox';
           const isTmdbSelected = state.selectedProvider === 'tmdb';
           const isCineproSelected = state.selectedProvider === 'cinepro';
-          const isMovieboxSelected = state.selectedProvider === 'moviebox';
 
           let html = `
+            <!-- 1. PARXSTREAM VIP (Default Core) -->
+            <button
+              type="button"
+              onclick="window.app.switchProvider('moviebox')"
+              class="w-full flex items-center justify-between p-2 rounded-xl text-left transition ${
+                isMovieboxSelected ? 'bg-purple-600/15 border border-purple-500/40 text-purple-300' : 'hover:bg-dark-800 text-gray-200'
+              }"
+            >
+              <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded-lg bg-purple-950/80 flex items-center justify-center p-0.5 border border-purple-500/30 shrink-0">
+                  <i class="fa-solid fa-crown text-xs text-purple-400"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-white">PARXSTREAM VIP (Default Core)</p>
+                  <p class="text-[10px] text-purple-400/80">1080p Ultra HD • Dual Audio • Anime & Cinema • Zero Ads</p>
+                </div>
+              </div>
+              ${isMovieboxSelected ? '<i class="fa-solid fa-check text-xs text-purple-400 mr-1"></i>' : ''}
+            </button>
+
+            <!-- 2. TMDB (Official Multi-Server) -->
             <button
               type="button"
               onclick="window.app.switchProvider('tmdb')"
@@ -5792,33 +5910,13 @@
                 </div>
                 <div>
                   <p class="text-xs font-semibold text-white">TMDB (Official Multi-Server)</p>
-                  <p class="text-[10px] text-gray-400">Live TMDB Catalog • 5 High-Speed Embeds</p>
+                  <p class="text-[10px] text-gray-400">Live TMDB Catalog • 6 High-Speed Embeds</p>
                 </div>
               </div>
               ${isTmdbSelected ? '<i class="fa-solid fa-check text-xs text-brand-500 mr-1"></i>' : ''}
             </button>
 
-            <!-- MovieBox VIP Option (123moviesfree.club Engine) -->
-            <button
-              type="button"
-              onclick="window.app.switchProvider('moviebox')"
-              class="w-full flex items-center justify-between p-2 rounded-xl text-left transition ${
-                isMovieboxSelected ? 'bg-purple-600/15 border border-purple-500/40 text-purple-300' : 'hover:bg-dark-800 text-gray-200'
-              }"
-            >
-              <div class="flex items-center gap-2.5">
-                <div class="w-6 h-6 rounded-lg bg-purple-950/80 flex items-center justify-center p-0.5 border border-purple-500/30 shrink-0">
-                  <i class="fa-solid fa-crown text-xs text-purple-400"></i>
-                </div>
-                <div>
-                  <p class="text-xs font-semibold text-white">MovieBox VIP (123Movies Core)</p>
-                  <p class="text-[10px] text-purple-400/80">1080p Ultra HD • Dual Audio • Anime & Cinema • Zero Ads</p>
-                </div>
-              </div>
-              ${isMovieboxSelected ? '<i class="fa-solid fa-check text-xs text-purple-400 mr-1"></i>' : ''}
-            </button>
-
-            <!-- CinePro Core Multi-Engine Option -->
+            <!-- 3. CinePro Core Multi-Engine Option -->
             <button
               type="button"
               onclick="window.app.switchProvider('cinepro')"
@@ -5925,15 +6023,15 @@
 
           if (providerValue === 'moviebox') {
             const iconSvg = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f451.svg';
-            if (nameEl) nameEl.textContent = 'MovieBox VIP';
+            if (nameEl) nameEl.textContent = 'PARXSTREAM (Default)';
             if (iconEl) iconEl.src = iconSvg;
             if (badgeEl) {
               badgeEl.textContent = '1080p VIP';
               badgeEl.className = 'hidden sm:inline bg-purple-500/20 text-purple-300 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-purple-500/30';
             }
-            if (mTopNameEl) mTopNameEl.textContent = 'MovieBox';
+            if (mTopNameEl) mTopNameEl.textContent = 'PARXSTREAM';
             if (mTopIconEl) mTopIconEl.src = iconSvg;
-            if (mNameEl) mNameEl.textContent = 'MovieBox VIP Core';
+            if (mNameEl) mNameEl.textContent = 'PARXSTREAM VIP (Default)';
             if (mIconEl) mIconEl.src = iconSvg;
             if (mBadgeEl) {
               mBadgeEl.textContent = '1080p VIP';
@@ -5962,11 +6060,22 @@
           }
 
           if (providerValue === 'tmdb') {
-            if (nameEl) nameEl.textContent = 'TMDB (Default)';
+            if (nameEl) nameEl.textContent = 'TMDB Core';
             if (iconEl) iconEl.src = 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png';
             if (badgeEl) {
               badgeEl.textContent = 'TMDB';
-              badgeEl.className = 'hidden sm:inline bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-emerald-500/30';
+              badgeEl.className = 'hidden sm:inline bg-brand-500/20 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30';
+            }
+            if (mTopNameEl) mTopNameEl.textContent = 'TMDB';
+            if (mTopIconEl) mTopIconEl.src = 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png';
+            if (mNameEl) mNameEl.textContent = 'TMDB (Official Multi-Server)';
+            if (mIconEl) mIconEl.src = 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png';
+            if (mBadgeEl) {
+              mBadgeEl.textContent = 'TMDB';
+              mBadgeEl.className = 'bg-brand-500/20 text-brand-400 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border border-brand-500/30';
+            }
+            return;
+          }
             }
             if (mTopNameEl) mTopNameEl.textContent = 'TMDB';
             if (mTopIconEl) mTopIconEl.src = 'https://cdn.jsdelivr.net/gh/Zenda-Cross/vega-providers@main/assets/autoEmbed.png';
@@ -6025,7 +6134,7 @@
             if (showNotification) {
               showToast(
                 providerValue === 'moviebox'
-                  ? 'Switched to MovieBox VIP (123Movies: 1080p Ultra HD & Dual Audio active)'
+                  ? 'Switched to PARXSTREAM VIP (1080p Ultra HD & Dual Audio active)'
                   : (providerValue === 'cinepro'
                     ? 'Switched to CinePro Core (17 HLS Engines active)'
                     : 'Switched to TMDB (Multi-Server) mode'),

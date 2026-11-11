@@ -317,9 +317,9 @@ apiRouter.get('/moviebox/streams', async (req, res) => {
 
 apiRouter.get('/moviebox/search', async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, page } = req.query;
     if (!q) return res.json([]);
-    const results = await searchMovieBox(q);
+    const results = await searchMovieBox(q, parseInt(page, 10) || 1, 24);
     res.json(results);
   } catch (err) {
     res.json([]);
