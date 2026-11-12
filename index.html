@@ -8657,6 +8657,20 @@
           populateResolutionAndAudioUI(hls);
         });
 
+        hls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
+          if (data && data.details && data.details.totalduration && data.details.totalduration > 0 && data.details.totalduration <= 90) {
+            console.warn('[PARXSTREAM] Detected short HLS notice/promo stream (' + data.details.totalduration + 's). Aborting and auto-switching to HD mirror...');
+            showToast('Switching to verified HD mirror...', 'info');
+            try { hls.destroy(); } catch (e) {}
+            state.hlsInstance = null;
+            if (state.modalMedia) {
+              switchServer('vidking');
+            } else {
+              tryNextWorkingStream();
+            }
+          }
+        });
+
         hls.on(Hls.Events.LEVEL_SWITCHED, () => {
           populateResolutionAndAudioUI(hls);
         });
@@ -8700,7 +8714,26 @@
         // Direct MP4 / MKV / CDN playback via proxy
         video.src = proxiedUrl;
         renderUniversalAudioUI();
+
+        video.onloadedmetadata = () => {
+          // Defense-in-depth: Automatically detect and abort short dummy notice clips or ads
+          if (video.duration && video.duration > 0 && video.duration <= 90) {
+            console.warn('[PARXSTREAM] Detected short promo/notice ad clip (' + video.duration + 's). Aborting and auto-switching to verified HD mirror...');
+            showToast('Switching to verified HD mirror...', 'info');
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            if (state.modalMedia) {
+              switchServer('vidking');
+            } else {
+              tryNextWorkingStream();
+            }
+            return;
+          }
+        };
+
         video.onloadeddata = () => {
+          if (video.duration && video.duration > 0 && video.duration <= 90) return;
           video.play().catch(() => { });
           if (loader) {
             loader.classList.add('opacity-0');

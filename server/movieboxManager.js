@@ -316,7 +316,21 @@ async function extractStreamsForSubject(subjectId, season = 0, episode = 0, dubL
 
     rawStreams.forEach((st, idx) => {
       const url = st.url;
-      if (!url || seenUrls.has(url) || url.includes('b164fbfb4347792950bdfbfb563d39d9')) return;
+      if (!url || seenUrls.has(url)) return;
+
+      // Filter out dummy anti-scraping traps, fake ads, and short warning notice clips
+      if (url.includes('/other/') ||
+          url.includes('80da52722ee7de7a4303290af6783424') ||
+          url.includes('b164fbfb4347792950bdfbfb563d39d9') ||
+          url.includes('notice') ||
+          url.includes('dummy')) {
+        return;
+      }
+
+      // Real movies and TV series are never under 90 seconds or under 15 MB
+      if (st.duration && Number(st.duration) > 0 && Number(st.duration) <= 90) return;
+      if (st.size && Number(st.size) > 0 && Number(st.size) < 15000000) return;
+
       seenUrls.add(url);
 
       const resStr = String(st.resolutions || '');
