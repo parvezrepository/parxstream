@@ -38,7 +38,8 @@ const productionPkg = {
     "cors": "^2.8.5",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "crypto-js": "^4.2.0"
   }
 };
 fs.writeFileSync(path.join(tempDir, 'package.json'), JSON.stringify(productionPkg, null, 2));

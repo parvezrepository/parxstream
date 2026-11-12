@@ -271,7 +271,7 @@ apiRouter.get('/cinepro/tv/:tmdbId/:season/:episode', async (req, res) => {
   }
 });
 
-// 9. MovieBox VIP Core Routes (1080p Ultra HD / Dual Audio / 123Movies Full Catalog)
+// 9. PARXSTREAM VIP Core Routes (1080p Ultra HD / Dual Audio Full Catalog)
 apiRouter.get('/moviebox/home', async (req, res) => {
   try {
     const data = await getMovieBoxHome(req.query.refresh === '1');

@@ -190,7 +190,7 @@ async function nativeApiRequest(method, pathOrUrl, bodyDict = null, retry = true
 /**
  * Search MovieBox titles with clean sanitization and comprehensive pagination
  */
-async function searchMovieBox(query, page = 1, perPage = 24) {
+async function searchMovieBox(query, page = 1, perPage = 20) {
   if (!query || typeof query !== 'string') return [];
   const cleanQ = query.trim().toLowerCase();
   const cacheKey = `${cleanQ}_p${page}`;
@@ -199,7 +199,7 @@ async function searchMovieBox(query, page = 1, perPage = 24) {
   }
 
   try {
-    const payload = { keyword: query.trim(), page: page || 1, perPage: perPage || 24 };
+    const payload = { keyword: query.trim(), page: page || 1, perPage: Math.min(perPage || 20, 20) };
     const res = await nativeApiRequest('POST', '/wefeed-mobile-bff/subject-api/search', payload);
     const data = res.data || {};
     const rawItems = data.items || data.list || [];

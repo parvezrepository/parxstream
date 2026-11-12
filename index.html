@@ -417,7 +417,7 @@
             <!-- Watch Now Primary Button -->
             <button
               id="heroWatchNowBtn"
-              onclick="window.app.playCurrentHero('vidlink')"
+              onclick="window.app.playCurrentHero()"
               class="glow-btn bg-brand-600 hover:bg-brand-700 text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2.5 shadow-lg shadow-brand-600/30 transition-all duration-200 transform hover:-translate-y-0.5 text-sm sm:text-base cursor-pointer"
             >
               <i class="fa-solid fa-play text-sm"></i>
@@ -1087,66 +1087,66 @@
                 <!-- PARXSTREAM VIP (MovieBox) Streams Container (Priority #1) -->
                 <div id="movieboxServerButtons" class="contents"></div>
 
-                <!-- Server 1: VidKing (Cinextma Player) -->
+                <!-- Mirror 1: VidKing (Cinextma Player) -->
                 <button
                   id="serverBtnVidKing"
                   onclick="window.app.switchServer('vidking')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="VidKing HD (Cinextma Player - 1080p Fast Embed & Multi-Audio)"
                 >
-                  <i class="fa-solid fa-play text-[10px] text-amber-300"></i> Server 1 (VidKing HD)
+                  <i class="fa-solid fa-play text-[10px] text-amber-300"></i> Mirror 1 (VidKing HD)
                   <span class="bg-amber-400/30 text-amber-300 text-[9px] px-1.5 py-0.2 rounded font-bold">Cinextma</span>
                 </button>
                 
-                <!-- Server 2: VidLink -->
+                <!-- Mirror 2: VidLink -->
                 <button
                   id="serverBtnVidLink"
                   onclick="window.app.switchServer('vidlink')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="VidLink HD (Fast 1080p Ultra Player)"
                 >
-                  <i class="fa-solid fa-bolt text-[10px] text-amber-300"></i> Server 2 (VidLink HD)
+                  <i class="fa-solid fa-bolt text-[10px] text-amber-300"></i> Mirror 2 (VidLink HD)
                   <span class="bg-emerald-500/30 text-emerald-300 text-[9px] px-1.5 py-0.2 rounded font-bold">Fast HD</span>
                 </button>
 
-                <!-- Server 3: AutoEmbed HD -->
+                <!-- Mirror 3: AutoEmbed HD -->
                 <button
                   id="serverBtnAutoEmbed"
                   onclick="window.app.switchServer('autoembed')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="AutoEmbed (Direct Embed & Multi-Audio)"
                 >
-                  <i class="fa-solid fa-film text-[10px] text-blue-400"></i> Server 3 (AutoEmbed)
+                  <i class="fa-solid fa-film text-[10px] text-blue-400"></i> Mirror 3 (AutoEmbed)
                 </button>
 
-                <!-- Server 4: VidSrc PM -->
+                <!-- Mirror 4: VidSrc PM -->
                 <button
                   id="serverBtnVidSrcPm"
                   onclick="window.app.switchServer('vidsrc_pm')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="VidSrc PM (Global Fast Stream)"
                 >
-                  <i class="fa-solid fa-play text-[10px] text-rose-400"></i> Server 4 (VidSrc PM)
+                  <i class="fa-solid fa-play text-[10px] text-rose-400"></i> Mirror 4 (VidSrc PM)
                 </button>
 
-                <!-- Server 5: VidSrc SU -->
+                <!-- Mirror 5: VidSrc SU -->
                 <button
                   id="serverBtnVidSrcSu"
                   onclick="window.app.switchServer('vidsrc_su')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="VidSrc SU (Mirror HD)"
                 >
-                  <i class="fa-solid fa-forward text-[10px] text-indigo-400"></i> Server 5 (VidSrc SU)
+                  <i class="fa-solid fa-forward text-[10px] text-indigo-400"></i> Mirror 5 (VidSrc SU)
                 </button>
 
-                <!-- Server 6: 2Embed -->
+                <!-- Mirror 6: 2Embed -->
                 <button
                   id="serverBtnTwoEmbed"
                   onclick="window.app.switchServer('twoembed')"
                   class="server-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5 transition flex items-center gap-1.5"
                   title="2Embed (Backup Stream)"
                 >
-                  <i class="fa-solid fa-clapperboard text-[10px] text-purple-400"></i> Server 6 (2Embed)
+                  <i class="fa-solid fa-clapperboard text-[10px] text-purple-400"></i> Mirror 6 (2Embed)
                 </button>
 
                 <!-- CinePro Core Direct HLS Streams Container -->
@@ -1374,22 +1374,25 @@
               <div id="providerStreamsList" class="flex items-center gap-1.5 flex-wrap"></div>
             </div>
 
-            <!-- Provider Resolution / Quality Selector Row -->
-            <div id="providerResolutionContainer" class="hidden flex items-center gap-2 flex-wrap pt-2 border-t border-white/5">
+          </div>
+
+          <!-- Universal Dual-Audio & Quality Toolbar (Direct on Player for All Providers) -->
+          <div id="universalMediaControlsToolbar" class="hidden flex-col gap-2.5 bg-dark-950 p-3 rounded-xl border border-white/10">
+            <!-- Resolution / Quality Selector Row -->
+            <div id="providerResolutionContainer" class="hidden flex items-center gap-2 flex-wrap">
               <span class="text-xs font-semibold text-sky-400 flex items-center gap-1.5 mr-1">
                 <i class="fa-solid fa-sliders text-xs"></i> Quality:
               </span>
               <div id="providerResolutionList" class="flex items-center gap-1.5 flex-wrap"></div>
             </div>
 
-            <!-- Provider Audio Track Selector Row -->
-            <div id="providerAudioContainer" class="hidden flex items-center gap-2 flex-wrap pt-2 border-t border-white/5">
+            <!-- Interactive Dual-Audio & Dubbed Track Selector Row -->
+            <div id="providerAudioContainer" class="hidden flex items-center gap-2 flex-wrap">
               <span class="text-xs font-semibold text-amber-400 flex items-center gap-1.5 mr-1">
                 <i class="fa-solid fa-volume-high text-xs"></i> Audio Track:
               </span>
               <div id="providerAudioList" class="flex items-center gap-1.5 flex-wrap"></div>
             </div>
-
           </div>
 
           <!-- Responsive 16:9 Video Player Container -->
@@ -3014,10 +3017,8 @@
           currentSeasonEpisodes: [],
           downloadOptions: [],
 
-          // Vega Providers Integration State (Defaults to PARXSTREAM VIP Core)
-          selectedProvider: (localStorage.getItem('cinestream_selected_provider') && localStorage.getItem('cinestream_selected_provider') !== 'tmdb')
-            ? localStorage.getItem('cinestream_selected_provider')
-            : 'moviebox',
+          // Vega Providers Integration State (Defaults to PARXSTREAM VIP Core from MovieBox)
+          selectedProvider: 'moviebox',
           availableProviders: [...FALLBACK_PROVIDERS],
           providerCatalog: [],
           providerCatalogIndex: 0,
@@ -3483,10 +3484,11 @@
         /**
          * Resumes a media immediately into the modal player
          */
-        function resumeMedia(id, season = 1, episode = 1, server = 'autoembed') {
+        function resumeMedia(id, season = 1, episode = 1, server) {
           const item = (state.continueWatching || []).find(c => String(c.id) === String(id));
           const mType = item?.media_type || (item?.season ? 'tv' : undefined);
-          openDetailsModal(id, server, season, episode, false, mType);
+          const activeServer = (server && server !== 'autoembed') ? server : (state.selectedProvider === 'moviebox' ? 'moviebox' : (state.selectedProvider === 'cinepro' ? 'cinepro' : 'vidking'));
+          openDetailsModal(id, activeServer, season, episode, false, mType);
           showToast('Resuming playback...', 'info');
         }
 
@@ -3657,7 +3659,7 @@
           return `
             <div
               class="group relative shrink-0 w-36 sm:w-44 md:w-48 aspect-poster rounded-xl overflow-hidden bg-dark-900 border border-white/10 hover:border-brand-500/50 hover:shadow-xl hover:shadow-brand-600/10 transition-all duration-300 transform hover:-translate-y-1.5 cursor-pointer"
-              onclick="window.app.openDetailsModal('${item.id}', 'vidking', 1, 1, false, '${mediaType}')"
+              onclick="window.app.openDetailsModal('${item.id}', undefined, 1, 1, false, '${mediaType}')"
             >
               <!-- Poster Image with Fallback -->
               <img
@@ -3693,7 +3695,7 @@
                 <!-- Hover Buttons -->
                 <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/15" onclick="event.stopPropagation()">
                   <button
-                    onclick="window.app.openDetailsModal('${item.id}', 'vidlink', 1, 1, false, '${mediaType}')"
+                    onclick="window.app.openDetailsModal('${item.id}', undefined, 1, 1, false, '${mediaType}')"
                     class="flex-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 transition shadow-md"
                     title="Play Movie / Series"
                   >
@@ -4352,8 +4354,12 @@
         /**
          * Details & Streaming Modal Management
          */
-        async function openDetailsModal(id, preferredServer = 'vidking', initialSeason = 1, initialEpisode = 1, autoPlay = false, explicitType) {
+        async function openDetailsModal(id, preferredServer, initialSeason = 1, initialEpisode = 1, autoPlay = false, explicitType) {
           try {
+            // Determine active streaming server: Defaults to PARXSTREAM VIP (MovieBox)
+            const activeServer = preferredServer || (state.selectedProvider === 'moviebox' ? 'moviebox' : (state.selectedProvider === 'cinepro' ? 'cinepro' : 'moviebox'));
+            state.currentServer = activeServer;
+
             // Reset auto-failover state on each fresh title open
             state.autoFailoverAttempt = 0;
             if (state.serverWatchdogTimer) {
@@ -4394,14 +4400,24 @@
             if (pRes) pRes.classList.add('hidden');
             if (pAudio) pAudio.classList.add('hidden');
 
-            // Pause and hide custom video element; show iframe player for TMDB
+            // Video / Iframe setup based on active server
             const videoEl = document.getElementById('streamVideoPlayer');
             const iframeEl = document.getElementById('streamIframe');
-            if (videoEl) {
-              try { videoEl.pause(); } catch (e) {}
-              videoEl.classList.add('hidden');
+            if (activeServer === 'moviebox') {
+              if (iframeEl) {
+                iframeEl.src = 'about:blank';
+                iframeEl.classList.add('hidden');
+              }
+              if (videoEl) {
+                videoEl.classList.remove('hidden');
+              }
+            } else {
+              if (videoEl) {
+                try { videoEl.pause(); } catch (e) {}
+                videoEl.classList.add('hidden');
+              }
+              if (iframeEl) iframeEl.classList.remove('hidden');
             }
-            if (iframeEl) iframeEl.classList.remove('hidden');
 
             // Find media item in all possible sources with priority to mediaRegistry
             let media = state.mediaRegistry?.get(String(id));
@@ -4467,7 +4483,7 @@
             }
 
             state.modalMedia = media;
-            state.currentServer = preferredServer;
+            state.currentServer = activeServer;
             state.selectedSeason = initialSeason || 1;
             state.selectedEpisode = initialEpisode || 1;
 
@@ -4656,7 +4672,23 @@
             }
 
             updateServerButtonsUI();
-            loadStreamPlayer();
+            if (activeServer === 'moviebox') {
+              const loader = document.getElementById('playerLoading');
+              if (loader) {
+                loader.classList.remove('opacity-0');
+                loader.classList.remove('pointer-events-none');
+                const loaderText = loader.querySelector('p');
+                if (loaderText) {
+                  loaderText.textContent = 'Connecting to Server 1 (PARXSTREAM VIP Core - 1080p Ultra HD)...';
+                }
+              }
+              // Immediately fetch & stream MovieBox VIP as Server 1
+              fetchMovieboxSourcesForModal(media, state.selectedSeason || 1, state.selectedEpisode || 1);
+            } else {
+              loadStreamPlayer();
+              // Fetch PARXSTREAM VIP (MovieBox) streams in background
+              fetchMovieboxSourcesForModal(media, state.selectedSeason || 1, state.selectedEpisode || 1);
+            }
 
             // Render initial fallback suggested items from live cache
             renderModalSuggested(media);
@@ -4671,8 +4703,6 @@
               fetchMovieboxDeepDetails(media.subjectId, isTv);
             }
 
-            // Fetch PARXSTREAM VIP (MovieBox) 1080p Ultra HD and Multi-Audio streams (Priority #1)
-            fetchMovieboxSourcesForModal(media, state.selectedSeason || 1, state.selectedEpisode || 1);
             // Fetch high-speed CinePro HLS direct streams in background
             fetchCineproSourcesForModal(media.id, isTv, state.selectedSeason || 1, state.selectedEpisode || 1);
           } catch (topModalError) {
@@ -4850,9 +4880,18 @@
             if (sid) url += `&subjectId=${encodeURIComponent(sid)}`;
             if (title) url += `&title=${encodeURIComponent(title)}&year=${encodeURIComponent(year)}`;
             const res = await apiFetch(url);
-            if (!res.ok) return;
+            if (!res.ok) {
+              if (state.currentServer === 'moviebox') switchServer('vidking');
+              return;
+            }
             const sources = await res.json();
-            if (!Array.isArray(sources) || sources.length === 0) return;
+            if (!Array.isArray(sources) || sources.length === 0) {
+              if (state.currentServer === 'moviebox') {
+                console.warn('[PARXSTREAM] MovieBox has no direct stream for this title, falling back to Mirror 1 (VidKing HD)...');
+                switchServer('vidking');
+              }
+              return;
+            }
 
             state.currentMovieboxSources = sources;
 
@@ -4864,12 +4903,14 @@
               const badgeText = isHindi ? 'Hindi Dub' : '1080p Ultra';
               const icon = isHindi ? 'fa-solid fa-volume-high text-amber-400' : 'fa-solid fa-crown text-purple-400';
 
-              const cleanServerName = (stream.server || `PARXSTREAM VIP ${idx + 1}`).replace(/moviebox\s*(vip)?\s*(core)?/gi, 'PARXSTREAM VIP');
+              const cleanServerName = isHindi
+                ? (sources.length > 1 ? `Server 2 (PARXSTREAM VIP - Hindi Dubbed)` : `Server 1 (PARXSTREAM VIP - Hindi Dubbed)`)
+                : (idx === 0 ? `Server 1 (PARXSTREAM VIP Core - 1080p Ultra HD)` : `Server ${idx + 1} (PARXSTREAM VIP HD)`);
               return `
                 <button
                   type="button"
                   onclick="window.app.playMovieboxStream(${idx})"
-                  class="server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-purple-500/30 transition flex items-center gap-1.5"
+                  class="server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold ${idx === 0 ? 'bg-purple-600 text-white border border-purple-400' : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-purple-500/30'} transition flex items-center gap-1.5 shadow-sm"
                   title="${escapeHtml(cleanServerName)}"
                 >
                   <i class="${icon} text-[10px]"></i>
@@ -4880,11 +4921,14 @@
             }).join('');
 
             // Priority #1 Auto-play: Always start with PARXSTREAM VIP (MovieBox) stream!
-            if (sources.length > 0 && (state.selectedProvider === 'moviebox' || state.selectedProvider === 'tmdb')) {
+            if (sources.length > 0 && (state.selectedProvider === 'moviebox' || state.currentServer === 'moviebox' || state.selectedProvider === 'tmdb')) {
               playMovieboxStream(0);
             }
           } catch (e) {
             console.warn('[PARXSTREAM] MovieBox streams fetch error:', e);
+            if (state.currentServer === 'moviebox') {
+              switchServer('vidking');
+            }
           }
         }
 
@@ -4896,6 +4940,7 @@
           const stream = sources[index];
           if (!stream || !stream.link) return;
 
+          state.currentServer = 'moviebox';
           const isTvMedia = state.modalMedia?.media_type === 'tv' || state.modalMedia?.type === 'tv' || state.modalMedia?.type === 'series';
           state.currentStreamList = [
             ...sources,
@@ -4911,6 +4956,19 @@
           });
           const activePill = document.querySelectorAll('.moviebox-pill')[index];
           if (activePill) {
+            activePill.className = 'server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 text-white shadow-sm ring-1 ring-purple-400 border border-purple-400 transition flex items-center gap-1.5';
+          }
+
+          const sName = stream.hasHindiAudio ? 'PARXSTREAM VIP (Hindi Dubbed)' : 'PARXSTREAM VIP Core (1080p Ultra HD)';
+          showToast(`Playing via ${sName}`, 'success');
+
+          // Unhide controls toolbar for audio/quality selectors
+          const toolbar = document.getElementById('universalMediaControlsToolbar');
+          if (toolbar) toolbar.classList.remove('hidden');
+
+          playStream(stream);
+          renderUniversalAudioUI();
+        }
             activePill.className = 'server-pill moviebox-pill px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 text-white shadow-sm ring-1 ring-purple-400 border border-purple-400 transition flex items-center gap-1.5';
           }
 
@@ -5581,21 +5639,31 @@
           state.selectedSeason = parseInt(newSeason, 10);
           state.selectedEpisode = 1;
           await populateEpisodesDropdown(state.selectedSeason);
-          loadStreamPlayer();
           showToast(`Switched to Season ${state.selectedSeason}`, 'info');
+          if (state.currentServer === 'moviebox' || state.selectedProvider === 'moviebox') {
+            if (state.modalMedia) {
+              fetchMovieboxSourcesForModal(state.modalMedia, state.selectedSeason, 1);
+            }
+          } else {
+            loadStreamPlayer();
+          }
           if (state.modalMedia) {
             fetchCineproSourcesForModal(state.modalMedia.id, true, state.selectedSeason, 1);
-            fetchMovieboxSourcesForModal(state.modalMedia, state.selectedSeason, 1);
           }
         }
 
         function onEpisodeChange(newEpisode) {
           state.selectedEpisode = parseInt(newEpisode, 10);
-          loadStreamPlayer();
           showToast(`Playing Episode ${state.selectedEpisode}`, 'info');
+          if (state.currentServer === 'moviebox' || state.selectedProvider === 'moviebox') {
+            if (state.modalMedia) {
+              fetchMovieboxSourcesForModal(state.modalMedia, state.selectedSeason, state.selectedEpisode);
+            }
+          } else {
+            loadStreamPlayer();
+          }
           if (state.modalMedia) {
             fetchCineproSourcesForModal(state.modalMedia.id, true, state.selectedSeason, state.selectedEpisode);
-            fetchMovieboxSourcesForModal(state.modalMedia, state.selectedSeason, state.selectedEpisode);
           }
         }
 
@@ -5788,12 +5856,12 @@
           const nextIdx = (currentIdx + 1) % servers.length;
           const nextServer = servers[nextIdx];
           const serverLabels = {
-            'vidking': 'Server 1 (VidKing HD)',
-            'autoembed': 'Server 2 (AutoEmbed Multi-Audio)',
-            'vidlink': 'Server 3 (VidLink HD)',
-            'vidsrc_pm': 'Server 4 (VidSrc PM)',
-            'vidsrc_su': 'Server 5 (VidSrc SU)',
-            'twoembed': 'Server 6 (2Embed)'
+            'vidking': 'Mirror 1 (VidKing HD)',
+            'vidlink': 'Mirror 2 (VidLink HD)',
+            'autoembed': 'Mirror 3 (AutoEmbed)',
+            'vidsrc_pm': 'Mirror 4 (VidSrc PM)',
+            'vidsrc_su': 'Mirror 5 (VidSrc SU)',
+            'twoembed': 'Mirror 6 (2Embed)'
           };
           showToast(`Server busy. Checking ${serverLabels[nextServer] || nextServer}...`, 'info');
           state.currentServer = nextServer;
@@ -5833,12 +5901,12 @@
           loadStreamPlayer();
 
           const serverNames = {
-            'vidking': 'Server 1 (VidKing HD - Cinextma)',
-            'vidlink': 'Server 2 (VidLink HD)',
-            'autoembed': 'Server 3 (AutoEmbed)',
-            'vidsrc_pm': 'Server 4 (VidSrc PM)',
-            'vidsrc_su': 'Server 5 (VidSrc SU)',
-            'twoembed': 'Server 6 (2Embed)',
+            'vidking': 'Mirror 1 (VidKing HD)',
+            'vidlink': 'Mirror 2 (VidLink HD)',
+            'autoembed': 'Mirror 3 (AutoEmbed)',
+            'vidsrc_pm': 'Mirror 4 (VidSrc PM)',
+            'vidsrc_su': 'Mirror 5 (VidSrc SU)',
+            'twoembed': 'Mirror 6 (2Embed)',
             'trailer': 'Official Trailer'
           };
           showToast(`Switched to ${serverNames[serverType] || serverType}`, 'info');
@@ -6223,7 +6291,7 @@
           renderHero();
         }
 
-        function playCurrentHero(server = 'autoembed') {
+        function playCurrentHero(server) {
           const movie = state.heroList[state.heroIndex % state.heroList.length];
           if (movie) {
             const mType = movie.media_type || (movie.first_air_date ? 'tv' : 'movie');
@@ -7988,15 +8056,17 @@
 
         /**
          * Universal Audio UI: Renders interactive audio selector pills (Hindi Dubbed, English, etc.)
-         * for HLS streams, direct Vega dual-audio streams, and embed mirrors.
+         * for HLS streams, direct MovieBox streams, and Vega dual-audio streams.
          */
         function renderUniversalAudioUI() {
+          const toolbar = document.getElementById('universalMediaControlsToolbar');
           const audioContainer = document.getElementById('providerAudioContainer');
           const audioList = document.getElementById('providerAudioList');
           if (!audioContainer || !audioList) return;
 
           // Case A: HLS instance has embedded audio tracks
           if (state.hlsInstance && Array.isArray(state.hlsInstance.audioTracks) && state.hlsInstance.audioTracks.length > 0) {
+            if (toolbar) toolbar.classList.remove('hidden');
             audioContainer.classList.remove('hidden');
             audioList.innerHTML = state.hlsInstance.audioTracks.map((track, idx) => {
               const label = formatAudioTrackLabel(track);
@@ -8026,21 +8096,38 @@
             return;
           }
 
-          // Case B: Title / Media / Stream List indicates multi-audio (Hindi + English)
+          // Case B: MovieBox or Vega Dual-Audio Streams (Hindi + English)
           const titleContext = (
             (state.activeProviderMedia?.title || '') + ' ' +
             (state.activeProviderMedia?.selectedDirectLinkTitle || '') + ' ' +
             (state.modalMedia?.title || '')
           ).toLowerCase();
-          const hasHindiStream = (state.currentStreamList || []).some(s => s.hasHindiAudio || (s.server || '').toLowerCase().includes('hindi') || (s.server || '').toLowerCase().includes('dual'));
+          const hasHindiStream = (state.currentMovieboxSources || []).some(s => s.hasHindiAudio || (s.server || '').toLowerCase().includes('hindi')) ||
+            (state.currentStreamList || []).some(s => s.hasHindiAudio || (s.server || '').toLowerCase().includes('hindi') || (s.server || '').toLowerCase().includes('dual'));
           const isDualAudio = titleContext.includes('hindi') || titleContext.includes('dual') || titleContext.includes('dubbed') || hasHindiStream;
 
           if (isDualAudio) {
+            if (toolbar) toolbar.classList.remove('hidden');
             audioContainer.classList.remove('hidden');
-            const isHindiActive = state.preferredAudioLanguage === 'hindi' || (!state.preferredAudioLanguage && isDualAudio);
-            const isEnglishActive = state.preferredAudioLanguage === 'english';
+            const isHindiActive = state.preferredAudioLanguage === 'hindi';
+            const isEnglishActive = state.preferredAudioLanguage === 'english' || (!state.preferredAudioLanguage);
 
             audioList.innerHTML = `
+              <button
+                type="button"
+                onclick="window.app.selectAudioLanguage('english')"
+                class="audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+                  isEnglishActive
+                    ? 'bg-blue-600 text-white shadow-md ring-1 ring-blue-400'
+                    : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
+                }"
+                title="Switch Audio to English / Original"
+              >
+                <i class="fa-solid fa-volume-high text-[10px] ${isEnglishActive ? 'text-blue-200' : 'text-gray-400'}"></i>
+                <span>English (Original)</span>
+                <span class="bg-blue-500/30 text-blue-200 text-[8px] px-1 rounded font-bold uppercase">EN</span>
+                ${isEnglishActive ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
+              </button>
               <button
                 type="button"
                 onclick="window.app.selectAudioLanguage('hindi')"
@@ -8056,21 +8143,6 @@
                 <span class="bg-orange-500/30 text-orange-200 text-[8px] px-1 rounded font-bold uppercase">Dubbed</span>
                 ${isHindiActive ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
               </button>
-              <button
-                type="button"
-                onclick="window.app.selectAudioLanguage('english')"
-                class="audio-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
-                  isEnglishActive
-                    ? 'bg-blue-600 text-white shadow-md ring-1 ring-blue-400'
-                    : 'bg-dark-800 text-gray-300 hover:text-white hover:bg-dark-700 border border-white/5'
-                }"
-                title="Switch Audio to English"
-              >
-                <i class="fa-solid fa-volume-high text-[10px] ${isEnglishActive ? 'text-blue-200' : 'text-gray-400'}"></i>
-                <span>English</span>
-                <span class="bg-blue-500/30 text-blue-200 text-[8px] px-1 rounded font-bold uppercase">EN</span>
-                ${isEnglishActive ? '<i class="fa-solid fa-check text-[9px] ml-0.5 text-white"></i>' : ''}
-              </button>
             `;
           } else {
             audioContainer.classList.add('hidden');
@@ -8085,7 +8157,33 @@
           const wantHindi = lower.includes('hin');
           state.preferredAudioLanguage = wantHindi ? 'hindi' : 'english';
 
-          // 1. If HLS stream is active with embedded audio tracks, switch track
+          // 1. If MovieBox sources are active, switch directly between primary and Hindi MovieBox streams
+          if (Array.isArray(state.currentMovieboxSources) && state.currentMovieboxSources.length > 0) {
+            let targetIdx = -1;
+            if (wantHindi) {
+              targetIdx = state.currentMovieboxSources.findIndex(s => s.hasHindiAudio || (s.server || '').toLowerCase().includes('hindi'));
+            } else {
+              targetIdx = state.currentMovieboxSources.findIndex(s => !s.hasHindiAudio && !(s.server || '').toLowerCase().includes('hindi'));
+              if (targetIdx === -1) targetIdx = 0;
+            }
+
+            if (targetIdx !== -1) {
+              playMovieboxStream(targetIdx);
+              showToast(`Switched to 🔊 ${wantHindi ? 'Hindi Dubbed' : 'English / Original'} Audio`, 'success');
+              renderUniversalAudioUI();
+              return;
+            } else if (wantHindi) {
+              // If MovieBox didn't load Hindi dub yet, re-query API with preferredAudio=hindi
+              showToast('Searching for Hindi dubbed audio stream...', 'info');
+              const media = state.modalMedia;
+              if (media) {
+                fetchMovieboxSourcesForModal(media, state.selectedSeason || 1, state.selectedEpisode || 1);
+              }
+              return;
+            }
+          }
+
+          // 2. If HLS stream is active with embedded audio tracks, switch track
           if (state.hlsInstance && Array.isArray(state.hlsInstance.audioTracks) && state.hlsInstance.audioTracks.length > 0) {
             const targetIdx = state.hlsInstance.audioTracks.findIndex(t => {
               const lbl = formatAudioTrackLabel(t).toLowerCase();
@@ -8098,7 +8196,7 @@
             }
           }
 
-          // 2. If browser HTMLMediaElement audioTracks API is supported
+          // 3. If browser HTMLMediaElement audioTracks API is supported
           const video = document.getElementById('streamVideoPlayer');
           if (video && video.audioTracks && video.audioTracks.length > 1) {
             for (let i = 0; i < video.audioTracks.length; i++) {
@@ -8109,7 +8207,7 @@
             }
           }
 
-          // 3. Switch stream in currentStreamList to match chosen language
+          // 4. Switch stream in currentStreamList to match chosen language
           if (Array.isArray(state.currentStreamList) && state.currentStreamList.length > 0) {
             let targetStreamIdx = -1;
             if (wantHindi) {
